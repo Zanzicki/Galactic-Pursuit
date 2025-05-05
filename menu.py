@@ -1,4 +1,6 @@
 import pygame
+from button import Button
+from UIManager import UIManager
 
 #Denne fil står for tre klasser: Menu, EndGameMenu og Options.
 #Hver klasse er en singleton og har hver deres run og constructor til at tegne hver deres skærm med relevant info
@@ -13,7 +15,7 @@ class Menu:
     def __init__(self):
         if not hasattr(self, 'initialized'):
             pygame.init()
-            self.screen = pygame.display.set_mode((1200, 800))
+            self.screen = pygame.display.set_mode((720, 500))
             self.running = True
             self.initialized = True
 
@@ -23,7 +25,9 @@ class Menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                UIManager().handle_event(event)
 
+            UIManager().draw(self.screen)
             pygame.display.flip()
 
         pygame.quit()
@@ -31,6 +35,7 @@ class Menu:
     def start_game(self):
         print("Starting game")
         self.running = False
+
 
 class EndGameMenu:
     _instance = None
@@ -55,7 +60,9 @@ class EndGameMenu:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.running = False
+                    UIManager().handle_endgame(event)
 
+                UIManager().draw_end_screen(self.screen)
                 pygame.display.flip()
 
 class Options:
@@ -81,5 +88,7 @@ class Options:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.running = False
+                    UIManager().handle_options(event)
 
+                UIManager().draw_options(self.screen)
                 pygame.display.flip()
