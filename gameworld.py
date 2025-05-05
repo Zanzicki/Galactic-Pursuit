@@ -1,6 +1,6 @@
 import pygame
 from menu import Menu
-from gameObject import GameObject
+from gameobject import GameObject
 
 class GameWorld:
     def __init__(self, width, height):
