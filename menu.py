@@ -1,4 +1,5 @@
 import pygame
+
 #Denne fil står for tre klasser: Menu, EndGameMenu og Options.
 #Hver klasse er en singleton og har hver deres run og constructor til at tegne hver deres skærm med relevant info
 class Menu:
@@ -12,7 +13,7 @@ class Menu:
     def __init__(self):
         if not hasattr(self, 'initialized'):
             pygame.init()
-            self.screen = pygame.display.set_mode((400, 300))
+            self.screen = pygame.display.set_mode((1200, 800))
             self.running = True
             self.initialized = True
 
