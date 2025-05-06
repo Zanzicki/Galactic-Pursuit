@@ -1,6 +1,7 @@
 import pygame
 from menu import Menu
 from gameobject import GameObject
+from FactoryPatterns.cardfactory import CardFactory
 
 class GameWorld:
     def __init__(self, width, height):
@@ -13,11 +14,13 @@ class GameWorld:
         pygame.display.set_caption("Game World")
         self._running = True
         self._clock = pygame.time.Clock()
+        CardFactory.create_component()
 
     def instantiate(self, gameObject):
         gameObject.awake(self)
         gameObject.start()
         self._gameObjects.append(gameObject)
+
     
     def Awake(self): 
         for gameObject in self._gameObjects[:]:
