@@ -2,11 +2,10 @@ import pygame
 from menu import Menu
 from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
+from FactoryPatterns.artifactFactory import ArtifactFactory
 
 class GameWorld:
     def __init__(self):
-        pygame.mixer.init()
-        pygame.init()
     
         self.width = 720
         self.height = 500
@@ -16,6 +15,7 @@ class GameWorld:
         self._clock = pygame.time.Clock()
         self._gameObjects = []
         self._cardFactory = CardFactory()
+        self._artifactFactory = ArtifactFactory()
         self._create_card = False
 
     def instantiate(self, gameObject):
@@ -53,6 +53,8 @@ class GameWorld:
             if self._create_card == False:
                 card = self._cardFactory.create_component()
                 self.instantiate(card)
+                artifact = self._artifactFactory.create_component()
+                self.instantiate(artifact)
                 self._create_card = True
 
             pygame.display.flip()
@@ -60,4 +62,7 @@ class GameWorld:
 
         pygame.quit()
 
+
+pygame.mixer.init()
+pygame.init()
 Menu().run()

@@ -1,14 +1,14 @@
 from Components.component import Component
 
 class Card(Component):
-    def __init__(self, name, value, type, rarity, description, image_path):
+    def __init__(self, name, value, type, rarity, description, prize):
         super().__init__()
         self._name = name
         self._value = value
         self._type = type
         self._rarity = rarity
         self._description = description
-        self._image_path = image_path
+        self._prize = prize
 
     @property
     def name(self):

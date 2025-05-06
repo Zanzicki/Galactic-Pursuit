@@ -1,7 +1,7 @@
 from Components.component import Component
 
 class Artifact(Component):
-    def __init__(self, name, rarity):
+    def __init__(self, name, rarity, prize):
         super().__init__()
         self._name = name
         self._rarity = rarity

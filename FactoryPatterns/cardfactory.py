@@ -6,11 +6,10 @@ import pygame
 from FactoryPatterns.factorypattern import Factory
 from FactoryPatterns.artifactFactory import ArtifactFactory
 
-
 class CardFactory(Factory):
     def create_component(self):
-        go = GameObject(pygame.math.Vector2(50, 50))
-        go.add_component(Card("Card", 0, "Card", "Common", "A simple card", "Assets\\card.png"))
+        go = GameObject(pygame.math.Vector2(250, 250))
+        go.add_component(Card("Card", 0, "Card", "Common", "A simple card", 67))
         r = random.randint(1, 13)
         if r < 10:
             r = "0" + str(r)           
