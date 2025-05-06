@@ -14,7 +14,8 @@ class UIManager:
             cls._instance._initialized = False
         return cls._instance
 
-#Constructoren opretter de forskellige lister af knapper, som skal vises alt efter hvilken skærm der vises
+    
+    #Constructoren opretter de forskellige lister af knapper, som skal vises alt efter hvilken skærm der vises
     def __init__(self):
         if not self._initialized:
             self._initialized = True
