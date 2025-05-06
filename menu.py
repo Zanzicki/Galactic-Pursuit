@@ -1,5 +1,5 @@
 import pygame
-from button import Button
+from Components.button import Button
 from UIManager import UIManager
 
 #Denne fil står for tre klasser: Menu, EndGameMenu og Options.

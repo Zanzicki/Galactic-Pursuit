@@ -1,5 +1,5 @@
 import pygame
-from button import Button
+from Components.button import Button
 
 #Klassen er en singleton
 #Denne klasse opretter knapper samt kalder buttons draw metode
