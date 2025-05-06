@@ -4,17 +4,19 @@ from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 
 class GameWorld:
-    def __init__(self, width, height):
+    def __init__(self):
         pygame.mixer.init()
         pygame.init()
     
-        self.width = width
-        self.height = height
+        self.width = 720
+        self.height = 500
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Game World")
         self._running = True
         self._clock = pygame.time.Clock()
-        CardFactory.create_component()
+        self._gameObjects = []
+        self._cardFactory = CardFactory()
+        self._create_card = False
 
     def instantiate(self, gameObject):
         gameObject.awake(self)
@@ -37,12 +39,9 @@ class GameWorld:
         while self._running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self._running =False
-            
-            self._background.update()
+                    self._running =False       
 
-            self._screen.fill("black")
-            self._background.draw()
+            self.screen.fill("black")
 
             delta_time = self._clock.tick(60) / 1000.0
 
@@ -50,7 +49,11 @@ class GameWorld:
                 gameObject.update(delta_time)
 
             self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
-            self._colliders = [col for col in self._colliders if not col.gameObject.is_destroyed]
+
+            if self._create_card == False:
+                card = self._cardFactory.create_component()
+                self.instantiate(card)
+                self._create_card = True
 
             pygame.display.flip()
             self._clock.tick(60)

@@ -1,4 +1,4 @@
-from FactoryPatterns.factory import Factory
+from FactoryPatterns.factorypattern import Factory
 from Components.artifact import Artifact
 
 class ArtifactFactory(Factory):
