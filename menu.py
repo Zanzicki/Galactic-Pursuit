@@ -1,67 +1,90 @@
 import pygame
-import sys
-import gameworld
+from Components.button import Button
+from UIManager import UIManager
 
-def main():
-    pygame.quit()  # Luk pygame helt, hvis det allerede kører
-    pygame.init()  # Genstart pygame
-    pygame.font.init()  # Sørg for at font-systemet også startes
+#Denne fil står for tre klasser: Menu, EndGameMenu og Options.
+#Hver klasse er en singleton og har hver deres run og constructor til at tegne hver deres skærm med relevant info
+class Menu:
+    _instance = None
 
-    # Skærmopløsning
-    res = (720, 720)
-    screen = pygame.display.set_mode(res)
-    pygame.display.set_caption("Whack-a-Mole")
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(Menu, cls).__new__(cls)
+        return cls._instance
 
-    # Font
-    font = pygame.font.SysFont("corbel", 35)  # Opret skrifttype EFTER pygame er initialiseret
+    def __init__(self):
+        if not hasattr(self, 'initialized'):
+            pygame.init()  # Ensure pygame is initialized here
+            self.screen = pygame.display.set_mode((720, 500))
+            self.running = True
+            self.initialized = True
 
-    menu(screen, font)
+    def run(self):
+        while self.running:
+            self.screen.fill((30, 30, 30))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                UIManager().handle_event(event)
 
-def menu(screen, font):
-    color = (255, 255, 255)  
-    color_light = (170, 170, 170)  
-    color_dark = (100, 100, 100)  
+            UIManager().draw(self.screen)
+            pygame.display.flip()
 
-    button_width = 200
-    button_height = 50
-    menu_running = True
+        pygame.quit()
 
-    def draw_button(x, y, text):
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
 
-        if x <= mouse[0] <= x + button_width and y <= mouse[1] <= y + button_height:
-            pygame.draw.rect(screen, color_light, [x, y, button_width, button_height])
-            if click[0]:  # Venstre klik
-                return True
-        else:
-            pygame.draw.rect(screen, color_dark, [x, y, button_width, button_height])
+class EndGameMenu:
+    _instance = None
 
-        text_render = font.render(text, True, color)
-        screen.blit(text_render, (x + 50, y + 10))
-        return False
+    def __new__(cls):
+        if not cls._instance:
+            cls._instance = super(EndGameMenu, cls).__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
 
-    while menu_running:
-        screen.fill((60, 25, 60))
+    def __init__(self):
+        if not self._initialized:
+            pygame.init()
+            self.screen = pygame.display.set_mode((400,300))
+            self.font = pygame.font.Font(None, 36)
+            self.running = True
+            self._initialized = True
 
-        start_clicked = draw_button(250, 300, "Start")
-        quit_clicked = draw_button(250, 400, "Quit")
+    def run(self):
+        while self.running:
+                self.screen.fill((50, 50, 50))
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
+                    UIManager().handle_endgame(event)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                UIManager().draw_end_screen(self.screen)
+                pygame.display.flip()
 
-        if start_clicked:
-            pygame.mixer.music.load("background_music.wav")
-            pygame.mixer.music.play(-1)
-            gameworld.game_loop(screen, font)
+class Options:
+    _instance = None
 
-        if quit_clicked:
-            pygame.quit()
-            sys.exit()
+    def __new__(cls):
+        if not cls._instance:
+            cls._instance = super(Options, cls).__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
 
-        pygame.display.update()
+    def __init__(self):
+        if not self._initialized:
+            pygame.init()
+            self.screen = pygame.display.set_mode((800,600))
+            self.font = pygame.font.Font(None, 36)
+            self.running = True
+            self._initialized = True
 
-if __name__ == "__main__":
-    main()
+    def run(self):
+        while self.running:
+                self.screen.fill((50, 50, 50))
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
+                    UIManager().handle_options(event)
+
+                UIManager().draw_options(self.screen)
+                pygame.display.flip()
