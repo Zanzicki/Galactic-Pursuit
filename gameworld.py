@@ -1,23 +1,30 @@
 import pygame
 from menu import Menu
-from gameObject import GameObject
+from gameobject import GameObject
+from FactoryPatterns.cardfactory import CardFactory
+from FactoryPatterns.artifactFactory import ArtifactFactory
+from Components.deck import Deck
 
 class GameWorld:
-    def __init__(self, width, height):
-        pygame.mixer.init()
-        pygame.init()
+    def __init__(self):
     
-        self.width = width
-        self.height = height
+        self.width = 720
+        self.height = 500
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Game World")
         self._running = True
         self._clock = pygame.time.Clock()
+        self._gameObjects = []
+        self._cardFactory = CardFactory()
+        self._artifactFactory = ArtifactFactory()
+        self._deck = Deck()
+        self._create_card = False
 
     def instantiate(self, gameObject):
         gameObject.awake(self)
         gameObject.start()
         self._gameObjects.append(gameObject)
+
     
     def Awake(self): 
         for gameObject in self._gameObjects[:]:
@@ -34,12 +41,9 @@ class GameWorld:
         while self._running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self._running =False
-            
-            self._background.update()
+                    self._running =False       
 
-            self._screen.fill("black")
-            self._background.draw()
+            self.screen.fill("black")
 
             delta_time = self._clock.tick(60) / 1000.0
 
@@ -47,11 +51,22 @@ class GameWorld:
                 gameObject.update(delta_time)
 
             self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
-            self._colliders = [col for col in self._colliders if not col.gameObject.is_destroyed]
+
+            if self._create_card == False:
+                i = 0
+                for card in self._deck.cards:
+                    card = self._cardFactory.create_component(card)
+                    self.instantiate(card)
+                    card.transform.position = pygame.math.Vector2(100 + i, 250)
+                    self._create_card = True
+                    i += 50  
 
             pygame.display.flip()
             self._clock.tick(60)
 
         pygame.quit()
 
+
+pygame.mixer.init()
+pygame.init()
 Menu().run()
