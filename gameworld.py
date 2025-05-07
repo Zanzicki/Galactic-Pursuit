@@ -1,6 +1,6 @@
 import pygame
 from menu import Menu
-from gameobject import GameObject
+from gameObject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.deck import Deck

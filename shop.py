@@ -3,10 +3,12 @@ from array import array
 import random
 import currency
 import upgrades
+from Components import artifact
+from Components import card
 
 item_cost = 25
 upgrade_cost = 20
 repair_cost = 8
 
-available_upgrades = array[3]
-available_upgrades.append(random.shuffle.upgrades.upgrade_dict)
+available_upgrades = []
+available_upgrades.append(upgrades.selected_dictionaries)
