@@ -19,5 +19,5 @@ class ArtifactFactory(Factory):
 
         go = GameObject(pygame.math.Vector2(50, 50))
         go.add_component(Artifact(name, rarity, prize))
-        go.add_component(SpriteRenderer("Icon34.png")) 
+        go.add_component(SpriteRenderer("Artifacts/Icon34.png")) 
         return go
