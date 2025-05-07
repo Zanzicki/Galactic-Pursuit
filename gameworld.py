@@ -1,9 +1,10 @@
 import pygame
 from menu import Menu
-from gameobject import GameObject
+from gameObject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.deck import Deck
+from UIManager import UIManager
 
 class GameWorld:
     def __init__(self):
@@ -19,6 +20,7 @@ class GameWorld:
         self._artifactFactory = ArtifactFactory()
         self._deck = Deck()
         self._create_card = False
+        self._ui_manager = UIManager() 
 
     def instantiate(self, gameObject):
         gameObject.awake(self)
@@ -42,7 +44,7 @@ class GameWorld:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self._running =False       
-
+                self._ui_manager.handle_back(event, self.go_back)
             self.screen.fill("black")
 
             delta_time = self._clock.tick(60) / 1000.0
@@ -60,12 +62,19 @@ class GameWorld:
                     card.transform.position = pygame.math.Vector2(100 + i, 250)
                     self._create_card = True
                     i += 50  
-
+                    
+            self._ui_manager.draw_back_button(self.screen) 
             pygame.display.flip()
             self._clock.tick(60)
 
-        pygame.quit()
-
+        
+    def go_back(self):
+        self._running = False
+        from menu import Menu
+        Menu().running = True 
+        menu = Menu()
+        menu.run()
+        
 
 pygame.mixer.init()
 pygame.init()

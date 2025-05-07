@@ -114,6 +114,17 @@ class UIManager:
                     font=self.font
                 )
             ]
+            self.back_button = Button(
+                x=10,
+                y=10,
+                width=100,
+                height=50,
+                text="BACK",
+                color=(0, 200, 255),
+                hover_color=(0, 200, 255),
+                text_color=(255, 255, 255),
+                font=self.font
+            )
     
     def draw(self, screen):
         #DRAW ALL BUTTONS
@@ -137,7 +148,8 @@ class UIManager:
             text_rect = options_text.get_rect(topleft=(10, y))
             screen.blit(options_text, text_rect)
             y += 30
-
+    def draw_back_button(self, screen):
+        self.back_button.draw(screen)
 #Alle handle_event metoder står for at køre relevante funktioner alt efter hvilke knapper der trykkes på
     def handle_event(self, event):
         for button in self.buttons:
@@ -198,3 +210,7 @@ class UIManager:
                 if button.text == "QUIT":
                     pygame.quit()
                     break
+    
+    def handle_back(self, event, callback):
+        if self.back_button.is_clicked(event):
+           callback() 

@@ -30,7 +30,7 @@ class Menu:
             UIManager().draw(self.screen)
             pygame.display.flip()
 
-        pygame.quit()
+        
 
 
 class EndGameMenu:
