@@ -8,18 +8,21 @@ from UIManager import UIManager
 
 class GameWorld:
     def __init__(self):
+        pygame.init()
         self.width = 720
         self.height = 500
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Game World")
         self._running = True
+        self._in_menu = True  # Start in the menu
         self._clock = pygame.time.Clock()
         self._gameObjects = []
         self._cardFactory = CardFactory()
         self._artifactFactory = ArtifactFactory()
         self._deck = Deck()
         self._create_card = False
-        self.ui_manager = UIManager()  # Initialize UIManager
+        self.ui_manager = UIManager()
+        self.menu = Menu(self)  # Pass GameWorld to the Menu
 
     def instantiate(self, gameObject):
         gameObject.awake(self)
@@ -36,12 +39,23 @@ class GameWorld:
 
     def update(self):
         while self._running:
+            if self._in_menu:
+                # Run the menu
+                self.menu.run()
+            else:
+                # Run the game
+                self.run_game()
+
+        pygame.quit()
+
+    def run_game(self):
+        while not self._in_menu and self._running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self._running = False
 
                 # Handle button events
-                self.ui_manager.handle_card(event)
+                self.ui_manager.handle_event(event)
 
             self.screen.fill("black")
 
@@ -61,14 +75,11 @@ class GameWorld:
                     self._create_card = True
                     i += 50  
 
-            # Draw the buttons
             self.ui_manager.draw_card_screen(self.screen)
-
             pygame.display.flip()
             self._clock.tick(60)
 
-
-pygame.mixer.init()
-pygame.init()
-Menu().run()
-pygame.quit()
+    def start_game(self):
+        """Transition from the menu to the game."""
+        print("Starting Game")
+        self._in_menu = False  # Exit the menu and start the game
