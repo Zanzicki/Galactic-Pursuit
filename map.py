@@ -11,7 +11,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Galactic Map")
 
 # setting up ship image and position 
-ship_image = pygame.image.load("spaceship_01.png")
+ship_image = pygame.image.load("Assets/spaceship_01.png") # load the image of the ship
 ship_image = pygame.transform.scale(ship_image, (100, 100)) # scale the image to fit the circles
 ship_pos = [screen_width // 2, screen_height // 2] # center the ship in the middle of the screen
 ship_speed = 0.1 # speed of the ship
