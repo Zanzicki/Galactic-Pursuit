@@ -114,6 +114,30 @@ class UIManager:
                     font=self.font
                 )
             ]
+            self.card_buttons = [
+                Button(
+                    x=150,
+                    y=50,
+                    width=100,
+                    height=50,
+                    text="Draw",
+                    color=(0, 200, 255),
+                    hover_color=(0, 200, 255),
+                    text_color=(255, 255, 255),
+                    font=self.font
+                ),
+                Button(
+                    x=150,
+                    y=250,
+                    width=100,
+                    height=50,
+                    text="End Turn",
+                    color=(0, 200, 255),
+                    hover_color=(0, 200, 255),
+                    text_color=(255, 255, 255),
+                    font=self.font
+                )
+            ]
     
     def draw(self, screen):
         #DRAW ALL BUTTONS
@@ -197,4 +221,20 @@ class UIManager:
                     break
                 if button.text == "QUIT":
                     pygame.quit()
+                    break
+    
+    def draw_card_screen(self, screen):
+        for button in self.card_buttons:
+            button.draw(screen)
+
+    def handle_card(self, event):
+        for button in self.card_buttons:
+            if button.is_clicked(event):
+                if button.text == "Draw":
+                    print("Drawing a card")
+                    # Implement the logic to draw a card here
+                    break
+                elif button.text == "End Turn":
+                    print("Ending turn")
+                    # Implement the logic to end the turn here
                     break
