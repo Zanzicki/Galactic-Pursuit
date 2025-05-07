@@ -1,20 +1,7 @@
 import pygame
 from Components.button import Button
 
-#Klassen er en singleton
-#Denne klasse opretter knapper samt kalder buttons draw metode
-#Den tegner også alle skærme samt håndterer tryk på de forskellige knapper
-#Med dette tænkes der på de forskellige klassers run metode, fx menu, options og endgame
 class UIManager:
-    _instance = None
-
-    def __new__(cls):
-        if not cls._instance:
-            cls._instance = super(UIManager, cls).__new__(cls)
-            cls._instance._initialized = False
-        return cls._instance
-
-#Constructoren opretter de forskellige lister af knapper, som skal vises alt efter hvilken skærm der vises
     def __init__(self):
         if not self._initialized:
             self._initialized = True

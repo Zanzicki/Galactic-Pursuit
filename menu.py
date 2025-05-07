@@ -1,9 +1,6 @@
 import pygame
-from Components.button import Button
 from UIManager import UIManager
 
-#Denne fil står for tre klasser: Menu, EndGameMenu og Options.
-#Hver klasse er en singleton og har hver deres run og constructor til at tegne hver deres skærm med relevant info
 class Menu:
     _instance = None
 
