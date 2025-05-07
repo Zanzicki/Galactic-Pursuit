@@ -1,5 +1,5 @@
 import pygame
-from button import Button
+from Components.button import Button
 from UIManager import UIManager
 
 #Denne fil står for tre klasser: Menu, EndGameMenu og Options.
@@ -14,7 +14,7 @@ class Menu:
 
     def __init__(self):
         if not hasattr(self, 'initialized'):
-            pygame.init()
+            pygame.init()  # Ensure pygame is initialized here
             self.screen = pygame.display.set_mode((720, 500))
             self.running = True
             self.initialized = True
@@ -31,10 +31,6 @@ class Menu:
             pygame.display.flip()
 
         pygame.quit()
-
-    def start_game(self):
-        print("Starting game")
-        self.running = False
 
 
 class EndGameMenu:

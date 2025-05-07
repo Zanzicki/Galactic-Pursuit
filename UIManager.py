@@ -1,5 +1,5 @@
 import pygame
-from button import Button
+from Components.button import Button
 
 #Klassen er en singleton
 #Denne klasse opretter knapper samt kalder buttons draw metode
@@ -144,23 +144,23 @@ class UIManager:
             if button.is_clicked(event):
                 if button.text == "PLAY":
                     print("Starting Game")
+                    from menu import Menu
+                    Menu().running = False  # Exit the Menu loop
                     from gameworld import GameWorld 
                     game = GameWorld()
                     game.Awake()
                     game.Start()
                     game.update()
-                    break
+                    return  # Exit the method immediately after handling the event
                 
                 elif button.text == "OPTIONS":
                     from menu import Options
                     Options().run()
-                    break
-                #Break for at undgå dobbelt metode
+                    return  # Exit the method immediately after handling the event
 
                 elif button.text == "QUIT":
                     pygame.quit()
-                    break
-                #Break for at undgå dobbelt metode
+                    return  # Exit the method immediately after handling the event
 
     def handle_endgame(self, event):
         for button in self.end_buttons:
