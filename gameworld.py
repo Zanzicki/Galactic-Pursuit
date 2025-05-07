@@ -80,6 +80,5 @@ class GameWorld:
             self._clock.tick(60)
 
     def start_game(self):
-        """Transition from the menu to the game."""
         print("Starting Game")
         self._in_menu = False  # Exit the menu and start the game
