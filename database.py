@@ -109,6 +109,10 @@ class Database:
         self.cursor.execute('SELECT * FROM cards')
         return self.cursor.fetchall()
     
+    def fetch_basic_cards(self):
+        self.cursor.execute('SELECT * FROM cards where rarity = "Basic"')
+        return self.cursor.fetchall()
+    
     def fetch_players(self):
         self.cursor.execute('SELECT * FROM players')
         return self.cursor.fetchall()

@@ -3,6 +3,7 @@ from menu import Menu
 from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
+from Components.deck import Deck
 
 class GameWorld:
     def __init__(self):
@@ -16,6 +17,7 @@ class GameWorld:
         self._gameObjects = []
         self._cardFactory = CardFactory()
         self._artifactFactory = ArtifactFactory()
+        self._deck = Deck()
         self._create_card = False
 
     def instantiate(self, gameObject):
@@ -51,11 +53,13 @@ class GameWorld:
             self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
 
             if self._create_card == False:
-                card = self._cardFactory.create_component()
-                self.instantiate(card)
-                artifact = self._artifactFactory.create_component()
-                self.instantiate(artifact)
-                self._create_card = True
+                i = 0
+                for card in self._deck.cards:
+                    card = self._cardFactory.create_component(card)
+                    self.instantiate(card)
+                    card.transform.position = pygame.math.Vector2(100 + i, 250)
+                    self._create_card = True
+                    i += 50  
 
             pygame.display.flip()
             self._clock.tick(60)
