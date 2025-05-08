@@ -1,6 +1,7 @@
 import pygame, sys, random
 # Made by: Erik 
 pygame.init()
+import shop
 
 screen_width = 800
 screen_height = 600
@@ -104,7 +105,7 @@ while running:
                         elif circle_color == (0, 255, 0):
                             print(f"{planet_name} (Green): Artifact menu!") # indsæt logik til at åbne artefakt menu her
                         elif circle_color == (0, 0, 255):
-                            print(f"{planet_name} (Blue): Shop åbnes!") # indsæt logik til at åbne shop her
+                            shop().run() # indsæt logik til at åbne shop her
                         elif circle_color == (255, 0, 255):
                             print(f"{planet_name} (Magenta): Mystery event!") # indsæt logik til at åbne mystisk event her
 
