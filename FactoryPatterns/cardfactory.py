@@ -14,7 +14,7 @@ class CardFactory(Factory):
         r = random.randint(1, 13)
         if r < 10:
             r = "0" + str(r)           
-        file_path = f"Clubs_card_{r}.png"
+        file_path = f"Cards/Clubs_card_{r}.png"
         go.add_component(SpriteRenderer(file_path))
         go.add_component(CardHoverHandler())
         return go
@@ -25,7 +25,7 @@ class CardFactory(Factory):
         r = random.randint(1, 13)
         if r < 10:
             r = "0" + str(r)           
-        file_path = f"Clubs_card_{r}.png"
+        file_path = f"Cards/Clubs_card_{r}.png"
         go.add_component(SpriteRenderer(file_path))
         go.add_component(CardHoverHandler())
         return go
