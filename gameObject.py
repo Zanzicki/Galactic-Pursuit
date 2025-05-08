@@ -18,6 +18,10 @@ class GameObject:
     def is_destroyed(self):
         return self._is_destroyed
     
+    @is_destroyed.setter
+    def is_destroyed(self, value):
+        self._is_destroyed = value
+    
     def destroy(self):
         self._is_destroyed = True
         # self._components.clear()

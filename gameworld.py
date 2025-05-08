@@ -77,5 +77,6 @@ class GameWorld:
         
 
 pygame.mixer.init()
-pygame.init()
+pygame.init() 
 Menu().run()
+

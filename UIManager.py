@@ -214,3 +214,5 @@ class UIManager:
     def handle_back(self, event, callback):
         if self.back_button.is_clicked(event):
            callback() 
+
+    

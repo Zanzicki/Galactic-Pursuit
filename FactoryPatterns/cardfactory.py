@@ -5,6 +5,7 @@ from gameObject import GameObject
 import pygame
 from FactoryPatterns.factorypattern import Factory
 from FactoryPatterns.artifactFactory import ArtifactFactory
+from Components.cardHoverHandler import CardHoverHandler
 
 class CardFactory(Factory):
     def create_component(self):
@@ -15,6 +16,7 @@ class CardFactory(Factory):
             r = "0" + str(r)           
         file_path = f"Clubs_card_{r}.png"
         go.add_component(SpriteRenderer(file_path))
+        go.add_component(CardHoverHandler())
         return go
     
     def create_component(self, card):
@@ -25,4 +27,7 @@ class CardFactory(Factory):
             r = "0" + str(r)           
         file_path = f"Clubs_card_{r}.png"
         go.add_component(SpriteRenderer(file_path))
+        go.add_component(CardHoverHandler())
         return go
+
+     
