@@ -1,14 +1,13 @@
 from Components.component import Component
-import random
 
 class Enemy(Component):
-    def __init__(self, name, health, attack, actions):
+    def __init__(self, name, health, attack, strategy):
         super().__init__()
         self._name = name
         self._health = health
         self._attack = attack
-        self._actions = actions
         self._is_alive = True
+        self._strategy = strategy
 
     @property
     def name(self):
@@ -22,11 +21,16 @@ class Enemy(Component):
     def attack(self):
         return self._attack
     
-    def enemy_action(self):
-        random_action = random.choice(self._actions)
-        if random_action == "attack":
-            print(f"{self._name} attacks!")
-        elif random_action == "defend":
-            print(f"{self._name} defends!")
-        elif random_action == "skill":
-            print(f"{self._name} uses a skill!")
+    @property
+    def is_alive(self):
+        return self._is_alive
+
+    @is_alive.setter
+    def is_alive(self, health):
+        if health <= 0:
+            self._is_alive = False
+        else:
+            self._is_alive = True
+    
+    def enemy_action(self, strategy):
+        strategy.choose_action()
