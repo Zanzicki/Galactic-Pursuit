@@ -20,7 +20,8 @@ class GameWorld:
         self._artifactFactory = ArtifactFactory()
         self._deck = Deck()
         self._create_card = False
-        self._ui_manager = UIManager() 
+        self._ui_manager = UIManager()
+        self._active_card = []  
 
     def instantiate(self, gameObject):
         gameObject.awake(self)
@@ -61,7 +62,9 @@ class GameWorld:
                     self.instantiate(card)
                     card.transform.position = pygame.math.Vector2(100 + i, 250)
                     self._create_card = True
-                    i += 50  
+                    i += 50
+                    self._active_card.append(card)
+                     
                     
             self._ui_manager.draw_back_button(self.screen) 
             pygame.display.flip()
