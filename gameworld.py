@@ -22,10 +22,14 @@ class GameWorld:
         self._artifactFactory = ArtifactFactory()
         self._deck = Deck()
         self._create_card = False
+<<<<<<< HEAD
         self._ui_manager = UIManager()
         self._active_card = []  
         self.ui_manager = UIManager()
         self.menu = Menu(self)  # Pass GameWorld to the Menu
+=======
+        self._ui_manager = UIManager() 
+>>>>>>> parent of 9bdbbb8 (Hover funktion and cart info works)
 
     def instantiate(self, gameObject):
         gameObject.awake(self)
@@ -77,8 +81,13 @@ class GameWorld:
                     card.transform.position = pygame.math.Vector2(100 + i, 250)
                     self._create_card = True
                     i += 50  
+<<<<<<< HEAD
 
             self.ui_manager.draw_card_screen(self.screen)
+=======
+                    
+            self._ui_manager.draw_back_button(self.screen) 
+>>>>>>> parent of 9bdbbb8 (Hover funktion and cart info works)
             pygame.display.flip()
             self._clock.tick(60)
 
