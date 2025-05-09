@@ -6,6 +6,7 @@ from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.deck import Deck
 from UIManager import UIManager
 from FactoryPatterns.enemyfactory import EnemyFactory
+from map import Map  # Import the map functionality
 
 class GameWorld:
     def __init__(self):
@@ -15,7 +16,7 @@ class GameWorld:
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Game World")
         self._running = True
-        self._in_menu = True  # Start in the menu
+        self._state = "menu"  # Start in the menu state
         self._clock = pygame.time.Clock()
         self._gameObjects = []
         self._cardFactory = CardFactory()
@@ -25,6 +26,7 @@ class GameWorld:
         self.ui_manager = UIManager()
         self.menu = Menu(self)  # Pass GameWorld to the Menu
         self._enemyFactory = EnemyFactory()
+        self.map = Map(self)  # Pass GameWorld to the Map
 
     def instantiate(self, gameObject):
         gameObject.awake(self)
@@ -41,17 +43,17 @@ class GameWorld:
 
     def update(self):
         while self._running:
-            if self._in_menu:
-                # Run the menu
-                self.menu.run()
-            else:
-                # Run the game
-                self.run_game()
+            if self._state == "menu":
+                self.menu.run()  # Run the menu
+            elif self._state == "map":
+                self.map.run()  # Run the map
+            elif self._state == "game":
+                self.run_game()  # Run the game
 
         pygame.quit()
 
     def run_game(self):
-        while not self._in_menu and self._running:
+        while self._state == "game" and self._running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self._running = False
@@ -79,7 +81,6 @@ class GameWorld:
                 new_enemy = self._enemyFactory.create_component("Arangel")
                 self.instantiate(new_enemy)
                 new_enemy.get_component("Enemy").enemy_action()
-                
 
             self.ui_manager.draw_card_screen(self.screen)
             pygame.display.flip()
@@ -87,4 +88,4 @@ class GameWorld:
 
     def start_game(self):
         print("Starting Game")
-        self._in_menu = False  # Exit the menu and start the game
+        self._state = "map"  # Transition to the map state

@@ -1,146 +1,157 @@
-import pygame, sys, random
-# Made by: Erik 
-pygame.init()
+import pygame
+import random
+import sys
 
-screen_width = 800
-screen_height = 600
+#Made by Erik
+# This code is a simple game map with planets and a spaceship.
+# The player can move the spaceship around the map and interact with planets.
+class GameWorld:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.screen = pygame.display.set_mode((width, height))
+        pygame.display.set_caption("Galactic Map")
+        self._running = True
+        self._state = "map"
 
-text = pygame.font.Font(None, 36)
+class Map:
+    def __init__(self, game_world):
+        self.game_world = game_world
+        self.screen = game_world.screen
+        self.ship_image = pygame.image.load("Assets/spaceship_01.png")  # Load the ship image
+        self.ship_image = pygame.transform.scale(self.ship_image, (100, 100))  # Scale the ship image
+        self.ship_pos = [self.game_world.width // 2, self.game_world.height // 2]  # Center the ship
+        self.ship_speed = 0.5  # Speed of the ship
+        self.planets = self.generate_planets()
+        self.font = pygame.font.Font(None, 36)  # Font for planet names
 
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Galactic Map")
+    def generate_planets(self):
+        """Generate planets with random positions, colors, and names."""
+        colors = [
+            (255, 0, 0),   # Red (Fight)
+            (0, 255, 0),   # Green (Artifact)
+            (0, 0, 255),   # Blue (Shop)
+            (255, 0, 255), # Magenta (Mystery)
+        ]
+        weights = [0.6, 0.1, 0.2, 0.1]  # Probabilities for each color
+        planet_names = [
+            "Mercury", "Venus", "Earth", "Mars", "Jupiter",
+            "Saturn", "Uranus", "Neptune", "Pluto", "Eris"
+        ]
+        used_names = []
+        planets = []
 
-# setting up ship image and position 
-ship_image = pygame.image.load("Assets/spaceship_01.png") # load the image of the ship
-ship_image = pygame.transform.scale(ship_image, (100, 100)) # scale the image to fit the circles
-ship_pos = [screen_width // 2, screen_height // 2] # center the ship in the middle of the screen
-ship_speed = 0.1 # speed of the ship
+        for _ in range(10):  # Generate 10 planets
+            color = random.choices(colors, weights=weights)[0]
+            radius = random.randint(35, 50)
+            buffer = 10
+            pos = (
+                random.randint(radius + buffer, self.game_world.width - radius - buffer),
+                random.randint(radius + buffer, self.game_world.height - radius - buffer)
+            )
 
-colors =[
-    (255, 0, 0),   # Red
-    (0, 255, 0),   # Green
-    (0, 0, 255),   # Blue
-    (255, 0, 255), # Magenta    
-]
-# list of chances for each color to be chosen
-# the sum of the weights should be 1.0, so they are normalized to 1.0
-weights = [0.6, 0.1, 0.2,0.1]
+            # Ensure no overlap with existing planets
+            if not self.does_overlap(pos, radius, planets):
+                available_names = [name for name in planet_names if name not in used_names]
+                if available_names:
+                    name = random.choice(available_names)
+                    used_names.append(name)
+                    planet_names.remove(name)
+                    planets.append({"color": color, "radius": radius, "pos": pos, "name": name})
 
-planet_names = [
-    "Mercury",
-    "Venus",
-    "Earth",
-    "Mars",
-    "Jupiter",
-    "Saturn",
-    "Uranus",
-    "Neptune",
-    "Pluto",
-    "Eris"]
+        return planets
 
-used_names = []
+    def does_overlap(self, new_pos, new_radius, existing_planets):
+        """Check if a new planet overlaps with existing planets."""
+        for planet in existing_planets:
+            distance = ((new_pos[0] - planet["pos"][0]) ** 2 + (new_pos[1] - planet["pos"][1]) ** 2) ** 0.5
+            if distance < new_radius + planet["radius"] + 5:
+                return True
+        return False
 
-def does_overLap(new_pos, new_radius, existing_circles):
-    for _, circle_radius, circle_pos, _ in existing_circles: #_ is used to ignore the color and name of the circle
-        distance = ((new_pos[0] - circle_pos[0]) ** 2 + (new_pos[1] - circle_pos[1]) ** 2) ** 0.5
-        if distance < new_radius + circle_radius +5 :
-            return True
-    return False
+    def run(self):
+        """Main loop for the map."""
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.game_world._running = False
+                    running = False
 
-# circles = planets on the map 
-cicles = []
-attempts = 0
-while len(cicles) < 10 and attempts < 1000:
-    circle_color = random.choices(colors, weights=weights)[0]
-    circle_radius = random.randint(35, 50)
-    buffer = 10
-    circle_pos = (
-        random.randint(circle_radius + buffer, screen_width - circle_radius - buffer),
-        random.randint(circle_radius + buffer, screen_height - circle_radius - buffer)
-        
-    )
-     
-    if not does_overLap(circle_pos, circle_radius, cicles): 
-        
-        available_names = [name for name in planet_names if name not in used_names]
-        if available_names:
-            planet_name = random.choice(available_names)
-            used_names.append(planet_name)
-            planet_names.remove(planet_name) 
-            cicles.append((circle_color, circle_radius, circle_pos, planet_name))  # nu tilføjes cirklen korrekt
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    for planet in self.planets:
+                        dx = self.ship_pos[0] - planet["pos"][0]
+                        dy = self.ship_pos[1] - planet["pos"][1]
+                        distance = (dx ** 2 + dy ** 2) ** 0.5
+                        if distance <= planet["radius"] + 20:
+                            if planet["color"] == (255, 0, 0):  # Red (Fight)
+                                print(f"{planet['name']} (Red): Starting fight!")
+                                self.game_world._state = "game"  # Transition to game state
+                                return
+                            elif planet["color"] == (0, 255, 0):  # Green (Artifact)
+                                print(f"{planet['name']} (Green): Opening artifact menu!")
+                                # Add logic for artifact menu
+                            elif planet["color"] == (0, 0, 255):  # Blue (Shop)
+                                print(f"{planet['name']} (Blue): Opening shop!")
+                                # Add logic for shop
+                            elif planet["color"] == (255, 0, 255):  # Magenta (Mystery)
+                                print(f"{planet['name']} (Magenta): Mystery event!")
+                                # Add logic for mystery event
 
-    attempts += 1
+            # Handle ship movement
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+                self.ship_pos[0] -= self.ship_speed
+            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+                self.ship_pos[0] += self.ship_speed
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
+                self.ship_pos[1] -= self.ship_speed
+            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+                self.ship_pos[1] += self.ship_speed
 
+            # Draw the map
+            self.screen.fill((0, 0, 0))
+            pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)  # Sun in the center
 
-def is_mouse_over_circle(circle_pos, circle_radius):
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-    distance = ((mouse_x - circle_pos[0]) ** 2 + (mouse_y - circle_pos[1]) ** 2) ** 0.5
-    return distance <= circle_radius
+            for planet in self.planets:
+                pygame.draw.circle(self.screen, planet["color"], planet["pos"], planet["radius"])
 
-running = True
-while running:
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-        ship_pos[0] -= ship_speed
-    if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-        ship_pos[0] += ship_speed
-    if keys[pygame.K_UP] or keys[pygame.K_w]:
-        ship_pos[1] -= ship_speed
-    if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-        ship_pos[1] += ship_speed
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-       
-        
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                for circle_color, circle_radius, circle_pos, planet_name in cicles:
-                    dx = ship_pos[0] - circle_pos[0]
-                    dy = ship_pos[1] - circle_pos[1]
-                    distance = (dx ** 2 + dy ** 2) ** 0.5
-                    if distance <= circle_radius + 20:
-                        if circle_color == (255, 0, 0):
-                            print(f"{planet_name} (Red): Start kamp!") # indsæt logik til at starte kamp her
-                        elif circle_color == (0, 255, 0):
-                            print(f"{planet_name} (Green): Artifact menu!") # indsæt logik til at åbne artefakt menu her
-                        elif circle_color == (0, 0, 255):
-                            print(f"{planet_name} (Blue): Shop åbnes!") # indsæt logik til at åbne shop her
-                        elif circle_color == (255, 0, 255):
-                            print(f"{planet_name} (Magenta): Mystery event!") # indsæt logik til at åbne mystisk event her
+                # Check distance between ship and planet
+                dx = self.ship_pos[0] - planet["pos"][0]
+                dy = self.ship_pos[1] - planet["pos"][1]
+                ship_distance = (dx ** 2 + dy ** 2) ** 0.5
 
-    screen.fill((0, 0, 0))
+                # Check distance between mouse and planet
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                mouse_distance = ((mouse_x - planet["pos"][0]) ** 2 + (mouse_y - planet["pos"][1]) ** 2) ** 0.5
 
-    # Draw the map here
-    pygame.draw.circle(screen, (255, 223, 0), (400, 300), 100)  # sun in the midelle of the screen 
+                # Highlight planet if ship or mouse is close
+                if ship_distance <= planet["radius"] + 20 or mouse_distance <= planet["radius"]:
+                    pygame.draw.circle(self.screen, (255, 255, 255), planet["pos"], planet["radius"] + 5, 2)
+                    text_surface = self.font.render(planet["name"], True, (255, 255, 255))
+                    text_x = max(0, min(planet["pos"][0] - planet["radius"], self.game_world.width - text_surface.get_width()))
+                    text_y = max(0, planet["pos"][1] - planet["radius"] - 30)
+                    self.screen.blit(text_surface, (text_x, text_y))
 
-    for circle_color, circle_radius, circle_pos, planet_name in cicles:
-        pygame.draw.circle(screen, circle_color, circle_pos, circle_radius)
+            # Draw the ship
+            self.screen.blit(
+                self.ship_image,
+                (self.ship_pos[0] - self.ship_image.get_width() // 2, self.ship_pos[1] - self.ship_image.get_height() // 2)
+            )
 
-        # check the distance between the ship and the planet      
-        dx = ship_pos[0] - circle_pos[0]
-        dy = ship_pos[1] - circle_pos[1]
-        ship_distance = (dx ** 2 + dy ** 2) ** 0.5
-        # check the distance between the mouse and the planet
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        mouse_dist = ((mouse_x - circle_pos[0]) ** 2 + (mouse_y - circle_pos[1]) ** 2) ** 0.5
+            pygame.display.flip()
 
-    # if the ship is close to the planet or the mouse is over the planet, draw a white circle around it
-    # and show the planet name
-        if ship_distance <= circle_radius + 20 or mouse_dist <= circle_radius:
-    # white circle around the planet
-            pygame.draw.circle(screen, (255, 255, 255), circle_pos, circle_radius + 5, 2)
-    # show planet name
-            text_surface = text.render(planet_name, True, (255, 255, 255))
-            text_x = max(0, min(circle_pos[0] - circle_radius, screen_width - text_surface.get_width()))
-            text_y = max(0, circle_pos[1] - circle_radius - 30)
-            screen.blit(text_surface, (text_x, text_y))
+def main():
+    pygame.init()
+    game_world = GameWorld(800, 600)
+    map_screen = Map(game_world)
 
+    while game_world._running:
+        if game_world._state == "map":
+            map_screen.run()
 
+    pygame.quit()
+    sys.exit()
 
-    # draw the ship
-    screen.blit(ship_image, (ship_pos[0] - ship_image.get_width() // 2, ship_pos[1] - ship_image.get_height() // 2))
-
-    pygame.display.flip()
-
-pygame.quit()
-sys.exit()
+if __name__ == "__main__":
+    main()
