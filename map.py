@@ -1,7 +1,9 @@
 import pygame, sys, random
 # Made by: Erik 
-pygame.init()
+
 import shop
+
+pygame.init()
 
 screen_width = 800
 screen_height = 600
