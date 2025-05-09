@@ -10,7 +10,6 @@ from Components import card
 screen_width = 1080
 screen_height = 720
 
-# Initialize Pygame and Pygame GUI
 pygame.init()
 screen = pygame.display.set_mode((screen_width,screen_height))
 pygame.display.set_caption("Interstellar Trade Sector")
