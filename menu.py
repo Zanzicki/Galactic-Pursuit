@@ -29,6 +29,9 @@ class Menu:
         print("Quitting Game")
         self.running = False
         self.game_world._running = False  # Stop the entire game
+    
+    def draw_card(self):
+        print("Drawing Card")
 
     def run(self):
         while self.running:
@@ -98,31 +101,19 @@ class Options:
 
             self.ui_manager.draw(self.screen)
             pygame.display.flip()
-
-class CardMenu:
-    _instance = None
-
-    def __new__(cls):
-        if not cls._instance:
-            cls._instance = super(CardMenu, cls).__new__(cls)
-            cls._instance._initialized = False
-        return cls._instance
-
-    def __init__(self):
-        if not self._initialized:
+    
+    class Combat():
+        def __init__(self):
             pygame.init()
-            self.screen = pygame.display.set_mode((800,600))
-            self.font = pygame.font.Font(None, 36)
+            self.screen = pygame.display.set_mode((720, 500))
+            pygame.display.set_caption("Combat")
             self.running = True
-            self._initialized = True
+            self.ui_manager = UIManager()
 
-    def run(self):
-        while self.running:
-                self.screen.fill((50, 50, 50))
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.running = False
-                    UIManager().handle_card(event)
+            # Define buttons for the combat menu
+            self.ui_manager.set_buttons([
+                {"text": "Draw", "x": 260, "y": 350, "width": 200, "height": 50, "action": self.draw_card},
+            ])
 
-                UIManager().draw_card(self.screen)
-                pygame.display.flip()
+        def draw_card(self):
+            print("Drawing Card")
