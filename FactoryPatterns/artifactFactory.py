@@ -2,7 +2,7 @@ import pygame
 from Components.component import SpriteRenderer
 from FactoryPatterns.factorypattern import Factory
 from Components.artifact import Artifact
-from gameobject import GameObject
+from gameObject import GameObject
 from database import Database
 
 class ArtifactFactory(Factory):
