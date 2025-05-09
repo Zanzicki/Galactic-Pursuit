@@ -5,6 +5,7 @@ from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.deck import Deck
 from UIManager import UIManager
+from FactoryPatterns.enemyfactory import EnemyFactory
 
 class GameWorld:
     def __init__(self):
@@ -23,6 +24,7 @@ class GameWorld:
         self._create_card = False
         self.ui_manager = UIManager()
         self.menu = Menu(self)  # Pass GameWorld to the Menu
+        self._enemyFactory = EnemyFactory()
 
     def instantiate(self, gameObject):
         gameObject.awake(self)
@@ -73,7 +75,11 @@ class GameWorld:
                     self.instantiate(card)
                     card.transform.position = pygame.math.Vector2(100 + i, 250)
                     self._create_card = True
-                    i += 50  
+                    i += 50
+                new_enemy = self._enemyFactory.create_component("Arangel")
+                self.instantiate(new_enemy)
+                new_enemy.get_component("Enemy").enemy_action()
+                
 
             self.ui_manager.draw_card_screen(self.screen)
             pygame.display.flip()

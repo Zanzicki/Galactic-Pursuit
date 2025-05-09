@@ -24,13 +24,29 @@ class Enemy(Component):
     @property
     def is_alive(self):
         return self._is_alive
-
-    @is_alive.setter
-    def is_alive(self, health):
-        if health <= 0:
-            self._is_alive = False
-        else:
-            self._is_alive = True
     
-    def enemy_action(self, strategy):
-        strategy.choose_action()
+    @property
+    def take_damage(self):
+        raise AttributeError("This property is write-only.")
+
+    @take_damage.setter
+    def take_damage(self, damage):
+        if self._is_alive:
+            self._health -= damage
+            if self._health <= 0:
+                self._is_alive = False
+                print(f"{self._name} has been defeated!")
+        else:
+            print(f"{self._name} is already defeated.")
+
+    def awake(self, game_world):
+        pass
+    
+    def start(self):
+        pass
+
+    def update(self, delta_time):
+        pass
+    
+    def enemy_action(self):
+        self._strategy.choose_action()
