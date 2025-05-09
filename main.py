@@ -1,5 +1,7 @@
+import pygame
 from gameworld import GameWorld
 
 if __name__ == "__main__":
-    game = GameWorld()
-    game.update()
+    pygame.init()
+    game_world = GameWorld(800, 600)
+    game_world.run()

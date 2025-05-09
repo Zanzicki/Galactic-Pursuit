@@ -1,22 +1,23 @@
 import pygame
 from menu import Menu
-from gameObject import GameObject
+from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.deck import Deck
 from UIManager import UIManager
 from FactoryPatterns.enemyfactory import EnemyFactory
-from map import Map  # Import the map functionality
+from map import Map
+from shop import Shop  
 
 class GameWorld:
-    def __init__(self):
+    def __init__(self, width, height):
         pygame.init()
-        self.width = 720
-        self.height = 500
-        self.screen = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("Game World")
+        self.width = width
+        self.height = height
+        self.screen = pygame.display.set_mode((width, height))
+        pygame.display.set_caption("Galactic Map")
         self._running = True
-        self._state = "menu"  # Start in the menu state
+        self._state = "map"  # Start in the map state
         self._clock = pygame.time.Clock()
         self._gameObjects = []
         self._cardFactory = CardFactory()
@@ -27,6 +28,7 @@ class GameWorld:
         self.menu = Menu(self)  # Pass GameWorld to the Menu
         self._enemyFactory = EnemyFactory()
         self.map = Map(self)  # Pass GameWorld to the Map
+        self.shop = Shop(self)  # Pass GameWorld to the Shop
 
     def instantiate(self, gameObject):
         gameObject.awake(self)
@@ -41,14 +43,12 @@ class GameWorld:
         for gameObject in self._gameObjects[:]:
             gameObject.start()
 
-    def update(self):
+    def run(self):
         while self._running:
-            if self._state == "menu":
-                self.menu.run()  # Run the menu
-            elif self._state == "map":
-                self.map.run()  # Run the map
-            elif self._state == "game":
-                self.run_game()  # Run the game
+            if self._state == "map":
+                self.map.run()
+            elif self._state == "shop":
+                self.shop.run()
 
         pygame.quit()
 

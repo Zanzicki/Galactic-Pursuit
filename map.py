@@ -23,7 +23,7 @@ class Map:
         self.ship_pos = [self.game_world.width // 2, self.game_world.height // 2]  # Center the ship
         self.ship_speed = 0.5  # Speed of the ship
         self.planets = self.generate_planets()
-        self.font = pygame.font.Font(None, 36)  # Font for planet names
+        self.font = pygame.font.Font(None, 36)
 
     def generate_planets(self):
         """Generate planets with random positions, colors, and names."""
@@ -70,7 +70,6 @@ class Map:
         return False
 
     def run(self):
-        """Main loop for the map."""
         running = True
         while running:
             for event in pygame.event.get():
@@ -84,19 +83,10 @@ class Map:
                         dy = self.ship_pos[1] - planet["pos"][1]
                         distance = (dx ** 2 + dy ** 2) ** 0.5
                         if distance <= planet["radius"] + 20:
-                            if planet["color"] == (255, 0, 0):  # Red (Fight)
-                                print(f"{planet['name']} (Red): Starting fight!")
-                                self.game_world._state = "game"  # Transition to game state
+                            if planet["color"] == (0, 0, 255):  # Blue (Shop)
+                                print(f"{planet['name']} (Blue): Entering shop!")
+                                self.game_world._state = "shop"  # Transition to shop state
                                 return
-                            elif planet["color"] == (0, 255, 0):  # Green (Artifact)
-                                print(f"{planet['name']} (Green): Opening artifact menu!")
-                                # Add logic for artifact menu
-                            elif planet["color"] == (0, 0, 255):  # Blue (Shop)
-                                print(f"{planet['name']} (Blue): Opening shop!")
-                                # Add logic for shop
-                            elif planet["color"] == (255, 0, 255):  # Magenta (Mystery)
-                                print(f"{planet['name']} (Magenta): Mystery event!")
-                                # Add logic for mystery event
 
             # Handle ship movement
             keys = pygame.key.get_pressed()
@@ -116,22 +106,14 @@ class Map:
             for planet in self.planets:
                 pygame.draw.circle(self.screen, planet["color"], planet["pos"], planet["radius"])
 
-                # Check distance between ship and planet
+                # Highlight planet if ship or mouse is close
                 dx = self.ship_pos[0] - planet["pos"][0]
                 dy = self.ship_pos[1] - planet["pos"][1]
                 ship_distance = (dx ** 2 + dy ** 2) ** 0.5
-
-                # Check distance between mouse and planet
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                mouse_distance = ((mouse_x - planet["pos"][0]) ** 2 + (mouse_y - planet["pos"][1]) ** 2) ** 0.5
-
-                # Highlight planet if ship or mouse is close
-                if ship_distance <= planet["radius"] + 20 or mouse_distance <= planet["radius"]:
+                if ship_distance <= planet["radius"] + 20:
                     pygame.draw.circle(self.screen, (255, 255, 255), planet["pos"], planet["radius"] + 5, 2)
                     text_surface = self.font.render(planet["name"], True, (255, 255, 255))
-                    text_x = max(0, min(planet["pos"][0] - planet["radius"], self.game_world.width - text_surface.get_width()))
-                    text_y = max(0, planet["pos"][1] - planet["radius"] - 30)
-                    self.screen.blit(text_surface, (text_x, text_y))
+                    self.screen.blit(text_surface, (planet["pos"][0] - 20, planet["pos"][1] - 40))
 
             # Draw the ship
             self.screen.blit(

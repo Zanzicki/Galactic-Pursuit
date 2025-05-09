@@ -105,3 +105,65 @@ while running:
     pygame.display.update()
 
 pygame.quit()
+
+class Shop:
+    def __init__(self, game_world):
+        self.game_world = game_world
+        self.screen = game_world.screen
+        self.font = pygame.font.Font(None, 36)
+        self.items = self.generate_shop_items()
+        self.selected_item_index = 0  # Track the currently selected item
+        self.player_gold = 100  # Example player gold
+
+    def generate_shop_items(self):
+        return [
+            {"name": "Health Potion", "price": 10},
+            {"name": "Strength Potion", "price": 15},
+            {"name": "Dexterity Potion", "price": 20},
+            {"name": "Repair Kit", "price": 25},
+        ]
+
+    def run(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.game_world._running = False
+                    running = False
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        print("Returning to map!")
+                        self.game_world._state = "map"  # Transition back to map state
+                        return
+                    elif event.key == pygame.K_UP:
+                        self.selected_item_index = (self.selected_item_index - 1) % len(self.items)
+                    elif event.key == pygame.K_DOWN:
+                        self.selected_item_index = (self.selected_item_index + 1) % len(self.items)
+                    elif event.key == pygame.K_RETURN:
+                        self.purchase_item()
+
+            # Draw the shop screen
+            self.screen.fill((50, 50, 50))
+            self.draw_shop()
+            pygame.display.flip()
+
+    def draw_shop(self):
+        title_surface = self.font.render("Welcome to the Shop!", True, (255, 255, 255))
+        self.screen.blit(title_surface, (self.game_world.width // 2 - title_surface.get_width() // 2, 50))
+
+        gold_surface = self.font.render(f"Gold: {self.player_gold}", True, (255, 255, 0))
+        self.screen.blit(gold_surface, (50, 50))
+
+        for i, item in enumerate(self.items):
+            color = (255, 255, 255) if i == self.selected_item_index else (200, 200, 200)
+            item_surface = self.font.render(f"{item['name']} - {item['price']} Gold", True, color)
+            self.screen.blit(item_surface, (50, 150 + i * 40))
+
+    def purchase_item(self):
+        selected_item = self.items[self.selected_item_index]
+        if self.player_gold >= selected_item["price"]:
+            self.player_gold -= selected_item["price"]
+            print(f"Purchased {selected_item['name']} for {selected_item['price']} gold!")
+        else:
+            print(f"Not enough gold to purchase {selected_item['name']}!")
