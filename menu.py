@@ -1,37 +1,50 @@
 import pygame
-from Components.button import Button
 from UIManager import UIManager
 
-#Denne fil står for tre klasser: Menu, EndGameMenu og Options.
-#Hver klasse er en singleton og har hver deres run og constructor til at tegne hver deres skærm med relevant info
 class Menu:
-    _instance = None
+    def __init__(self, game_world):
+        self.game_world = game_world  # Reference to the GameWorld
+        self.screen = game_world.screen
+        self.running = True
+        self.ui_manager = UIManager()
 
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super(Menu, cls).__new__(cls)
-        return cls._instance
+        # Define buttons for the menu
+        self.ui_manager.set_buttons([
+            {"text": "PLAY", "x": 260, "y": 150, "width": 200, "height": 50, "action": self.start_game},
+            {"text": "OPTIONS", "x": 260, "y": 250, "width": 200, "height": 50, "action": self.open_options},
+            {"text": "QUIT", "x": 260, "y": 350, "width": 200, "height": 50, "action": self.quit_game},
+        ])
 
-    def __init__(self):
-        if not hasattr(self, 'initialized'):
-            pygame.init()  # Ensure pygame is initialized here
-            self.screen = pygame.display.set_mode((720, 500))
-            self.running = True
-            self.initialized = True
+    def start_game(self):
+        print("Starting Game")
+        self.running = False  # Stop the menu loop
+        self.game_world.start_game()  # Notify GameWorld to start the game
+
+    def open_options(self):
+        print("Opening Options")
+        options_menu = Options()
+        options_menu.run()
+
+    def quit_game(self):
+        print("Quitting Game")
+        self.running = False
+        self.game_world._running = False  # Stop the entire game
+    
+    def draw_card(self):
+        print("Drawing Card")
 
     def run(self):
         while self.running:
-            self.screen.fill((30, 30, 30))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.running = False
-                UIManager().handle_event(event)
+                    self.quit_game()
+                    return
 
-            UIManager().draw(self.screen)
+                self.ui_manager.handle_event(event)
+
+            self.screen.fill((30, 30, 30))
+            self.ui_manager.draw(self.screen)
             pygame.display.flip()
-
-        pygame.quit()
-
 
 class EndGameMenu:
     _instance = None
@@ -62,29 +75,45 @@ class EndGameMenu:
                 pygame.display.flip()
 
 class Options:
-    _instance = None
-
-    def __new__(cls):
-        if not cls._instance:
-            cls._instance = super(Options, cls).__new__(cls)
-            cls._instance._initialized = False
-        return cls._instance
-
     def __init__(self):
-        if not self._initialized:
-            pygame.init()
-            self.screen = pygame.display.set_mode((800,600))
-            self.font = pygame.font.Font(None, 36)
-            self.running = True
-            self._initialized = True
+        pygame.init()
+        self.screen = pygame.display.set_mode((720, 500))
+        pygame.display.set_caption("Options")
+        self.running = True
+        self.ui_manager = UIManager()
+
+        # Define buttons for the options menu
+        self.ui_manager.set_buttons([
+            {"text": "BACK", "x": 260, "y": 350, "width": 200, "height": 50, "action": self.quit_options},
+        ])
+
+    def quit_options(self):
+        print("Returning to Main Menu")
+        self.running = False
 
     def run(self):
         while self.running:
-                self.screen.fill((50, 50, 50))
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.running = False
-                    UIManager().handle_options(event)
+            self.screen.fill((50, 50, 50))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit_options()
+                self.ui_manager.handle_event(event)
 
-                UIManager().draw_options(self.screen)
-                pygame.display.flip()
+            self.ui_manager.draw(self.screen)
+            pygame.display.flip()
+    
+    class Combat():
+        def __init__(self):
+            pygame.init()
+            self.screen = pygame.display.set_mode((720, 500))
+            pygame.display.set_caption("Combat")
+            self.running = True
+            self.ui_manager = UIManager()
+
+            # Define buttons for the combat menu
+            self.ui_manager.set_buttons([
+                {"text": "Draw", "x": 260, "y": 350, "width": 200, "height": 50, "action": self.draw_card},
+            ])
+
+        def draw_card(self):
+            print("Drawing Card")
