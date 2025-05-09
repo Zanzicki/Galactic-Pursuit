@@ -17,21 +17,19 @@ class Menu:
 
     def start_game(self):
         print("Starting Game")
-        self.running = False  # Stop the menu loop
-        self.game_world.start_game()  # Notify GameWorld to start the game
+        self.running = False
+        self.game_world.start_game()  # Transition to the map state
 
     def open_options(self):
         print("Opening Options")
+        self.running = False
         options_menu = Options()
         options_menu.run()
 
     def quit_game(self):
         print("Quitting Game")
         self.running = False
-        self.game_world._running = False  # Stop the entire game
-    
-    def draw_card(self):
-        print("Drawing Card")
+        self.game_world._running = False
 
     def run(self):
         while self.running:

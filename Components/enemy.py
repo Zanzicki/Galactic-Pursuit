@@ -1,14 +1,13 @@
 from Components.component import Component
-import random
 
 class Enemy(Component):
-    def __init__(self, name, health, attack, actions):
+    def __init__(self, name, health, attack, strategy):
         super().__init__()
         self._name = name
         self._health = health
         self._attack = attack
-        self._actions = actions
         self._is_alive = True
+        self._strategy = strategy
 
     @property
     def name(self):
@@ -22,11 +21,32 @@ class Enemy(Component):
     def attack(self):
         return self._attack
     
+    @property
+    def is_alive(self):
+        return self._is_alive
+    
+    @property
+    def take_damage(self):
+        raise AttributeError("This property is write-only.")
+
+    @take_damage.setter
+    def take_damage(self, damage):
+        if self._is_alive:
+            self._health -= damage
+            if self._health <= 0:
+                self._is_alive = False
+                print(f"{self._name} has been defeated!")
+        else:
+            print(f"{self._name} is already defeated.")
+
+    def awake(self, game_world):
+        pass
+    
+    def start(self):
+        pass
+
+    def update(self, delta_time):
+        pass
+    
     def enemy_action(self):
-        random_action = random.choice(self._actions)
-        if random_action == "attack":
-            print(f"{self._name} attacks!")
-        elif random_action == "defend":
-            print(f"{self._name} defends!")
-        elif random_action == "skill":
-            print(f"{self._name} uses a skill!")
+        self._strategy.choose_action()
