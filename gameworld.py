@@ -5,7 +5,6 @@ from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.deck import Deck
 from UIManager import UIManager
-from UIManager import UIManager
 
 class GameWorld:
     def __init__(self):
@@ -22,8 +21,6 @@ class GameWorld:
         self._artifactFactory = ArtifactFactory()
         self._deck = Deck()
         self._create_card = False
-        self._ui_manager = UIManager()
-        self._active_card = []  
         self.ui_manager = UIManager()
         self.menu = Menu(self)  # Pass GameWorld to the Menu
 
@@ -82,16 +79,6 @@ class GameWorld:
             pygame.display.flip()
             self._clock.tick(60)
 
-        
-    def go_back(self):
-        self._running = False
-        from menu import Menu
-        Menu().running = True 
-        menu = Menu()
-        menu.run()
-        
-
-pygame.mixer.init()
-pygame.init() 
-Menu().run()
-
+    def start_game(self):
+        print("Starting Game")
+        self._in_menu = False  # Exit the menu and start the game
