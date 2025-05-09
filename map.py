@@ -87,6 +87,10 @@ class Map:
                                 print(f"{planet['name']} (Blue): Entering shop!")
                                 self.game_world._state = "shop"  # Transition to shop state
                                 return
+                            elif planet["color"] == (255, 0, 0):  # Red (Fight)
+                                print(f"{planet['name']} (Red): Entering fight!")
+                                self.game_world._state = "game"  # Transition to game state
+                                return
 
             # Handle ship movement
             keys = pygame.key.get_pressed()
@@ -122,18 +126,3 @@ class Map:
             )
 
             pygame.display.flip()
-
-def main():
-    pygame.init()
-    game_world = GameWorld(800, 600)
-    map_screen = Map(game_world)
-
-    while game_world._running:
-        if game_world._state == "map":
-            map_screen.run()
-
-    pygame.quit()
-    sys.exit()
-
-if __name__ == "__main__":
-    main()

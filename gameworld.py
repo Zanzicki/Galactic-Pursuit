@@ -17,7 +17,7 @@ class GameWorld:
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Galactic Map")
         self._running = True
-        self._state = "map"  # Start in the map state
+        self._state = "menu"  # Start in the map state
         self._clock = pygame.time.Clock()
         self._gameObjects = []
         self._cardFactory = CardFactory()
@@ -45,14 +45,18 @@ class GameWorld:
 
     def run(self):
         while self._running:
-            if self._state == "map":
+            if self._state == "menu":
+                self.menu.run()
+            elif self._state == "map":
                 self.map.run()
+            elif self._state == "game":
+                self.update()
             elif self._state == "shop":
                 self.shop.run()
 
         pygame.quit()
 
-    def run_game(self):
+    def update(self):
         while self._state == "game" and self._running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
