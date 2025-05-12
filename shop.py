@@ -68,6 +68,13 @@ class Shop:
             )
             self.buttons.append(('artifact', item, button))
 
+
+        self.repair_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((50, 400), (300,60)),
+            text='Repair your ship (restore 30% max health)',
+            manager=self.manager
+        )
+
         # Exit button
         self.exit_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((490, 500), (100, 50)),
