@@ -20,7 +20,7 @@ class GameWorld:
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Galactic Pursuit")
         self._running = True
-        self._state = "map"  # Start in the map state
+        self._state = "menu"  # Start in the map state
         self._clock = pygame.time.Clock()
         self._gameObjects = []  # List of all game objects
         self.font = pygame.font.Font(None, 36)
@@ -78,8 +78,6 @@ class GameWorld:
 
             self.screen.fill("black")
 
-            delta_time = self._clock.tick(60) / 1000.0
-
             # Update all game objects
             for gameObject in self._gameObjects[:]:
                 gameObject.update(delta_time)
@@ -103,7 +101,6 @@ class GameWorld:
             self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
             
             pygame.display.flip()
-            self._clock.tick(60)
 
         pygame.quit()
 
