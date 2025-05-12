@@ -26,7 +26,6 @@ class Map:
         self.font = pygame.font.Font(None, 36)
 
     def generate_planets(self):
-        """Generate planets with random positions, colors, and names."""
         colors = [
             (255, 0, 0),   # Red (Fight)
             (0, 255, 0),   # Green (Artifact)
@@ -62,7 +61,6 @@ class Map:
         return planets
 
     def does_overlap(self, new_pos, new_radius, existing_planets):
-        """Check if a new planet overlaps with existing planets."""
         for planet in existing_planets:
             distance = ((new_pos[0] - planet["pos"][0]) ** 2 + (new_pos[1] - planet["pos"][1]) ** 2) ** 0.5
             if distance < new_radius + planet["radius"] + 5:
@@ -91,17 +89,9 @@ class Map:
                                 print(f"{planet['name']} (Red): Entering fight!")
                                 self.game_world._state = "game"  # Transition to game state
                                 return
-
-            # Handle ship movement
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-                self.ship_pos[0] -= self.ship_speed
-            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-                self.ship_pos[0] += self.ship_speed
-            if keys[pygame.K_UP] or keys[pygame.K_w]:
-                self.ship_pos[1] -= self.ship_speed
-            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-                self.ship_pos[1] += self.ship_speed
+                            elif planet["color"] == (0, 255, 0):  # Green (Artifact)
+                                print(f"{planet['name']} (Green): Entering artifact!")
+                                self.game_world._state = "artifact"  # Transition to artifact state
 
             # Draw the map
             self.screen.fill((0, 0, 0))
