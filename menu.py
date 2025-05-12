@@ -18,7 +18,7 @@ class Menu:
     def start_game(self):
         print("Starting Game")
         self.running = False
-        self.game_world.start_game()  # Transition to the map state
+        self.game_world.state = "map"  # Transition to the map state
 
     def open_options(self):
         print("Opening Options")
