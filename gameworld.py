@@ -44,11 +44,11 @@ class GameWorld:
         gameObject.start()
         self._gameObjects.append(gameObject)
 
-    def Awake(self):
+    def awake(self):
         for gameObject in self._gameObjects[:]:
             gameObject.awake(self)
 
-    def Start(self):
+    def start(self):
         for gameObject in self._gameObjects[:]:
             gameObject.start()
 
