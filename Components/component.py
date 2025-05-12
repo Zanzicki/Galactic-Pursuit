@@ -95,6 +95,10 @@ class SpriteRenderer(Component):
       self._game_world = game_world
       self._sprite.rect.topleft = self.gameObject.transform.position
 
+    def set_offset(self, x_offset, y_offset):
+        self._sprite.rect.x += x_offset
+        self._sprite.rect.y += y_offset
+
     def start(self):
         pass
    
