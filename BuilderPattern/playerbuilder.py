@@ -13,8 +13,9 @@ class PlayerBuilder(Builder):
         deck = self._gameObject.add_component(Deck())
         self._gameObject.add_component(Player(deck))
         self._gameObject.add_component(SpriteRenderer("spaceShip_01.png"))
-        self._gameObject.get_component("SpriteRenderer").set_scale(0.5)
-        self._gameObject.get_component("SpriteRenderer").set_offset(pygame.math.Vector2(0, 0))
+        self._gameObject.get_component(SpriteRenderer).sprite_image = pygame.transform.scale(pygame.surface.Surface, (100, 100))  # Scale the ship image
+        self._gameObject.get_component(SpriteRenderer).sprite_image = [800 // 2, 600 // 2]  # Center the ship
+
 
         
     
