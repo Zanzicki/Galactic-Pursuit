@@ -7,7 +7,8 @@ from Components.deck import Deck
 from UIManager import UIManager
 from FactoryPatterns.enemyfactory import EnemyFactory
 from map import Map
-from shop import Shop  
+from shop import Shop
+
 
 class GameWorld:
     def __init__(self, width, height):
@@ -17,7 +18,7 @@ class GameWorld:
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Galactic Map")
         self._running = True
-        self._state = "menu"  # Start in the map state
+        self._state = "menu"  # Start in the menu state
         self._clock = pygame.time.Clock()
         self._gameObjects = []
         self._cardFactory = CardFactory()
@@ -35,29 +36,16 @@ class GameWorld:
         gameObject.start()
         self._gameObjects.append(gameObject)
 
-    def Awake(self): 
+    def Awake(self):
         for gameObject in self._gameObjects[:]:
-            gameObject.awake(self)      
+            gameObject.awake(self)
 
-    def Start(self): 
+    def Start(self):
         for gameObject in self._gameObjects[:]:
             gameObject.start()
 
-    def run(self):
-        while self._running:
-            if self._state == "menu":
-                self.menu.run()
-            elif self._state == "map":
-                self.map.run()
-            elif self._state == "game":
-                self.update()
-            elif self._state == "shop":
-                self.shop.run()
-
-        pygame.quit()
-
     def update(self):
-        while self._state == "game" and self._running:
+        while self._running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self._running = False
@@ -65,31 +53,39 @@ class GameWorld:
                 # Handle button events
                 self.ui_manager.handle_event(event)
 
-            self.screen.fill("black")
+            # Handle the current state
+            if self._state == "menu":
+                self.menu.run()
+            elif self._state == "map":
+                self.map.run()
+            elif self._state == "game":
+                self.run_game()
+            elif self._state == "shop":
+                self.shop.run()
 
-            delta_time = self._clock.tick(60) / 1000.0
+        pygame.quit()
 
-            for gameObject in self._gameObjects[:]:
-                gameObject.update(delta_time)
+    def run_game(self):
+        self.screen.fill("black")
 
-            self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
+        delta_time = self._clock.tick(60) / 1000.0
 
-            if not self._create_card:
-                i = 0
-                for card in self._deck.cards:
-                    card = self._cardFactory.create_component(card)
-                    self.instantiate(card)
-                    card.transform.position = pygame.math.Vector2(100 + i, 250)
-                    self._create_card = True
-                    i += 50
-                new_enemy = self._enemyFactory.create_component("Arangel")
-                self.instantiate(new_enemy)
-                new_enemy.get_component("Enemy").enemy_action()
+        for gameObject in self._gameObjects[:]:
+            gameObject.update(delta_time)
 
-            self.ui_manager.draw_card_screen(self.screen)
-            pygame.display.flip()
-            self._clock.tick(60)
+        self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
 
-    def start_game(self):
-        print("Starting Game")
-        self._state = "map"  # Transition to the map state
+        if not self._create_card:
+            i = 0
+            for card in self._deck.cards:
+                card = self._cardFactory.create_component(card)
+                self.instantiate(card)
+                card.transform.position = pygame.math.Vector2(100 + i, 250)
+                self._create_card = True
+                i += 50
+            new_enemy = self._enemyFactory.create_component("Arangel")
+            self.instantiate(new_enemy)
+            new_enemy.get_component("Enemy").enemy_action()
+
+        self.ui_manager.draw_card_screen(self.screen)
+        pygame.display.flip()
