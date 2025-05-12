@@ -8,6 +8,7 @@ from UIManager import UIManager
 from FactoryPatterns.enemyfactory import EnemyFactory
 from map import Map
 from shop import Shop
+from UIManager import UIManager
 
 
 class GameWorld:
@@ -30,6 +31,8 @@ class GameWorld:
         self._enemyFactory = EnemyFactory()
         self.map = Map(self)  # Pass GameWorld to the Map
         self.shop = Shop(self)  # Pass GameWorld to the Shop
+        self.ui_manager.set_buttons([
+            {"text": "Back", "x": 260, "y": 350, "width": 200, "height": 50, "action": self.menu}])
 
     @property
     def state(self):

@@ -1,6 +1,9 @@
 import pygame
 import random
 import sys
+import pygame_gui
+import pygame_gui.ui_manager
+
 
 #Made by Erik
 # This code is a simple game map with planets and a spaceship.
@@ -24,6 +27,15 @@ class Map:
         self.ship_speed = 0.5  # Speed of the ship
         self.planets = self.generate_planets()
         self.font = pygame.font.Font(None, 36)
+        
+        self.ui_manager = pygame_gui.UIManager((self.game_world.width, self.game_world.height))
+        self.back_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((10, 10), (100, 50)),
+            text='Back',
+            manager=self.ui_manager
+        )
+        
+        
 
     def generate_planets(self):
         """Generate planets with random positions, colors, and names."""
@@ -71,11 +83,22 @@ class Map:
 
     def run(self):
         running = True
+        clock = pygame.time.Clock()
         while running:
+            time_delta = clock.tick(60) / 1000.0  # For pygame_gui timing
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.game_world._running = False
                     running = False
+                
+                self.ui_manager.process_events(event)  #  required for GUI
+
+                if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                    if event.ui_element == self.back_button:
+                        print("Back button pressed")
+                        self.game_world._state = "menu"
+                        return
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     for planet in self.planets:
@@ -91,7 +114,7 @@ class Map:
                                 print(f"{planet['name']} (Red): Entering fight!")
                                 self.game_world._state = "game"  # Transition to game state
                                 return
-
+            self.ui_manager.update(time_delta)  # 👈 updates GUI state
             # Handle ship movement
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT] or keys[pygame.K_a]:
@@ -124,5 +147,7 @@ class Map:
                 self.ship_image,
                 (self.ship_pos[0] - self.ship_image.get_width() // 2, self.ship_pos[1] - self.ship_image.get_height() // 2)
             )
+            # Draw the back button
+            self.ui_manager.draw_ui(self.screen)  # Draw the GUI elements
 
             pygame.display.flip()

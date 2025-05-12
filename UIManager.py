@@ -35,3 +35,8 @@ class UIManager:
 
     def draw_card_screen(self, screen):
         self.draw(screen)  # Reuse the draw method to draw buttons
+
+
+    
+        
+        
