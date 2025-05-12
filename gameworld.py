@@ -31,8 +31,7 @@ class GameWorld:
         self._enemyFactory = EnemyFactory()
         self.map = Map(self)  # Pass GameWorld to the Map
         self.shop = Shop(self)  # Pass GameWorld to the Shop
-        self.ui_manager.set_buttons([
-            {"text": "Back", "x": 260, "y": 350, "width": 200, "height": 50, "action": self.menu}])
+        
 
     @property
     def state(self):
@@ -63,9 +62,9 @@ class GameWorld:
 
                 # Handle button events
                 self.ui_manager.handle_event(event)
-
+            print(f"[debug] Current state: {self._state}")
             # Handle the current state
-            if self._state == "menu":
+            if self._state == "menu":            
                 self.menu.run()
             elif self._state == "map":
                 self.map.run()

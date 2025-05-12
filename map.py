@@ -3,6 +3,7 @@ import random
 import sys
 import pygame_gui
 import pygame_gui.ui_manager
+from menu import Menu
 
 
 #Made by Erik
@@ -85,6 +86,12 @@ class Map:
         running = True
         clock = pygame.time.Clock()
         while running:
+            
+            
+            if self.game_world.state != "map":
+                print(f"[debug] Map.run() exiting, state changed to: {self.game_world.state}")
+                return
+            
             time_delta = clock.tick(60) / 1000.0  # For pygame_gui timing
 
             for event in pygame.event.get():
@@ -96,10 +103,11 @@ class Map:
 
                 if event.type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == self.back_button:
+                        
                         print("Back button pressed")
-                        self.game_world._state = "menu"
-                        return
-
+                        self.game_world._state = "menu"                        
+                        return Menu(self.game_world).run()  # Transition to menu state
+                    
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     for planet in self.planets:
                         dx = self.ship_pos[0] - planet["pos"][0]
