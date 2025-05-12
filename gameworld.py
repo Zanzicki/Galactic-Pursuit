@@ -31,6 +31,14 @@ class GameWorld:
         self.map = Map(self)  # Pass GameWorld to the Map
         self.shop = Shop(self)  # Pass GameWorld to the Shop
 
+    @property
+    def state(self):
+        return self._state
+    
+    @state.setter
+    def state(self, value):
+        self._state = value
+
     def instantiate(self, gameObject):
         gameObject.awake(self)
         gameObject.start()
