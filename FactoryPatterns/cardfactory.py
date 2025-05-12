@@ -1,7 +1,7 @@
 from Components.card import Card
 from Components.component import SpriteRenderer, Transform
 import random
-from gameobject import GameObject
+from gameObject import GameObject
 import pygame
 from FactoryPatterns.factorypattern import Factory
 from FactoryPatterns.artifactFactory import ArtifactFactory
