@@ -122,7 +122,7 @@ class Map:
                                 print(f"{planet['name']} (Red): Entering fight!")
                                 self.game_world._state = "game"  # Transition to game state
                                 return
-            self.ui_manager.update(time_delta)  # 👈 updates GUI state
+            self.ui_manager.update(time_delta)  # updates GUI state
             # Handle ship movement
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT] or keys[pygame.K_a]:

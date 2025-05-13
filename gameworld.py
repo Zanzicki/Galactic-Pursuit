@@ -93,9 +93,25 @@ class GameWorld:
                 card.transform.position = pygame.math.Vector2(100 + i, 250)
                 self._create_card = True
                 i += 50
-            new_enemy = self._enemyFactory.create_component("Arangel")
-            self.instantiate(new_enemy)
-            new_enemy.get_component("Enemy").enemy_action()
+            self.new_enemy = self._enemyFactory.create_component("Arangel")
+            self.instantiate(self.new_enemy)
+            self.new_enemy.get_component("Enemy").enemy_action()
 
         self.ui_manager.draw_card_screen(self.screen)
+        try:
+            selected_card_go = self.ui_manager.selected_card  # You must manage this reference
+            print(f"[debug] selected card GameObject: {selected_card_go}")
+
+            if selected_card_go:
+                card_component = selected_card_go.get_component("Card")
+                if card_component:
+                    card_component.card_activated(self, target=self.new_enemy.get_component("Enemy"))
+                else:
+                    print("[error] No Card component found on selected_card_go")
+            else:
+                print("[error] No card was selected")
+        except Exception as e:
+            print(f"[exception] Error activating card: {e}")
+
+        
         pygame.display.flip()
