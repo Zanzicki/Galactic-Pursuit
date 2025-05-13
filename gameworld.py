@@ -91,7 +91,6 @@ class GameWorld:
                 self.menu.update(delta_time)
                 self.menu.draw(self.screen)
             elif self._state == "map":
-                print("Map State")
                 pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)  # Sun in the center
                 self.draw_and_update_map(delta_time)
             elif self._state == "shop":
