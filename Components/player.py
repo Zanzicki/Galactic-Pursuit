@@ -9,6 +9,7 @@ class Player(Component):
         self._speed = speed
         self._deck = deck
         self.game_world = None  # Reference to the GameWorld
+        self.events = None
 
     def awake(self, game_world):
         self.game_world = game_world  # Store reference to the GameWorld
@@ -35,7 +36,7 @@ class Player(Component):
         self._gameObject.transform.translate(movement * delta_time)
 
         # Check for interaction with planets when spacebar is pressed
-        for event in pygame.event.get():
+        for event in self.events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.check_planet_interaction()
 
@@ -64,3 +65,6 @@ class Player(Component):
     def draw(self, screen):
         pygame.draw.rect(screen, (255, 255, 255), (self._gameObject.transform.position.x - 10,
                                                    self._gameObject.transform.position.y - 10, 20, 20))
+
+    def get_events(self, events):
+        self.events = events

@@ -25,7 +25,6 @@ class Menu:
         )
 
     def handle_event(self, event):
-        """Handle events for the menu."""
         print(f"Event: {event}")  # Debugging
         self.ui_manager.process_events(event)
 
@@ -39,11 +38,9 @@ class Menu:
                 self.quit_game()
 
     def update(self, delta_time):
-        """Update the UI manager."""
         self.ui_manager.update(delta_time)
 
     def draw(self, screen):
-        """Draw the menu."""
         screen.fill((30, 30, 30))  # Background color
         self.ui_manager.draw_ui(screen)
 

@@ -6,11 +6,11 @@ from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.deck import Deck
-from UIManager import UIManager
 from FactoryPatterns.enemyfactory import EnemyFactory
 from map import Map
 from shop import Shop
 from Components.planet import Planet
+from uimanager import UIManager  # Import the UIManager class
 
 class GameWorld:
     def __init__(self, width, height):
@@ -20,7 +20,7 @@ class GameWorld:
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Galactic Pursuit")
         self._running = True
-        self._state = "map"  # Start in the menu state
+        self._state = "menu"  # Start in the menu state
         self._clock = pygame.time.Clock()
         self._gameObjects = []  # List of all game objects
         self.font = pygame.font.Font(None, 36)
@@ -28,9 +28,11 @@ class GameWorld:
         self._artifactFactory = ArtifactFactory()
         self._deck = Deck()
         self._create_card = False
-        self.ui_manager = UIManager()
         self.menu = Menu(self)  # Pass GameWorld to the Menu
         self._enemyFactory = EnemyFactory()
+
+        # Initialize UIManager
+        self.ui_manager = UIManager(self)
 
         builder = PlayerBuilder()
         builder.build()
@@ -70,41 +72,40 @@ class GameWorld:
             gameObject.start()
 
     def update(self):
+        """Main game loop."""
         while self._running:
             delta_time = self._clock.tick(60) / 1000.0  # Limit to 60 FPS
 
-            for event in pygame.event.get():
+            events = pygame.event.get()  # Get all events for this frame
+            for event in events:
                 if event.type == pygame.QUIT:
                     self._running = False
 
-                # Handle button events
+                # Delegate UI events to the UIManager
                 self.ui_manager.handle_event(event)
 
             self.screen.fill("black")
 
+            # Update the active state
             if self._state == "menu":
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self._running = False
-                    self.menu.handle_event(event)
-
-                self.menu.update(delta_time)
-                self.menu.draw(self.screen)
+                self.ui_manager.update(delta_time)
+                self.ui_manager.draw(self.screen)
             elif self._state == "map":
                 pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)  # Sun in the center
-                self.draw_and_update_map(delta_time)
+                self.draw_and_update_map(delta_time, events)
             elif self._state == "shop":
                 self.shop.run()
             elif self._state == "game":
-                self.draw_and_update_map(delta_time)
+                self.draw_and_update_fight(delta_time)
 
             self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
-            
+
             pygame.display.flip()
 
         pygame.quit()
 
-    def draw_and_update_map(self, delta_time):
+    def draw_and_update_map(self, delta_time, events):
+        """Update and draw the map and game objects."""
         # First, update and draw planets
         for gameObject in self._gameObjects:
             if gameObject.get_component("Planet") is not None:
@@ -114,6 +115,7 @@ class GameWorld:
         # Then, update and draw the player
         for gameObject in self._gameObjects:
             if gameObject.get_component("Player") is not None:
+                gameObject.get_component("Player").get_events(events)
                 gameObject.update(delta_time)
 
     def draw_and_update_fight(self, delta_time):
@@ -128,6 +130,11 @@ class GameWorld:
                 new_enemy = self._enemyFactory.create_component("Arangel")
                 self.instantiate(new_enemy)
                 new_enemy.get_component("Enemy").enemy_action()
+            for gameObject in self._gameObjects:
+                if gameObject.get_component("Card") is not None:
+                    gameObject.update(delta_time)
+                if gameObject.get_component("Enemy") is not None:
+                    gameObject.update(delta_time)
 
     def get_player_position(self):
         for gameObject in self._gameObjects:
