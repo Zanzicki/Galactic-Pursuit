@@ -20,7 +20,7 @@ class GameWorld:
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Galactic Pursuit")
         self._running = True
-        self._state = "map"  # Start in the map state
+        self._state = "map"  # Start in the menu state
         self._clock = pygame.time.Clock()
         self._gameObjects = []  # List of all game objects
         self.font = pygame.font.Font(None, 36)
@@ -45,7 +45,7 @@ class GameWorld:
         self.shop = Shop(self)  # Pass GameWorld to the Shop
 
         # Initialize player and planets
-        self.map.generate_planets(self.player)
+        self.map.generate_planets()
         self.player_position = [400, 300]  # Example player position
 
     @property
