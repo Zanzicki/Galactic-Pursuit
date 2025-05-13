@@ -20,7 +20,7 @@ class GameWorld:
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Galactic Pursuit")
         self._running = True
-        self._state = "menu"  # Start in the map state
+        self._state = "map"  # Start in the map state
         self._clock = pygame.time.Clock()
         self._gameObjects = []  # List of all game objects
         self.font = pygame.font.Font(None, 36)
@@ -34,9 +34,13 @@ class GameWorld:
 
         builder = PlayerBuilder()
         builder.build()
-        
-        self._gameObjects.append(builder.get_gameObject())
-        self.player = builder.get_gameObject 
+
+        self.player = builder.get_gameObject()
+        self._gameObjects.append(self.player)
+
+        # Center the player's position
+        self.player.transform.position = pygame.math.Vector2(self.width // 2, self.height // 2)
+
         self.map = Map(self)  # Pass GameWorld to the Map
         self.shop = Shop(self)  # Pass GameWorld to the Shop
 
@@ -78,12 +82,42 @@ class GameWorld:
 
             self.screen.fill("black")
 
-            # Update all game objects
-            for gameObject in self._gameObjects[:]:
-                gameObject.update(delta_time)
-                if gameObject.get_component("Planet") is not None:
-                   gameObject.get_component("Planet").draw(self.screen, self.font)
+            if self._state == "menu":
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self._running = False
+                    self.menu.handle_event(event)
 
+                self.menu.update(delta_time)
+                self.menu.draw(self.screen)
+            elif self._state == "map":
+                print("Map State")
+                pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)  # Sun in the center
+                self.draw_and_update_map(delta_time)
+            elif self._state == "shop":
+                self.shop.run()
+            elif self._state == "game":
+                self.draw_and_update_map(delta_time)
+
+            self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
+            
+            pygame.display.flip()
+
+        pygame.quit()
+
+    def draw_and_update_map(self, delta_time):
+        # First, update and draw planets
+        for gameObject in self._gameObjects:
+            if gameObject.get_component("Planet") is not None:
+                gameObject.update(delta_time)
+                gameObject.get_component("Planet").draw(self.screen, self.font)
+
+        # Then, update and draw the player
+        for gameObject in self._gameObjects:
+            if gameObject.get_component("Player") is not None:
+                gameObject.update(delta_time)
+
+    def draw_and_update_fight(self, delta_time):
             if not self._create_card:
                 i = 0
                 for card in self._deck.cards:
@@ -96,22 +130,7 @@ class GameWorld:
                 self.instantiate(new_enemy)
                 new_enemy.get_component("Enemy").enemy_action()
 
-            pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)  # Sun in the center
-
-            self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
-            
-            pygame.display.flip()
-
-        pygame.quit()
-
-    def draw(self):
-        self.screen.fill("black")
-
-        self.ui_manager.draw_card_screen(self.screen)
-        pygame.display.flip()
-
     def get_player_position(self):
         for gameObject in self._gameObjects:
                 if gameObject.get_component("Player") is not None:
                     return gameObject.transform.position
-    
