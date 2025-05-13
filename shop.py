@@ -73,6 +73,13 @@ class Shop:
             relative_rect=pygame.Rect((50, 400), (300,60)),
             text='Repair your ship (restore 30% max health)',
             manager=self.manager
+            item_cost = 8
+            if self.player_gold >= item_cost:
+                                self.player_gold -= item_cost
+                                self.player_inventory.append(item_name)
+                                print(f"Restored {item_name} for {item_cost} gold.")
+                            else:
+                                print("Not enough gold.")
         )
 
         # Exit button
