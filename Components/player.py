@@ -61,6 +61,12 @@ class Player(Component):
                     print(f"{planetcomponent._name} (Red): Entering fight!")
                     self.game_world._state = "game"  # Transition to game state
                     return
+                elif planetcomponent._color == (0, 255, 0):  # Green (Artifact)
+                    print(f"{planetcomponent._name} (Green): Entering artifact!")
+                    self.game_world._state = "artifact"
+                elif planetcomponent._color == (255, 0, 255):
+                    print(f"{planetcomponent._name} (Magenta): Entering mystery!")
+                    self.game_world._state = "mystery"
 
     def draw(self, screen):
         pygame.draw.rect(screen, (255, 255, 255), (self._gameObject.transform.position.x - 10,

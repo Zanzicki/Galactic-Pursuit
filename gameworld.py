@@ -97,6 +97,24 @@ class GameWorld:
                 self.shop.run()
             elif self._state == "game":
                 self.draw_and_update_fight(delta_time)
+                self.back_to_map(delta_time)
+            elif self._state == "game_over":
+                self.screen.fill((0, 0, 0))
+                game_over_text = self.font.render("Game Over", True, (255, 0, 0))
+                self.screen.blit(game_over_text, (self.width // 2 - game_over_text.get_width() // 2,
+                                                   self.height // 2 - game_over_text.get_height() // 2))
+            elif self._state == "artifact":
+                self.screen.fill((0, 0, 0))
+                artifact_text = self.font.render("Artifact", True, (255, 0, 0))
+                self.screen.blit(artifact_text, (self.width // 2 - artifact_text.get_width() // 2,
+                                                   self.height // 2 - artifact_text.get_height() // 2))
+                self.back_to_map(delta_time)
+            elif self._state == "mystery":
+                self.screen.fill((0, 0, 0))
+                mystery_text = self.font.render("Mystery", True, (255, 0, 0))
+                self.screen.blit(mystery_text, (self.width // 2 - mystery_text.get_width() // 2,
+                                                   self.height // 2 - mystery_text.get_height() // 2))
+                self.back_to_map(delta_time)
 
             self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
 
@@ -140,3 +158,9 @@ class GameWorld:
         for gameObject in self._gameObjects:
                 if gameObject.get_component("Player") is not None:
                     return gameObject.transform.position
+                
+    def back_to_map(self, delta_time):
+                self.ui_manager.back_to_map_button.show()  # Show the Back to Map button
+                self.ui_manager.update(delta_time)
+                self.ui_manager.draw(self.screen)
+
