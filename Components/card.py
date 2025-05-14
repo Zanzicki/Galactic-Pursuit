@@ -32,14 +32,4 @@ class Card(Component):
     def update(self, delta_time):
         pass
 
-    def card_activated(self, game_world, target=None):
-        
-        
-        if self.name == "laser canon":
-            print(f"[card activated] {self._name} laser cannon activated")        
-            if target:
-                target.take_damage(self.damage)        
-                print(f"[card activated] {self._name} dealt {self.damage}")
-
-        elif self.name == "Protective Barrier":
-            print("[card activated] Protective Barrier activated")
+   

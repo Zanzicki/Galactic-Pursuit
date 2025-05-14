@@ -1,4 +1,4 @@
-from gameobject import GameObject
+from gameObject import GameObject
 import pygame
 from Components.component import Component
 

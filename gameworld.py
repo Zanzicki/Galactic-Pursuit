@@ -10,7 +10,7 @@ from FactoryPatterns.enemyfactory import EnemyFactory
 from map import Map
 from shop import Shop
 from Components.planet import Planet
-from uimanager import UIManager  # Import the UIManager class
+from UIManager import UIManager  # Import the UIManager class
 
 class GameWorld:
     def __init__(self, width, height):
