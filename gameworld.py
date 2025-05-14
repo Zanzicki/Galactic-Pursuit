@@ -1,6 +1,7 @@
 import pygame
 import random
 from BuilderPattern.playerbuilder import PlayerBuilder
+from Components.player import Player
 from menu import Menu
 from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
@@ -34,14 +35,15 @@ class GameWorld:
         # Initialize UIManager
         self.ui_manager = UIManager(self)
 
+        # Initialize Player using PlayerBuilder
         builder = PlayerBuilder()
         builder.build()
 
-        self.player = builder.get_gameObject()
-        self._gameObjects.append(self.player)
+        self.player = Player.get_instance()
+        self._gameObjects.append(builder.get_gameObject())  # Add the player to the game objects
 
         # Center the player's position
-        self.player.transform.position = pygame.math.Vector2(self.width // 2, self.height // 2)
+        builder.get_gameObject().transform.position = pygame.math.Vector2(self.width // 2, self.height // 2)
 
         self.map = Map(self)  # Pass GameWorld to the Map
         self.shop = Shop(self)  # Pass GameWorld to the Shop
@@ -123,7 +125,6 @@ class GameWorld:
         pygame.quit()
 
     def draw_and_update_map(self, delta_time, events):
-        """Update and draw the map and game objects."""
         # First, update and draw planets
         for gameObject in self._gameObjects:
             if gameObject.get_component("Planet") is not None:

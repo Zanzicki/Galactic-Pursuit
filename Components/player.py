@@ -4,12 +4,52 @@ from Components.component import Component
 
 
 class Player(Component):
-    def __init__(self, deck, speed=500):
-        super().__init__()
-        self._speed = speed
-        self._deck = deck
-        self.game_world = None  # Reference to the GameWorld
-        self.events = None
+    _instance = None  # Class-level attribute to store the single instance
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(Player, cls).__new__(cls)
+        return cls._instance
+
+    def __init__(self, health=100, speed=300):
+        if not hasattr(self, "_initialized"):  # Ensure __init__ is only called once
+            super().__init__()
+            self._speed = speed
+            self._health = health
+            self.game_world = None  # Reference to the GameWorld
+            self.events = None
+            self._initialized = True  # Mark as initialized
+
+    @staticmethod
+    def get_instance():
+        if Player._instance is None:
+            Player._instance = Player()
+        return Player._instance
+
+    @property
+    def health(self):
+        return self._health
+
+    @health.setter
+    def health(self, value):
+        if value < 0:
+            self._health = 0
+        else:
+            self._health = value
+
+    @property
+    def take_damage(self):
+        return self._health
+
+
+    def take_damage(self, damage):
+        if self._health > 0:
+            self._health -= damage
+            if self._health <= 0:
+                self._gameObject.is_destroyed = True
+                print(f"{self._gameObject} has been defeated!")
+        else:
+            print(f"{self._gameObject} is already defeated.")
 
     def awake(self, game_world):
         self.game_world = game_world  # Store reference to the GameWorld
@@ -50,7 +90,7 @@ class Player(Component):
         for planet in planets:
             dx = player_position.x - planet.transform.position[0]
             dy = player_position.y - planet.transform.position[1]
-            planetcomponent = planet.get_component("Planet") 
+            planetcomponent = planet.get_component("Planet")
             distance = (dx ** 2 + dy ** 2) ** 0.5
             if distance <= planetcomponent._size + 20:  # Check if the player is close enough to the planet
                 if planetcomponent._color == (0, 0, 255):  # Blue (Shop)
