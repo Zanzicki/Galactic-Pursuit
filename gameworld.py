@@ -106,6 +106,7 @@ class GameWorld:
                 self.shop.draw()
                 # When leaving shop and entering menu or map:
                 if self.state_changed_to_shop == "out":
+                    self.state = "map" 
                     self.shop.exit()
             elif self._state == "game":
                 self.draw_and_update_fight(delta_time)

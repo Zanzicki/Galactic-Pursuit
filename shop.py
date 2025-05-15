@@ -43,7 +43,7 @@ class Shop:
         # Create buttons for cards
         for i, item in enumerate(self.shop_items['cards']):
             button = pygame_gui.elements.UIButton(
-                relative_rect=pygame.Rect((50 + i * 200, 100), (180, 60)),
+                relative_rect=pygame.Rect((50 + i * 200, 100), (-1, -1)),
                 text=f"{item} ({self.item_prices['card']}g)",
                 manager=self.manager
             )
@@ -98,8 +98,6 @@ class Shop:
             if event.ui_element == self.exit_button:
                 print("Returning to map!")
                 self.game_world.state_changed_to_shop = "out"
-                self.game_world._state = "map"
-                
 
         # Let the shared UIManager process the event
         self.manager.process_events(event)
