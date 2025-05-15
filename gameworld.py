@@ -1,6 +1,7 @@
 import pygame
 import random
 from BuilderPattern.playerbuilder import PlayerBuilder
+from Components.player import Player
 from menu import Menu
 from gameObject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
@@ -34,14 +35,15 @@ class GameWorld:
         # Initialize UIManager
         self.ui_manager = UIManager(self)
 
+        # Initialize Player using PlayerBuilder
         builder = PlayerBuilder()
         builder.build()
 
-        self.player = builder.get_gameObject()
-        self._gameObjects.append(self.player)
+        self.player = Player.get_instance()
+        self._gameObjects.append(builder.get_gameObject())  # Add the player to the game objects
 
         # Center the player's position
-        self.player.transform.position = pygame.math.Vector2(self.width // 2, self.height // 2)
+        builder.get_gameObject().transform.position = pygame.math.Vector2(self.width // 2, self.height // 2)
 
         self.map = Map(self)  # Pass GameWorld to the Map
         self.shop = Shop(self)  # Pass GameWorld to the Shop
@@ -97,6 +99,24 @@ class GameWorld:
                 self.shop.run()
             elif self._state == "game":
                 self.draw_and_update_fight(delta_time)
+                self.back_to_map(delta_time)
+            elif self._state == "game_over":
+                self.screen.fill((0, 0, 0))
+                game_over_text = self.font.render("Game Over", True, (255, 0, 0))
+                self.screen.blit(game_over_text, (self.width // 2 - game_over_text.get_width() // 2,
+                                                   self.height // 2 - game_over_text.get_height() // 2))
+            elif self._state == "artifact":
+                self.screen.fill((0, 0, 0))
+                artifact_text = self.font.render("Artifact", True, (255, 0, 0))
+                self.screen.blit(artifact_text, (self.width // 2 - artifact_text.get_width() // 2,
+                                                   self.height // 2 - artifact_text.get_height() // 2))
+                self.back_to_map(delta_time)
+            elif self._state == "mystery":
+                self.screen.fill((0, 0, 0))
+                mystery_text = self.font.render("Mystery", True, (255, 0, 0))
+                self.screen.blit(mystery_text, (self.width // 2 - mystery_text.get_width() // 2,
+                                                   self.height // 2 - mystery_text.get_height() // 2))
+                self.back_to_map(delta_time)
 
             self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
 
@@ -105,7 +125,6 @@ class GameWorld:
         pygame.quit()
 
     def draw_and_update_map(self, delta_time, events):
-        """Update and draw the map and game objects."""
         # First, update and draw planets
         for gameObject in self._gameObjects:
             if gameObject.get_component("Planet") is not None:
@@ -140,3 +159,9 @@ class GameWorld:
         for gameObject in self._gameObjects:
                 if gameObject.get_component("Player") is not None:
                     return gameObject.transform.position
+                
+    def back_to_map(self, delta_time):
+                self.ui_manager.back_to_map_button.show()  # Show the Back to Map button
+                self.ui_manager.update(delta_time)
+                self.ui_manager.draw(self.screen)
+

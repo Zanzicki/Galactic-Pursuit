@@ -24,6 +24,13 @@ class UIManager:
             manager=self.ui_manager
         )
 
+        self.back_to_map_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((550, 500), (200, 50)),
+            text="RETURN TO MAP",
+            manager=self.ui_manager,
+            visible=False 
+        )
+
     def handle_event(self, event):
         self.ui_manager.process_events(event)
 
@@ -32,6 +39,8 @@ class UIManager:
                 self.start_game()
             elif event.ui_element == self.quit_button:
                 self.quit_game()
+            elif event.ui_element == self.back_to_map_button:
+                self.return_to_map()
 
     def update(self, delta_time):
         self.ui_manager.update(delta_time)
@@ -42,7 +51,19 @@ class UIManager:
     def start_game(self):
         print("Starting Game")
         self.game_world.state = "map"  # Transition to the map state
+        self.play_button.hide()
+        self.options_button.hide()
+        self.quit_button.hide()
 
     def quit_game(self):
         print("Quitting Game")
         self.game_world._running = False
+
+    def return_to_map(self):
+        print("Returning to Map")
+        self.game_world.state = "map"
+        self.back_to_map_button.hide()
+    
+    def show_options(self):
+        print("Showing Options")
+        # Implement options menu logic here
