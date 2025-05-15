@@ -1,7 +1,7 @@
 from Components.component import SpriteRenderer, Transform
 import random
 from StrategyPattern.strategy import Strategy
-from gameObject import GameObject
+from gameobject import GameObject
 import pygame
 from FactoryPatterns.factorypattern import Factory
 from Components.enemy import Enemy

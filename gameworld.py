@@ -3,7 +3,7 @@ import random
 from BuilderPattern.playerbuilder import PlayerBuilder
 from Components.player import Player
 from menu import Menu
-from gameObject import GameObject
+from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.deck import Deck
@@ -11,7 +11,7 @@ from FactoryPatterns.enemyfactory import EnemyFactory
 from map import Map
 from shop import Shop
 from Components.planet import Planet
-from UIManager import UIManager  # Import the UIManager class
+from uimanager import UIManager  # Import the UIManager class
 
 class GameWorld:
     def __init__(self, width, height):

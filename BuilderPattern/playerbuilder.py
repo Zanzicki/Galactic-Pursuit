@@ -3,7 +3,7 @@ from BuilderPattern.builder import Builder
 from Components.component import SpriteRenderer
 from Components.deck import Deck
 from Components.player import Player
-from gameObject import GameObject
+from gameobject import GameObject
 
 
 class PlayerBuilder(Builder):
