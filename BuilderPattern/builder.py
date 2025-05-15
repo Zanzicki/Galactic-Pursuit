@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from gameObject import GameObject
+from gameobject import GameObject
 
 class Builder(ABC):
     

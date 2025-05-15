@@ -2,7 +2,7 @@ import pygame
 import random
 import pygame_gui
 from Components.planet import Planet
-from gameObject import GameObject
+from gameobject import GameObject
 
 class Map:
     def __init__(self, game_world):
