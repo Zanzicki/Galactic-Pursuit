@@ -26,6 +26,10 @@ class Map:
         (0, 0, 255),   # Blue (Shop)
         (255, 0, 255), # Magenta (Mystery)
         ]
+
+        weigthed_colors = [0.7, 0.1, 0.1, 0.1]
+        colors = random.choices(colors, weights=weigthed_colors, k=10)
+
         planet_names = [
         "Mercury", "Venus", "Earth", "Mars", "Jupiter",
         "Saturn", "Uranus", "Neptune", "Pluto", "Eris"
