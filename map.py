@@ -18,30 +18,58 @@ class Map:
         )
         
         
-
+    
     def generate_planets(self):
         colors = [
-            (255, 0, 0),   # Red (Fight)
-            (0, 255, 0),   # Green (Artifact)
-            (0, 0, 255),   # Blue (Shop)
-            (255, 0, 255), # Magenta (Mystery)
+        (255, 0, 0),   # Red (Fight)
+        (0, 255, 0),   # Green (Artifact)
+        (0, 0, 255),   # Blue (Shop)
+        (255, 0, 255), # Magenta (Mystery)
         ]
         planet_names = [
-            "Mercury", "Venus", "Earth", "Mars", "Jupiter",
-            "Saturn", "Uranus", "Neptune", "Pluto", "Eris"
-        ]
-        for i in range(10):  # Generate 10 planets
+        "Mercury", "Venus", "Earth", "Mars", "Jupiter",
+        "Saturn", "Uranus", "Neptune", "Pluto", "Eris"
+    ]
+
+        max_attempts = 100  # Max tries to find non-overlapping position per planet
+
+        for i in range(10):
             name = planet_names[i]
             size = random.randint(35, 50)
             color = random.choice(colors)
-            position = (
-                random.randint(size + 10, self.game_world.width - size - 10),
-                random.randint(size + 10, self.game_world.height - size - 10)
-            )
-            planet = GameObject(position)
-            planet.add_component(Planet(name, size, color, position, self.game_world))
-            self.planets.append(planet)  # Add planet to the list
-            self.game_world._gameObjects.append(planet)  # Add planet to the game objects
+
+            placed = False
+            for attempt in range(max_attempts):
+                x = random.randint(size + 10, self.game_world.width - size - 10)
+                y = random.randint(size + 10, self.game_world.height - size - 10)
+                new_pos = (x, y)
+
+                overlaps = False
+                for other in self.planets:
+                    other_pos = other.transform.position
+                    other_planet = other.get_component("Planet")
+                    if other_planet is None:
+                        continue
+                    other_size = other_planet.size
+
+                    dx = other_pos[0] - x
+                    dy = other_pos[1] - y
+                    distance = (dx**2 + dy**2)**0.5
+
+                    if distance < (size + other_size + 10):
+                     overlaps = True
+                     break
+
+                if not overlaps:
+                    planet = GameObject(new_pos)
+                    planet.add_component(Planet(name, size, color, new_pos, self.game_world))
+                    self.planets.append(planet)
+                    self.game_world._gameObjects.append(planet)
+                    placed = True
+                    break
+
+        
+
 
     def draw(self, screen):
         for planet in self.planets:
