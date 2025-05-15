@@ -31,6 +31,7 @@ class GameWorld:
         self._create_card = False
         self.menu = Menu(self)  # Pass GameWorld to the Menu
         self._enemyFactory = EnemyFactory()
+        self.state_changed_to_shop = "out"
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
@@ -74,7 +75,6 @@ class GameWorld:
             gameObject.start()
 
     def update(self):
-        """Main game loop."""
         while self._running:
             delta_time = self._clock.tick(60) / 1000.0  # Limit to 60 FPS
 
@@ -85,6 +85,9 @@ class GameWorld:
 
                 # Delegate UI events to the UIManager
                 self.ui_manager.handle_event(event)
+                if self.state == "shop":
+                    self.shop.handle_event(event)
+
 
             self.screen.fill("black")
 
@@ -96,7 +99,14 @@ class GameWorld:
                 pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)  # Sun in the center
                 self.draw_and_update_map(delta_time, events)
             elif self._state == "shop":
-                self.shop.run()
+                if self.state_changed_to_shop == "into":
+                    self.state_changed_to_shop = "in"
+                    self.shop.enter()
+                self.shop.update(delta_time)
+                self.shop.draw()
+                # When leaving shop and entering menu or map:
+                if self.state_changed_to_shop == "out":
+                    self.shop.exit()
             elif self._state == "game":
                 self.draw_and_update_fight(delta_time)
                 self.back_to_map(delta_time)

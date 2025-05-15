@@ -35,9 +35,6 @@ class CardHoverHandler(Component):
 
         elif card_type == "Block":
             self.block_card_activated(game_world, target)
-            
-            
-
 
     def attack_card_activated(self, game_world, target=None):      
         get_card_component = self.get_card_component()

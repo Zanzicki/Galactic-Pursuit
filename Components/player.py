@@ -96,6 +96,7 @@ class Player(Component):
                 if planetcomponent._color == (0, 0, 255):  # Blue (Shop)
                     print(f"{planetcomponent._name} (Blue): Entering shop!")
                     self.game_world._state = "shop"  # Transition to shop state
+                    self.game_world.state_changed_to_shop = "into"
                     return
                 elif planetcomponent._color == (255, 0, 0):  # Red (Fight)
                     print(f"{planetcomponent._name} (Red): Entering fight!")
