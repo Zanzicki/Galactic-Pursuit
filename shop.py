@@ -10,7 +10,7 @@ class Shop:
         self.game_world = game_world
         self.screen = game_world.screen
         self.manager = game_world.ui_manager.ui_manager  # Use the shared UIManager
-        self.background = pygame.Surface((1080, 720))
+        self.background = pygame.Surface((self.screen.get_size()))
         self.background.fill(pygame.Color('#2e2e2e'))
         self.font = pygame.font.Font(None, 36)
 

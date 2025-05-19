@@ -6,20 +6,21 @@ class UIManager:
     def __init__(self, game_world):
         self.game_world = game_world  # Reference to the GameWorld
         self.ui_manager = pygame_gui.UIManager((game_world.width, game_world.height))  # Initialize pygame_gui UI manager
+        self.screen = game_world.screen
 
         # Example buttons for the menu
         self.play_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((260, 150), (200, 50)),
+            relative_rect=pygame.Rect((self.screen.width/2-200, self.screen.height/2-250), (400, 100)),
             text="PLAY",
             manager=self.ui_manager
         )
         self.options_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((260, 200), (200, 50)),
+            relative_rect=pygame.Rect((self.screen.width/2-200, self.screen.height/2-50), (400, 100)),
             text="OPTIONS",
             manager=self.ui_manager
         )
         self.quit_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((260, 250), (200, 50)),
+            relative_rect=pygame.Rect((self.screen.width/2-200, self.screen.height/2+150), (400, 100)),
             text="QUIT",
             manager=self.ui_manager
         )
