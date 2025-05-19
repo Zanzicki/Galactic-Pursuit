@@ -51,7 +51,6 @@ class GameWorld:
 
         # Initialize player and planets
         self.map.generate_planets()
-        self.player_position = [400, 300]  # Example player position
 
     @property
     def state(self):
@@ -87,6 +86,11 @@ class GameWorld:
                 self.ui_manager.handle_event(event)
                 if self.state == "shop":
                     self.shop.handle_event(event)
+        
+            pygame.pressed_keys = pygame.key.get_pressed()
+            if pygame.pressed_keys[pygame.K_ESCAPE]:
+                self._running = False
+
 
 
             self.screen.fill("black")
@@ -163,8 +167,11 @@ class GameWorld:
             for gameObject in self._gameObjects:
                 if gameObject.get_component("Card") is not None:
                     gameObject.update(delta_time)
+                    gameObject.get_component("Card").draw_cardtext(self.screen, gameObject.transform.position.x, gameObject.transform.position.y)
                 if gameObject.get_component("Enemy") is not None:
                     gameObject.update(delta_time)
+                    self.ui_manager.draw_healthbar(self.screen,gameObject.get_component("Enemy").health, (100, 100))
+            self.ui_manager.draw_healthbar(self.screen, self.player.health, (self.width - 300, 100))
 
     def get_player_position(self):
         for gameObject in self._gameObjects:

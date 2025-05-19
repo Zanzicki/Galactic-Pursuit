@@ -1,3 +1,4 @@
+import pygame
 from Components.component import Component
 
 class Card(Component):
@@ -10,6 +11,7 @@ class Card(Component):
         self._description = description
         self._prize = prize
         self.damage = damage
+        self.gameworld = None
 
     @property
     def name(self):
@@ -32,4 +34,8 @@ class Card(Component):
     def update(self, delta_time):
         pass
 
+    def draw_cardtext(self, screen, x, y):
+        font = pygame.font.Font("Assets/Fonts/ImpactfulBits.ttf", 20)
+        text_surface = font.render(f"{self._name} \n{self._description}", True, (0,0,0))
+        screen.blit(text_surface, (x, y))
    

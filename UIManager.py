@@ -67,3 +67,15 @@ class UIManager:
     def show_options(self):
         print("Showing Options")
         # Implement options menu logic here
+
+    # Draws the health bar of a game object
+    def draw_healthbar(self, screen, max_health, position):
+        bar_width = 200
+        bar_height = 20
+        x, y = position
+
+        health_percentage = max_health / 100
+        
+        pygame.draw.rect(screen, (255, 0, 0), (x, y, bar_width, bar_height))
+
+        pygame.draw.rect(screen, (0, 255, 0), (x, y, bar_width * health_percentage, bar_height))

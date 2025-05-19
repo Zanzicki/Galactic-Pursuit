@@ -70,9 +70,6 @@ class Map:
                     placed = True
                     break
 
-        
-
-
     def draw(self, screen):
         for planet in self.planets:
             planet.draw(screen, self.font)

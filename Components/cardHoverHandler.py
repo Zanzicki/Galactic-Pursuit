@@ -35,6 +35,8 @@ class CardHoverHandler(Component):
 
         elif card_type == "Block":
             self.block_card_activated(game_world, target)
+        elif card_type == "Deck":
+            print("Deck activated")
 
     def attack_card_activated(self, game_world, target=None):      
         get_card_component = self.get_card_component()
@@ -49,7 +51,7 @@ class CardHoverHandler(Component):
                 
                 enemy_component = target.get_component("Enemy")
                 if enemy_component:
-                    card_damage= 100
+                    card_damage= 10
                     enemy_component.take_damage(card_damage)
                     print(f"[card activated] {card_type} dealt {card_damage} to {enemy_component.name}")
                 else:
@@ -76,8 +78,12 @@ class CardHoverHandler(Component):
         if not sprite_renderer:
             return
 
-        rect = sprite_renderer.sprite.rect 
-        rect.topleft = self.gameObject.transform.position
+        rect = pygame.Rect(
+            self.gameObject.transform.position[0],
+            self.gameObject.transform.position[1],
+            sprite_renderer.sprite_image.get_width(),
+            sprite_renderer.sprite_image.get_height()
+        )
 
         mouse_pos = pygame.mouse.get_pos()
         self._hovered = rect.collidepoint(mouse_pos)
@@ -129,5 +135,3 @@ class CardHoverHandler(Component):
 
         else:
             self.clicked = False
-
-    
