@@ -15,9 +15,64 @@ class CardHoverHandler(Component):
 
     def start(self):
         pass
+    
+    def get_card_component(self):
+        card_component = self.gameObject.get_component("Card")
+        if not card_component:
+            print("[error] No Card component found on this GameObject.")
+            return None
+        return card_component
+
+    # method to see wich type has been activated
+    # and call the right method
+    def card_type_activated(self, game_world, target=None):
+        get_card_component = self.get_card_component()
+
+        card_type = getattr(get_card_component, "_type", "")
+
+        if card_type == "Attack":
+                self.attack_card_activated(game_world, target)
+
+        elif card_type == "Block":
+            self.block_card_activated(game_world, target)
+            
+            
+
+
+    def attack_card_activated(self, game_world, target=None):      
+        get_card_component = self.get_card_component()
+
+        card_type = getattr(get_card_component, "_type", "")
+        card_damage = getattr(get_card_component, "damage", 0)
+
+        
+        if card_type == "Attack":
+            print(f"[card activated] {card_type} activated")        
+            if target: 
+                
+                enemy_component = target.get_component("Enemy")
+                if enemy_component:
+                    card_damage= 100
+                    enemy_component.take_damage(card_damage)
+                    print(f"[card activated] {card_type} dealt {card_damage} to {enemy_component.name}")
+                else:
+                    print("[error] Target does not have an Enemy component.")
+
+        else:
+            print("you missed the target")       
+
+    
+    def block_card_activated(self, game_world, target=None):
+        get_card_component = self.get_card_component()
+
+        card_type = getattr(get_card_component, "_type", "")
+        
+        if card_type == "Block":
+            print("Block activated")
+
 
     def update(self, delta_time):
-        # ✅ Local import to avoid circular dependency
+        #  Local import to avoid circular dependency
         from gameworld import GameWorld
 
         sprite_renderer = self.gameObject.get_component("SpriteRenderer")
@@ -63,9 +118,19 @@ class CardHoverHandler(Component):
             if pygame.mouse.get_pressed()[0]:  # Left click
                 if not self.clicked:
                  self.clicked = True
-                 print(f"Card clicked!")
-                 print(vars(card_info))
-                 self.gameObject.is_destroyed = True
+                 print(f"Card clicked!")                 
+                 
+                enemy_target = None
+                for obj in self._game_world._gameObjects:
+                     enemy_component = obj.get_component("Enemy")
+                     if enemy_component and enemy_component.is_alive:
+                         enemy_target = obj
+                         break
+                 
+                self.card_type_activated(self._game_world, target=enemy_target) 
+                self.gameObject.is_destroyed = True
+
         else:
             self.clicked = False
 
+    

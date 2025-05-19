@@ -1,7 +1,7 @@
 from Components.component import Component
 
 class Card(Component):
-    def __init__(self, name, value, type, rarity, description, prize):
+    def __init__(self, name, value, type, rarity, description, prize, damage=0):
         super().__init__()
         self._name = name
         self._value = value
@@ -9,6 +9,7 @@ class Card(Component):
         self._rarity = rarity
         self._description = description
         self._prize = prize
+        self.damage = damage
 
     @property
     def name(self):
@@ -30,3 +31,5 @@ class Card(Component):
 
     def update(self, delta_time):
         pass
+
+   

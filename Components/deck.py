@@ -11,6 +11,12 @@ class Deck:
     def cardsindeck(self):
         return self._cards
 
+    def awake(self, game_world):
+        pass
+
+    def start(self):
+        pass
+
     def add_card(self, card: Card):
         self.cards.append(card)
 
@@ -48,3 +54,6 @@ class Deck:
                 name, value, type, rarity, description, prize = card_data[1], card_data[2], card_data[3], card_data[4], card_data[5], card_data[6]
                 card = Card(name, value, type, rarity, description, prize)
                 self.add_card(card)
+
+    def update(self, delta_time):
+        pass

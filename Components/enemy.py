@@ -1,5 +1,6 @@
 from Components.component import Component
 
+
 class Enemy(Component):
     def __init__(self, name, health, attack, strategy):
         super().__init__()
@@ -29,18 +30,21 @@ class Enemy(Component):
     def take_damage(self):
         raise AttributeError("This property is write-only.")
 
-    @take_damage.setter
+    
     def take_damage(self, damage):
         if self._is_alive:
             self._health -= damage
             if self._health <= 0:
                 self._is_alive = False
                 print(f"{self._name} has been defeated!")
+                self.gameObject.is_destroyed = True #remove enemy from game world
+                
+                self.game_world.state = "map" # Transition to the map state
         else:
             print(f"{self._name} is already defeated.")
 
     def awake(self, game_world):
-        pass
+        self.game_world = game_world
     
     def start(self):
         pass
