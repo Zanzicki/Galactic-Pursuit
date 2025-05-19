@@ -52,7 +52,7 @@ class CardHoverHandler(Component):
                 
                 enemy_component = target.get_component("Enemy")
                 if enemy_component:
-                    card_damage= 100
+                    card_damage= 10
                     enemy_component.take_damage(card_damage)
                     print(f"[card activated] {card_type} dealt {card_damage} to {enemy_component.name}")
                 else:
