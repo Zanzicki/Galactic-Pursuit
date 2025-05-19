@@ -34,8 +34,13 @@ class Card(Component):
     def update(self, delta_time):
         pass
 
-    def draw_cardtext(self, screen, x, y):
+    def draw_cardtext(self, screen, gameObject):
         font = pygame.font.Font("Assets/Fonts/ImpactfulBits.ttf", 20)
         text_surface = font.render(f"{self._name} \n{self._description}", True, (0,0,0))
+        spriterenderer = gameObject.get_component("SpriteRenderer")
+        if spriterenderer:
+            sprite_rect = spriterenderer.sprite_image.get_rect(topleft=gameObject.transform.position)
+            x = sprite_rect.x + (sprite_rect.width - text_surface.get_width()) // 1.5
+            y = sprite_rect.y + (sprite_rect.height - text_surface.get_height()) // 1.5
         screen.blit(text_surface, (x, y))
    

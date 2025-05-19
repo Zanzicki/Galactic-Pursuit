@@ -158,19 +158,19 @@ class GameWorld:
                 for card in self._deck.cards:
                     card = self._cardFactory.create_component(card)
                     self.instantiate(card)
-                    card.transform.position = pygame.math.Vector2(100 + i, 250)
+                    card.transform.position = pygame.math.Vector2(300 + i, 700)
                     self._create_card = True
-                    i += 50
+                    i += 200
                 new_enemy = self._enemyFactory.create_component("Arangel")
                 self.instantiate(new_enemy)
                 new_enemy.get_component("Enemy").enemy_action()
             for gameObject in self._gameObjects:
                 if gameObject.get_component("Card") is not None:
                     gameObject.update(delta_time)
-                    gameObject.get_component("Card").draw_cardtext(self.screen, gameObject.transform.position.x, gameObject.transform.position.y)
+                    gameObject.get_component("Card").draw_cardtext(self.screen, gameObject)
                 if gameObject.get_component("Enemy") is not None:
                     gameObject.update(delta_time)
-                    self.ui_manager.draw_healthbar(self.screen,gameObject.get_component("Enemy").health, (100, 100))
+                    self.ui_manager.draw_healthbar(self.screen,gameObject.get_component("Enemy").health, (300, 100))
             self.ui_manager.draw_healthbar(self.screen, self.player.health, (self.width - 300, 100))
 
     def get_player_position(self):

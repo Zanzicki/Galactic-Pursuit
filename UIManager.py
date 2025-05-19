@@ -80,3 +80,8 @@ class UIManager:
         pygame.draw.rect(screen, (255, 0, 0), (x, y, bar_width, bar_height))
 
         pygame.draw.rect(screen, (0, 255, 0), (x, y, bar_width * health_percentage, bar_height))
+        #draw health text
+        font = pygame.font.Font(None, 24)
+        health_text = font.render(f"Health: {max_health}", True, (255, 255, 255))
+        text_rect = health_text.get_rect(center=(x + bar_width // 2, y + bar_height // 2))
+        screen.blit(health_text, text_rect)
