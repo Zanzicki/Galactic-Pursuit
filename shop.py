@@ -78,20 +78,6 @@ class Shop:
                 manager=self.manager
             )
             self.buttons.append(('repair', item, button))
-        # self.repair_button = pygame_gui.elements.UIButton(
-        #     relative_rect=pygame.Rect((50, 400), (300,60)),
-        #     text='Repair your ship (restore 30% max health)',
-        #     manager=self.manager
-            # if event.type == pygame_gui.UI_BUTTON_PRESSED:
-            #         for item_type, item_name, button in self.buttons:
-            #             if event.ui_element == button:
-            #             repair_cost = self.item_prices
-            #             if self.player_gold >= repair_cost:
-            #                 self.player_gold -= repair_cost
-            #                 print(f"Restored {item_name} for {item_cost} gold.")
-            #             else:
-            #                 print("Not enough gold.")
-        #)
 
         # Exit button
         self.exit_button = pygame_gui.elements.UIButton(
