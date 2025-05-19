@@ -6,6 +6,8 @@ class NewGame():
 
     def create_new_player(self, name):
         self.database.create_player(name)
-
-        self.game_world.initialize_player(name)
+    
+    def continue_game(self, player_id):
+        self.database.load_player(player_id)
+        
 
