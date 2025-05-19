@@ -64,6 +64,18 @@ class Database:
             )
         ''')
 
+        # Create planet table
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS planets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                type TEXT NOT NULL,
+                explored BOOLEAN NOT NULL,
+                position_x INTEGER NOT NULL,
+                position_y INTEGER NOT NULL,
+            )
+        ''')
+
         self.connection.commit()
 
     def insert_artifact(self, name, rarity, prize):
@@ -123,6 +135,10 @@ class Database:
     
     def fetch_player_artifacts(self, player_id):
         self.cursor.execute('SELECT * FROM playerartifacts WHERE player_id = ?', (player_id,))
+        return self.cursor.fetchall()
+    
+    def fetch_planets(self):
+        self.cursor.execute('SELECT * FROM planets')
         return self.cursor.fetchall()
 
     def close(self):

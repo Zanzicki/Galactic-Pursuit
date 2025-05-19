@@ -1,10 +1,8 @@
 from Components.card import Card
-from Components.component import SpriteRenderer, Transform
-import random
+from Components.component import SpriteRenderer
 from gameobject import GameObject
 import pygame
 from FactoryPatterns.factorypattern import Factory
-from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.cardHoverHandler import CardHoverHandler
 
 class CardFactory(Factory):
@@ -13,6 +11,8 @@ class CardFactory(Factory):
         go.add_component(Card("Card", 0, "Card", "Common", "A simple card", 67))
         go.add_component(SpriteRenderer("Cards/floppycard.png"))
         go.add_component(CardHoverHandler())
+        go.get_component("SpriteRenderer").sprite_image = pygame.transform.scale(go.get_component("SpriteRenderer").sprite_image, (150, 150))
+
         return go
     
     def create_component(self, card):
@@ -20,5 +20,5 @@ class CardFactory(Factory):
         go.add_component(card)
         go.add_component(SpriteRenderer(("Cards/floppycard.png")))
         go.add_component(CardHoverHandler())
-        go.get_component("SpriteRenderer").sprite_image = pygame.transform.scale(go.get_component("SpriteRenderer").sprite_image, (200, 200))
+        go.get_component("SpriteRenderer").sprite_image = pygame.transform.scale(go.get_component("SpriteRenderer").sprite_image, (150, 150))
         return go

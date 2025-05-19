@@ -8,12 +8,18 @@ class UIManager:
         self.ui_manager = pygame_gui.UIManager((game_world.width, game_world.height))  # Initialize pygame_gui UI manager
         self.screen = game_world.screen
 
-        # Example buttons for the menu
-        self.play_button = pygame_gui.elements.UIButton(
+        self.new_game = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((self.screen.width/2-200, self.screen.height/2-250), (400, 100)),
-            text="PLAY",
+            text="New Game",
             manager=self.ui_manager
         )
+
+        self.continue_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((self.screen.width/2-200, self.screen.height/2-150), (400, 100)),
+            text="CONTINUE",
+            manager=self.ui_manager
+        )
+
         self.options_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((self.screen.width/2-200, self.screen.height/2-50), (400, 100)),
             text="OPTIONS",
@@ -32,16 +38,29 @@ class UIManager:
             visible=False 
         )
 
+        self.deck_tracker_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((self.screen.width/20, self.screen.height-200), (150, 150)),
+            text="DECK\nTRACKER",
+            manager=self.ui_manager,
+            visible=False
+        )
+
     def handle_event(self, event):
         self.ui_manager.process_events(event)
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
-            if event.ui_element == self.play_button:
+            if event.ui_element == self.continue_button:
                 self.start_game()
+            elif event.ui_element == self.new_game:
+                self.start_new_game()
             elif event.ui_element == self.quit_button:
                 self.quit_game()
             elif event.ui_element == self.back_to_map_button:
                 self.return_to_map()
+            elif event.ui_element == self.options_button:
+                self.show_options()
+            elif event.ui_element == self.deck_tracker_button:
+                print("Deck Tracker Button Pressed")
 
     def update(self, delta_time):
         self.ui_manager.update(delta_time)
@@ -56,6 +75,10 @@ class UIManager:
         self.options_button.hide()
         self.quit_button.hide()
 
+    def start_new_game(self):
+        print("Starting New Game")
+        self.game_world.state = "map"
+        
     def quit_game(self):
         print("Quitting Game")
         self.game_world._running = False
@@ -68,6 +91,11 @@ class UIManager:
     def show_options(self):
         print("Showing Options")
         # Implement options menu logic here
+
+    def deck_tracker(self):
+        print("Showing Deck Tracker")
+        # Implement deck tracker logic here
+        self.deck_tracker_button.show()
 
     # Draws the health bar of a game object
     def draw_healthbar(self, screen, max_health, position):

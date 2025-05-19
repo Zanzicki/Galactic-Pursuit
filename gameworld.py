@@ -155,10 +155,12 @@ class GameWorld:
     def draw_and_update_fight(self, delta_time):
             if not self._create_card:
                 i = 0
-                for card in self._deck.cards:
+                for j in range(5):         
+                    card = random.choice(self._deck.cards)
+                    card = self._deck.cards.pop(self._deck.cards.index(card))
                     card = self._cardFactory.create_component(card)
                     self.instantiate(card)
-                    card.transform.position = pygame.math.Vector2(300 + i, 700)
+                    card.transform.position = pygame.math.Vector2(200 + i, 500)
                     self._create_card = True
                     i += 200
                 new_enemy = self._enemyFactory.create_component("Arangel")

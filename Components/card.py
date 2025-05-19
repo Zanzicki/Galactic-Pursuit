@@ -35,7 +35,7 @@ class Card(Component):
         pass
 
     def draw_cardtext(self, screen, gameObject):
-        font = pygame.font.Font("Assets/Fonts/ImpactfulBits.ttf", 20)
+        font = pygame.font.Font("Assets/Fonts/ImpactfulBits.ttf", 15)
         text_surface = font.render(f"{self._name} \n{self._description}", True, (0,0,0))
         spriterenderer = gameObject.get_component("SpriteRenderer")
         if spriterenderer:
