@@ -45,7 +45,7 @@ class Shop:
         # Create buttons for cards
         for i, item in enumerate(self.shop_items['cards']):
             button = pygame_gui.elements.UIButton(
-                relative_rect=pygame.Rect((50 + i * 200, 100), (-1, -1)),
+                relative_rect=pygame.Rect((50 + i * 200, 100), (180, 60)),
                 text=f"{item} ({self.item_prices['card']}g)",
                 manager=self.manager
             )
@@ -88,29 +88,12 @@ class Shop:
     def enter(self):
         self.create_ui_elements()  # Create buttons when entering shop
 
-<<<<<<< HEAD
-                if event.type == pygame_gui.UI_BUTTON_PRESSED:
-                    for item_type, item_name, button in self.buttons:
-                        if event.ui_element == button:
-                            item_cost = self.item_prices[item_type]
-                            if self.player_gold >= item_cost:
-                                self.player_gold -= item_cost
-                                self.player_inventory.append(item_name)
-                                print(f"Bought {item_name} for {item_cost} gold.")
-                            else:
-                                print("Not enough gold.") 
-                    if event.ui_element == self.exit_button:
-                        print("Returning to map!")
-                        self.game_world._state = "map"
-                        return
-=======
     def exit(self):
         # Destroy all shop buttons when leaving shop
         for _, _, button in self.buttons:
             button.kill()
         self.exit_button.kill()
         self.buttons.clear()
->>>>>>> origin/krelleshopandenmies
 
     def handle_event(self, event):
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
