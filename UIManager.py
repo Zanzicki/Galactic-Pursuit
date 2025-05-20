@@ -22,6 +22,14 @@ class UIManager:
         self.startgame = NewGame()
         self.startgame.database = Database()  # Attach your database
 
+        # End turn button
+        self.end_turn_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((game_world.width - 220, game_world.height - 80), (200, 60)),
+            text="End Turn",
+            manager=self.ui_manager
+        )
+        self.end_turn_button.hide()
+
     def create_menu_buttons(self):
         # Create your menu buttons and add them to self.menu_buttons
         self.new_game_button = pygame_gui.elements.UIButton(
@@ -206,6 +214,12 @@ class UIManager:
     def deck_tracker(self):
         print("Showing Deck Tracker")
         self.deck_tracker_button.show()
+
+    def show_end_turn_button(self):
+        self.end_turn_button.show()
+
+    def hide_end_turn_button(self):
+        self.end_turn_button.hide()
 
     # Draws the health bar of a game object
     def draw_healthbar(self, screen, max_health, position):
