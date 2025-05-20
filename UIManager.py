@@ -1,32 +1,46 @@
 import pygame
 import pygame_gui
+from startgame import NewGame
+from database import Database
 
 
 class UIManager:
     def __init__(self, game_world):
-        self.game_world = game_world  # Reference to the GameWorld
-        self.ui_manager = pygame_gui.UIManager((game_world.width, game_world.height))  # Initialize pygame_gui UI manager
+        self.game_world = game_world
+        self.ui_manager = pygame_gui.UIManager((game_world.width, game_world.height))
         self.screen = game_world.screen
 
-        self.new_game = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.screen.width/2-200, self.screen.height/2-250), (400, 100)),
+        self.menu_buttons = []
+        self.create_menu_buttons()
+
+        # For dialogs
+        self.name_entry_window = None
+        self.name_entry_line = None
+        self.player_select_window = None
+        self.player_dropdown = None
+
+        self.startgame = NewGame()
+        self.startgame.database = Database()  # Attach your database
+
+    def create_menu_buttons(self):
+        # Create your menu buttons and add them to self.menu_buttons
+        self.new_game_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((self.screen.get_width()/2-200, self.screen.get_height()/2-250), (400, 100)),
             text="New Game",
             manager=self.ui_manager
         )
-
         self.continue_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.screen.width/2-200, self.screen.height/2-150), (400, 100)),
+            relative_rect=pygame.Rect((self.screen.get_width()/2-200, self.screen.get_height()/2-150), (400, 100)),
             text="CONTINUE",
             manager=self.ui_manager
         )
-
         self.options_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.screen.width/2-200, self.screen.height/2-50), (400, 100)),
+            relative_rect=pygame.Rect((self.screen.get_width()/2-200, self.screen.get_height()/2-50), (400, 100)),
             text="OPTIONS",
             manager=self.ui_manager
         )
         self.quit_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.screen.width/2-200, self.screen.height/2+150), (400, 100)),
+            relative_rect=pygame.Rect((self.screen.get_width()/2-200, self.screen.get_height()/2+150), (400, 100)),
             text="QUIT",
             manager=self.ui_manager
         )
@@ -45,22 +59,120 @@ class UIManager:
             visible=False
         )
 
+        self.menu_buttons = [self.new_game_button, self.continue_button, self.options_button, self.quit_button]
+
+    def show_menu_buttons(self):
+        for button in self.menu_buttons:
+            button.show()
+
+    def hide_menu_buttons(self):
+        for button in self.menu_buttons:
+            button.hide()
+
+
     def handle_event(self, event):
         self.ui_manager.process_events(event)
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
-            if event.ui_element == self.continue_button:
-                self.start_game()
-            elif event.ui_element == self.new_game:
-                self.start_new_game()
+            if event.ui_element == self.new_game_button:
+                self.show_new_player_dialog()
+            elif event.ui_element == self.continue_button:
+                self.show_continue_dialog()
+            elif self.name_entry_window and event.ui_element == self.name_entry_line:
+                pass  # handled below
+            elif self.player_select_window and event.ui_element == self.player_dropdown:
+                pass  # handled below
+            elif event.ui_element == self.options_button:
+                self.show_options()
             elif event.ui_element == self.quit_button:
                 self.quit_game()
             elif event.ui_element == self.back_to_map_button:
                 self.return_to_map()
-            elif event.ui_element == self.options_button:
-                self.show_options()
-            elif event.ui_element == self.deck_tracker_button:
-                print("Deck Tracker Button Pressed")
+        # Handle text entry for new player
+        if self.name_entry_line and event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED:
+            if event.ui_element == self.name_entry_line:
+                player_name = event.text
+                self.startgame.create_new_player(player_name)
+                print(f"Created new player: {player_name}")
+                self.name_entry_window.kill()
+                self.name_entry_window = None
+                self.name_entry_line = None
+                self.game_world.state = "map"
+
+        # Handle dropdown selection for continue
+        if self.player_dropdown and event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
+            if event.ui_element == self.player_dropdown:
+                player_id = int(event.text.split(":")[0])
+                self.startgame.continue_game(player_id)
+                print(f"Continuing game for player id: {player_id}")
+                self.player_select_window.kill()
+                self.player_select_window = None
+                self.player_dropdown = None
+                self.game_world.state = "map"
+        if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            if hasattr(self, "save_slot_buttons"):
+                for btn in self.save_slot_buttons:
+                    if event.ui_element == btn:
+                        player_id = btn.player_id
+                        self.startgame.continue_game(player_id)
+                        print(f"Continuing game for player id: {player_id}")
+                        if self.player_select_window:
+                            self.player_select_window.kill()
+                            self.player_select_window = None
+                        for b in self.save_slot_buttons:
+                            b.kill()
+                        self.save_slot_buttons = []
+                        self.game_world.state = "map"
+
+    def show_new_player_dialog(self):
+        if self.name_entry_window:
+            self.name_entry_window.kill()
+        self.name_entry_window = pygame_gui.elements.UIWindow(
+            pygame.Rect((self.screen.get_width()/2-150, self.screen.get_height()/2-50), (300, 100)),
+            manager=self.ui_manager,
+            window_display_title="Enter Player Name"
+        )
+        self.name_entry_line = pygame_gui.elements.UITextEntryLine(
+            relative_rect=pygame.Rect((10, 10), (280, 30)),
+            manager=self.ui_manager,
+            container=self.name_entry_window
+        )
+        self.name_entry_line.set_text_length_limit(20)
+
+    def show_continue_dialog(self):
+        # Destroy previous window if it exists
+        if self.player_select_window:
+            self.player_select_window.kill()
+            self.player_select_window = None
+        # Remove old slot buttons if they exist
+        if hasattr(self, "save_slot_buttons"):
+            for btn in self.save_slot_buttons:
+                btn.kill()
+        self.save_slot_buttons = []
+
+        players = self.startgame.database.fetch_players()
+        if not players:
+            print("No players found.")
+            return
+
+        # Limit to 10 slots
+        players = players[:10]
+        self.player_select_window = pygame_gui.elements.UIWindow(
+            pygame.Rect((self.screen.get_width()/2-200, self.screen.get_height()/2-200), (400, 600)),
+            manager=self.ui_manager,
+            window_display_title="Select Save Slot"
+        )
+
+        for idx, player in enumerate(players):
+            player_id, player_name, player_gold = player[:3]
+            btn = pygame_gui.elements.UIButton(
+                relative_rect=pygame.Rect((20, 20 + idx*55, 360, 50)),
+                text=f"Slot {idx+1}: {player_name} (Gold: {player_gold})",
+                manager=self.ui_manager,
+                container=self.player_select_window
+            )
+            btn.player_id = player_id  # Attach player_id for later reference
+            self.save_slot_buttons.append(btn)
 
     def update(self, delta_time):
         self.ui_manager.update(delta_time)
@@ -90,11 +202,9 @@ class UIManager:
     
     def show_options(self):
         print("Showing Options")
-        # Implement options menu logic here
 
     def deck_tracker(self):
         print("Showing Deck Tracker")
-        # Implement deck tracker logic here
         self.deck_tracker_button.show()
 
     # Draws the health bar of a game object

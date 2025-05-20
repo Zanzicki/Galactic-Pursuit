@@ -2,7 +2,6 @@ import pygame
 import random
 from BuilderPattern.playerbuilder import PlayerBuilder
 from Components.player import Player
-from menu import Menu
 from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
@@ -29,7 +28,6 @@ class GameWorld:
         self._artifactFactory = ArtifactFactory()
         self._deck = Deck()
         self._create_card = False
-        self.menu = Menu(self)  # Pass GameWorld to the Menu
         self._enemyFactory = EnemyFactory()
         self.state_changed_to_shop = "out"
 
@@ -91,15 +89,15 @@ class GameWorld:
             if pygame.pressed_keys[pygame.K_ESCAPE]:
                 self._running = False
 
-
-
             self.screen.fill("black")
 
-            # Update the active state
             if self._state == "menu":
+                self.ui_manager.show_menu_buttons()
                 self.ui_manager.update(delta_time)
                 self.ui_manager.draw(self.screen)
-            elif self._state == "map":
+            else:
+                self.ui_manager.hide_menu_buttons()
+            if self._state == "map":
                 pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)  # Sun in the center
                 self.draw_and_update_map(delta_time, events)
             elif self._state == "shop":
