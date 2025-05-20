@@ -1,8 +1,9 @@
 import pygame
 import random
+
+import pygame_gui
 from BuilderPattern.playerbuilder import PlayerBuilder
 from Components.player import Player
-from menu import Menu
 from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
@@ -12,6 +13,7 @@ from map import Map
 from shop import Shop
 from Components.planet import Planet
 from uimanager import UIManager  # Import the UIManager class
+from turnorder import TurnOrder
 
 class GameWorld:
     def __init__(self, width, height):
@@ -29,8 +31,10 @@ class GameWorld:
         self._artifactFactory = ArtifactFactory()
         self._deck = Deck()
         self._create_card = False
-        self.menu = Menu(self)  # Pass GameWorld to the Menu
         self._enemyFactory = EnemyFactory()
+        self.state_changed_to_shop = "out"
+        self.turnorder = 0
+        self.current_enemy = None
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
@@ -50,7 +54,8 @@ class GameWorld:
 
         # Initialize player and planets
         self.map.generate_planets()
-        self.player_position = [400, 300]  # Example player position
+
+        self.turn_order = None  # Will be set when a fight starts
 
     @property
     def state(self):
@@ -74,7 +79,6 @@ class GameWorld:
             gameObject.start()
 
     def update(self):
-        """Main game loop."""
         while self._running:
             delta_time = self._clock.tick(60) / 1000.0  # Limit to 60 FPS
 
@@ -85,18 +89,34 @@ class GameWorld:
 
                 # Delegate UI events to the UIManager
                 self.ui_manager.handle_event(event)
+                if self.state == "shop":
+                    self.shop.handle_event(event)
+        
+            pygame.pressed_keys = pygame.key.get_pressed()
+            if pygame.pressed_keys[pygame.K_ESCAPE]:
+                self._running = False
 
             self.screen.fill("black")
 
-            # Update the active state
             if self._state == "menu":
+                self.ui_manager.show_menu_buttons()
                 self.ui_manager.update(delta_time)
                 self.ui_manager.draw(self.screen)
-            elif self._state == "map":
+            else:
+                self.ui_manager.hide_menu_buttons()
+            if self._state == "map":
                 pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)  # Sun in the center
                 self.draw_and_update_map(delta_time, events)
             elif self._state == "shop":
-                self.shop.run()
+                if self.state_changed_to_shop == "into":
+                    self.state_changed_to_shop = "in"
+                    self.shop.enter()
+                self.shop.update(delta_time)
+                self.shop.draw()
+                # When leaving shop and entering menu or map:
+                if self.state_changed_to_shop == "out":
+                    self.state = "map" 
+                    self.shop.exit()
             elif self._state == "game":
                 self.draw_and_update_fight(delta_time)
                 self.back_to_map(delta_time)
@@ -118,6 +138,9 @@ class GameWorld:
                                                    self.height // 2 - mystery_text.get_height() // 2))
                 self.back_to_map(delta_time)
 
+            if self._state != "game":
+                 self._fight_initialized = False
+
             self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
 
             pygame.display.flip()
@@ -138,22 +161,47 @@ class GameWorld:
                 gameObject.update(delta_time)
 
     def draw_and_update_fight(self, delta_time):
-            if not self._create_card:
-                i = 0
-                for card in self._deck.cards:
-                    card = self._cardFactory.create_component(card)
-                    self.instantiate(card)
-                    card.transform.position = pygame.math.Vector2(100 + i, 250)
-                    self._create_card = True
-                    i += 50
-                new_enemy = self._enemyFactory.create_component("Arangel")
-                self.instantiate(new_enemy)
-                new_enemy.get_component("Enemy").enemy_action()
-            for gameObject in self._gameObjects:
-                if gameObject.get_component("Card") is not None:
-                    gameObject.update(delta_time)
-                if gameObject.get_component("Enemy") is not None:
-                    gameObject.update(delta_time)
+        # Setup fight if not already done
+        if not hasattr(self, "_fight_initialized") or not self._fight_initialized:
+            # Create cards and enemy as before
+            i = 0
+            for j in range(5):         
+                card = random.choice(self._deck.cards)
+                card = self._deck.cards.pop(self._deck.cards.index(card))
+                card = self._cardFactory.create_component(card)
+                self.instantiate(card)
+                card.transform.position = pygame.math.Vector2(200 + i, 500)
+                i += 200
+            new_enemy = self._enemyFactory.create_component("Arangel")
+            self.instantiate(new_enemy)
+            self.current_enemy = new_enemy.get_component("Enemy")
+            # Setup turn order
+            self.turn_order = TurnOrder(self.player, self.current_enemy)
+            self._fight_initialized = True
+
+        # Draw cards and enemy as before
+        for gameObject in self._gameObjects:
+            if gameObject.get_component("Card") is not None:
+                gameObject.update(delta_time)
+                gameObject.get_component("Card").draw_cardtext(self.screen, gameObject)
+            if gameObject.get_component("Enemy") is not None:
+                gameObject.update(delta_time)
+                self.ui_manager.draw_healthbar(self.screen, gameObject.get_component("Enemy").health, (300, 100))
+        self.ui_manager.draw_healthbar(self.screen, self.player.health, (self.width - 300, 100))
+
+        # Turn logic
+        if self.turn_order.is_player_turn():
+            # Enable card play, show "End Turn" button, etc.
+            self.ui_manager.show_end_turn_button()
+            for event in pygame.event.get():
+                self.ui_manager.handle_event(event)
+                if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ui_manager.end_turn_button:
+                    self.turn_order.end_turn()
+                    self.ui_manager.hide_end_turn_button()
+        elif self.turn_order.is_enemy_turn():
+            # Enemy acts automatically
+            self.current_enemy.enemy_action()
+            self.turn_order.end_turn()
 
     def get_player_position(self):
         for gameObject in self._gameObjects:
@@ -161,7 +209,7 @@ class GameWorld:
                     return gameObject.transform.position
                 
     def back_to_map(self, delta_time):
-                self.ui_manager.back_to_map_button.show()  # Show the Back to Map button
+                self.ui_manager.back_to_map_button.show()  
                 self.ui_manager.update(delta_time)
                 self.ui_manager.draw(self.screen)
 

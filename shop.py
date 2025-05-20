@@ -1,16 +1,16 @@
 import pygame
-import pygame_gui
 import random
+
+import pygame_gui
 from Components import artifact, card
 import upgrades
-
 
 class Shop:
     def __init__(self, game_world):
         self.game_world = game_world
         self.screen = game_world.screen
-        self.manager = pygame_gui.UIManager((1080, 720))
-        self.background = pygame.Surface((1080, 720))
+        self.manager = game_world.ui_manager.ui_manager  # Use the shared UIManager
+        self.background = pygame.Surface((self.screen.get_size()))
         self.background.fill(pygame.Color('#2e2e2e'))
         self.font = pygame.font.Font(None, 36)
 
@@ -39,14 +39,13 @@ class Shop:
 
         # UI elements
         self.buttons = []
-        self.create_ui_elements()
 
     def create_ui_elements(self):
-        """Create UI elements for shop items."""
+        self.buttons.clear()
         # Create buttons for cards
         for i, item in enumerate(self.shop_items['cards']):
             button = pygame_gui.elements.UIButton(
-                relative_rect=pygame.Rect((50 + i * 200, 100), (180, 60)),
+                relative_rect=pygame.Rect((50 + i * 200, 100), (-1, -1)),
                 text=f"{item} ({self.item_prices['card']}g)",
                 manager=self.manager
             )
@@ -86,17 +85,10 @@ class Shop:
             manager=self.manager
         )
 
-    def run(self):
-        """Run the shop interface."""
-        clock = pygame.time.Clock()
-        running = True
-        while running:
-            time_delta = clock.tick(60) / 1000.0
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.game_world._running = False
-                    running = False
+    def enter(self):
+        self.create_ui_elements()  # Create buttons when entering shop
 
+<<<<<<< HEAD
                 if event.type == pygame_gui.UI_BUTTON_PRESSED:
                     for item_type, item_name, button in self.buttons:
                         if event.ui_element == button:
@@ -111,10 +103,36 @@ class Shop:
                         print("Returning to map!")
                         self.game_world._state = "map"
                         return
+=======
+    def exit(self):
+        # Destroy all shop buttons when leaving shop
+        for _, _, button in self.buttons:
+            button.kill()
+        self.exit_button.kill()
+        self.buttons.clear()
+>>>>>>> origin/krelleshopandenmies
 
-                self.manager.process_events(event)
+    def handle_event(self, event):
+        if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            for item_type, item_name, button in self.buttons:
+                if event.ui_element == button:
+                    item_cost = self.item_prices[item_type]
+                    if self.player_gold >= item_cost:
+                        self.player_gold -= item_cost
+                        self.player_inventory.append(item_name)
+                        print(f"Bought {item_name} for {item_cost} gold.")
+                    else:
+                        print("Not enough gold.")
+            if event.ui_element == self.exit_button:
+                print("Returning to map!")
+                self.game_world.state_changed_to_shop = "out"
 
-            self.manager.update(time_delta)
-            self.screen.blit(self.background, (0, 0))
-            self.manager.draw_ui(self.screen)
-            pygame.display.update()
+        # Let the shared UIManager process the event
+        self.manager.process_events(event)
+
+    def update(self, delta_time):
+        self.manager.update(delta_time)
+
+    def draw(self):
+        self.screen.blit(self.background, (0, 0))
+        self.manager.draw_ui(self.screen)
