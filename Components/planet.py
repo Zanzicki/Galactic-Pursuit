@@ -51,11 +51,14 @@ class Planet(Component):
         self._highlighted = distance <= self._size + 20
 
     def draw(self, screen, font):
-        # Draw the planet
-        pygame.draw.circle(screen, self._color, self._position, self._size)
 
+        color = (100, 100, 100) if self._visited == True else self._color
+        # Draw the planet
+        pygame.draw.circle(screen, color, self._position, self._size)
+         
+            
         # Draw highlight if the planet is close to the player
-        if self._highlighted:
+        if self._highlighted and self._visited == False:
             pygame.draw.circle(screen, (255, 255, 255), self._position, self._size + 5, 2)
             text_surface = font.render(self._name, True, (255, 255, 255))
             screen.blit(text_surface, (self._position[0] - 20, self._position[1] - 40))
