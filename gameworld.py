@@ -9,8 +9,8 @@ from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.deck import Deck
 from FactoryPatterns.enemyfactory import EnemyFactory
-from map import Map
-from shop import Shop
+from State.map import Map
+from State.shop import Shop
 from Components.planet import Planet
 from UI.uimanager import UIManager 
 from turnorder import TurnOrder
