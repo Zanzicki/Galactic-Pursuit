@@ -27,9 +27,11 @@ class Map:
         (255, 0, 255), # Magenta (Mystery)
         ]
 
-        weigthed_colors = [0.7, 0.1, 0.1, 0.1]
-        colors = random.choices(colors, weights=weigthed_colors, k=10)
-
+        weigthed_colors = [0.8, 0.05, 0.1, 0.05]
+        rnd_colors = random.choices(colors, weights=weigthed_colors, k=6)
+        all_colors = colors + rnd_colors
+        random.shuffle(all_colors) 
+        
         planet_names = [
         "Mercury", "Venus", "Earth", "Mars", "Jupiter",
         "Saturn", "Uranus", "Neptune", "Pluto", "Eris"
@@ -40,7 +42,7 @@ class Map:
         for i in range(10):
             name = planet_names[i]
             size = random.randint(35, 50)
-            color = random.choice(colors)
+            color = all_colors[i]
 
             placed = False
             for attempt in range(max_attempts):
