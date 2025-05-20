@@ -12,8 +12,9 @@ from FactoryPatterns.enemyfactory import EnemyFactory
 from map import Map
 from shop import Shop
 from Components.planet import Planet
-from uimanager import UIManager  # Import the UIManager class
+from UI.uimanager import UIManager 
 from turnorder import TurnOrder
+from UI.uielement import UIElement 
 
 class GameWorld:
     def __init__(self, width, height):
@@ -35,6 +36,7 @@ class GameWorld:
         self.state_changed_to_shop = "out"
         self.turnorder = 0
         self.current_enemy = None
+        self.ui_element = UIElement
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
@@ -118,7 +120,7 @@ class GameWorld:
                     self.state = "map" 
                     self.shop.exit()
             elif self._state == "game":
-                self.draw_and_update_fight(delta_time)
+                self.draw_and_update_fight(delta_time, events)
                 self.back_to_map(delta_time)
             elif self._state == "game_over":
                 self.screen.fill((0, 0, 0))
@@ -160,7 +162,7 @@ class GameWorld:
                 gameObject.get_component("Player").get_events(events)
                 gameObject.update(delta_time)
 
-    def draw_and_update_fight(self, delta_time):
+    def draw_and_update_fight(self, delta_time, events):
         # Setup fight if not already done
         if not hasattr(self, "_fight_initialized") or not self._fight_initialized:
             # Create cards and enemy as before
@@ -172,12 +174,16 @@ class GameWorld:
                 self.instantiate(card)
                 card.transform.position = pygame.math.Vector2(200 + i, 500)
                 i += 200
-            new_enemy = self._enemyFactory.create_component("Arangel")
+            random_enemy = random.choice(["Arangel", "Gorpi", "The Blue Centipede"])
+            new_enemy = self._enemyFactory.create_component(random_enemy)
             self.instantiate(new_enemy)
             self.current_enemy = new_enemy.get_component("Enemy")
             # Setup turn order
             self.turn_order = TurnOrder(self.player, self.current_enemy)
             self._fight_initialized = True
+
+        turncount = self.turn_order.turncount
+        self.ui_element.draw(self, f"{turncount}", (self.width // 2, 50))
 
         # Draw cards and enemy as before
         for gameObject in self._gameObjects:
@@ -193,7 +199,7 @@ class GameWorld:
         if self.turn_order.is_player_turn():
             # Enable card play, show "End Turn" button, etc.
             self.ui_manager.show_end_turn_button()
-            for event in pygame.event.get():
+            for event in events:
                 self.ui_manager.handle_event(event)
                 if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ui_manager.end_turn_button:
                     self.turn_order.end_turn()
