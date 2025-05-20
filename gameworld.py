@@ -120,7 +120,7 @@ class GameWorld:
                     self.state = "map" 
                     self.shop.exit()
             elif self._state == "game":
-                self.draw_and_update_fight(delta_time)
+                self.draw_and_update_fight(delta_time, events)
                 self.back_to_map(delta_time)
             elif self._state == "game_over":
                 self.screen.fill((0, 0, 0))
@@ -162,7 +162,7 @@ class GameWorld:
                 gameObject.get_component("Player").get_events(events)
                 gameObject.update(delta_time)
 
-    def draw_and_update_fight(self, delta_time):
+    def draw_and_update_fight(self, delta_time, events):
         # Setup fight if not already done
         if not hasattr(self, "_fight_initialized") or not self._fight_initialized:
             # Create cards and enemy as before
@@ -199,7 +199,7 @@ class GameWorld:
         if self.turn_order.is_player_turn():
             # Enable card play, show "End Turn" button, etc.
             self.ui_manager.show_end_turn_button()
-            for event in pygame.event.get():
+            for event in events:
                 self.ui_manager.handle_event(event)
                 if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ui_manager.end_turn_button:
                     self.turn_order.end_turn()
