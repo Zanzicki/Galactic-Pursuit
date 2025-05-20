@@ -94,13 +94,11 @@ class Player(Component):
 
         # Access planets from the Map class
         planets = self.game_world.map.planets
-
-        
         
         for planet in planets:
             dx = player_position.x - planet.transform.position[0]
             dy = player_position.y - planet.transform.position[1]
-            planetcomponent = planet.get_component(Planet)
+            planetcomponent = planet.get_component("Planet")
             
             if planetcomponent.visited:
              continue

@@ -32,6 +32,10 @@ class Planet(Component):
     @property
     def visited(self):
         return self._visited
+    
+    @visited.setter
+    def visited(self, value):
+        self._visited = value
 
     def awake(self, game_world):
         pass
