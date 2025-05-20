@@ -52,7 +52,7 @@ class CardHoverHandler(Component):
                 
                 enemy_component = target.get_component("Enemy")
                 if enemy_component:
-                    card_damage= 100
+                    card_damage= 10
                     enemy_component.take_damage(card_damage)
                     print(f"[card activated] {card_type} dealt {card_damage} to {enemy_component.name}")
                 else:
@@ -69,6 +69,16 @@ class CardHoverHandler(Component):
         
         if card_type == "Block":
             print("Block activated")
+
+            player = None
+            for obj in game_world._gameObjects:
+                player_component = obj.get_component("Player")
+                if player_component:
+                    player = player_component
+                    break
+            if player:
+                player.block_points += 5
+                print(f"[card activated] {card_type} activated, block points: {player.block_points}")
 
 
     def update(self, delta_time):
