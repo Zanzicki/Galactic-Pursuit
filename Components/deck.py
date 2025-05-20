@@ -3,13 +3,26 @@ from database import Database
 
 class Deck:
     def __init__(self):
-        self.cards = []
+        self.full_deck = []
+        self.discarded_cards = []
+        self.remaining_cards = []
         self.db = Database()
         self.create_starter_deck()
     
     @property
     def cardsindeck(self):
-        return self._cards
+        return self.full_deck
+    
+    @property
+    def discarded_cards(self):
+        return self._discarded_cards
+    
+    @discarded_cards.setter
+    def discarded_cards(self, value):
+        if isinstance(value, list):
+            self._discarded_cards = value
+        else:
+            raise ValueError("discarded_cards must be a list")
 
     def awake(self, game_world):
         pass
@@ -18,23 +31,23 @@ class Deck:
         pass
 
     def add_card(self, card: Card):
-        self.cards.append(card)
+        self.full_deck.append(card)
 
     def remove_card(self, card: Card):
-        if card in self.cards:
-            self.cards.remove(card)
+        if card in self.full_deck:
+            self.full_deck.remove(card)
 
     def shuffle(self):
         import random
-        random.shuffle(self.cards)
+        random.shuffle(self.full_deck)
 
     def draw_card(self):
-        if self.cards:
-            return self.cards.pop(0)  # Remove and return the top card
+        if self.full_deck:
+            return self.full_deck.pop(0)  # Remove and return the top card
         return None  # Return None if the deck is empty
 
     def __len__(self):
-        return len(self.cards)
+        return len(self.full_deck)
     
     def create_starter_deck(self):
         cardfromdb = self.db.fetch_basic_cards() 

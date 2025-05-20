@@ -19,6 +19,7 @@ class Player(Component):
             self.game_world = None  # Reference to the GameWorld
             self.events = None
             self._initialized = True  # Mark as initialized
+            self.deck = None
 
     @staticmethod
     def get_instance():
@@ -101,7 +102,6 @@ class Player(Component):
                 elif planetcomponent._color == (255, 0, 0):  # Red (Fight)
                     print(f"{planetcomponent._name} (Red): Entering fight!")
                     self.game_world._state = "game"  # Transition to game state
-                    self.game_world.ui_manager.deck_tracker()
                     return
                 elif planetcomponent._color == (0, 255, 0):  # Green (Artifact)
                     print(f"{planetcomponent._name} (Green): Entering artifact!")

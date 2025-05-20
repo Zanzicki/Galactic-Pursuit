@@ -1,5 +1,6 @@
 import pygame
 import pygame_gui
+from Components.player import Player
 from State.startgame import NewGame
 from database import Database
 
@@ -59,16 +60,21 @@ class UIManager:
             manager=self.ui_manager,
             visible=False 
         )
-
-        self.deck_tracker_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.screen.width/20, self.screen.height-200), (150, 150)),
-            text="DECK\nTRACKER",
-            manager=self.ui_manager,
-            visible=False
+        
+        self.show_deck_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((self.screen.get_width()/2-420, self.screen.get_height()/2+150), (200, 50)),
+            text="Show Deck",
+            manager=self.ui_manager
+        )
+        self.show_discard_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((self.screen.get_width()/2+220, self.screen.get_height()/2+150), (200, 50)),
+            text="Show Discard",
+            manager=self.ui_manager
         )
 
         self.menu_buttons = [self.new_game_button, self.continue_button, self.options_button, self.quit_button]
-
+        self.game_buttons = [self.show_deck_button, self.show_discard_button]
+        
     def show_menu_buttons(self):
         for button in self.menu_buttons:
             button.show()
@@ -77,6 +83,13 @@ class UIManager:
         for button in self.menu_buttons:
             button.hide()
 
+    def show_game_buttons(self):
+        for button in self.game_buttons:
+            button.show()
+
+    def hide_game_buttons(self):
+        for button in self.game_buttons:
+            button.hide()
 
     def handle_event(self, event):
         self.ui_manager.process_events(event)
@@ -96,6 +109,11 @@ class UIManager:
                 self.quit_game()
             elif event.ui_element == self.back_to_map_button:
                 self.return_to_map()
+            elif event.ui_element == self.show_deck_button:
+                self.show_card_list_window(deck_type="deck")
+            elif event.ui_element == self.show_discard_button:
+                self.show_card_list_window(deck_type="discard")
+
         # Handle text entry for new player
         if self.name_entry_line and event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED:
             if event.ui_element == self.name_entry_line:
@@ -237,3 +255,38 @@ class UIManager:
         health_text = font.render(f"Health: {max_health}", True, (255, 255, 255))
         text_rect = health_text.get_rect(center=(x + bar_width // 2, y + bar_height // 2))
         screen.blit(health_text, text_rect)
+
+    def show_card_list_window(self, deck_type="deck"):
+        # Remove previous window if it exists
+        if hasattr(self, "card_list_window") and self.card_list_window:
+            self.card_list_window.kill()
+            self.card_list_window = None
+
+        # Get the deck from the player
+        player = Player.get_instance()
+        deck = player.deck if isinstance(player, Player) else None
+        if not deck:
+            print("No deck found!")
+            return
+
+        if deck_type == "deck":
+            card_list = deck.cardsindeck
+            title = "Cards in Deck"
+        else:
+            card_list = deck.discarded_cards
+            title = "Discarded Cards"
+
+        card_names = [getattr(card, "name", str(card)) for card in card_list]
+        card_text = "\n".join(card_names) if card_names else "No cards."
+
+        self.card_list_window = pygame_gui.elements.UIWindow(
+            pygame.Rect((self.screen.get_width()/2-200, self.screen.get_height()/2-200), (400, 400)),
+            manager=self.ui_manager,
+            window_display_title=title
+        )
+        text_box = pygame_gui.elements.UITextBox(
+            html_text=card_text.replace("\n", "<br>"),
+            relative_rect=pygame.Rect((10, 10), (380, 340)),
+            manager=self.ui_manager,
+            container=self.card_list_window
+        )

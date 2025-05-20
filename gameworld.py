@@ -44,6 +44,7 @@ class GameWorld:
         # Initialize Player using PlayerBuilder
         builder = PlayerBuilder()
         builder.build()
+        self.playerGo = builder.get_gameObject()
 
         self.player = Player.get_instance()
         self._gameObjects.append(builder.get_gameObject())  # Add the player to the game objects
@@ -102,13 +103,16 @@ class GameWorld:
 
             if self._state == "menu":
                 self.ui_manager.show_menu_buttons()
+                self.ui_manager.hide_game_buttons()
                 self.ui_manager.update(delta_time)
                 self.ui_manager.draw(self.screen)
             else:
                 self.ui_manager.hide_menu_buttons()
+
             if self._state == "map":
                 pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)  # Sun in the center
                 self.draw_and_update_map(delta_time, events)
+                self.ui_manager.hide_game_buttons()
             elif self._state == "shop":
                 if self.state_changed_to_shop == "into":
                     self.state_changed_to_shop = "in"
@@ -120,6 +124,7 @@ class GameWorld:
                     self.state = "map" 
                     self.shop.exit()
             elif self._state == "game":
+                self.ui_manager.show_game_buttons()
                 self.draw_and_update_fight(delta_time, events)
                 self.back_to_map(delta_time)
             elif self._state == "game_over":
@@ -168,8 +173,8 @@ class GameWorld:
             # Create cards and enemy as before
             i = 0
             for j in range(5):         
-                card = random.choice(self._deck.cards)
-                card = self._deck.cards.pop(self._deck.cards.index(card))
+                card = random.choice(self._deck.full_deck)
+                card = self._deck.full_deck.pop(self._deck.full_deck.index(card))
                 card = self._cardFactory.create_component(card)
                 self.instantiate(card)
                 card.transform.position = pygame.math.Vector2(200 + i, 500)
