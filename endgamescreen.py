@@ -19,10 +19,14 @@ class EndGameScreen:
     
     def restart_game(self):
     # Ryd gameObjects
-        #self.game_world._gameObjects.clear()
+        self.game_world._gameObjects.clear()
         #genskab menu
-        self.game_world.menu = Menu(self.game_world)
         
+        self.game_world.state = "menu"
+        self.game_world.ui_manager.play_button.show()
+        self.game_world.ui_manager.options_button.show()
+        self.game_world.ui_manager.quit_button.show()
+
     # Rebuild player
         builder = PlayerBuilder()
         builder.build()
@@ -33,6 +37,8 @@ class EndGameScreen:
     )
         self.game_world.player = player
 
+        
+       
     # Reset kort og tilstande
         self.game_world._deck.cards.clear()
         self.game_world._create_card = False
@@ -40,8 +46,13 @@ class EndGameScreen:
     # Genskab map
         self.game_world.map = Map(self.game_world)
         self.game_world.map.generate_planets()
+        
+         # After all game objects are created and added to self.game_world._gameObjects
+        for game_object in self.game_world._gameObjects:
+            for component in game_object._components.values():
+                    component._game_world = self.game_world
+                    print(f"Set _game_world for {component}")
 
-    
 
     def update(self, time_delta, events):
         for event in events:
