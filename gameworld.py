@@ -155,7 +155,7 @@ class GameWorld:
             if gameObject.get_component("Planet") is not None:
                 gameObject.update(delta_time)
                 gameObject.get_component("Planet").draw(self.screen, self.font)
-        self.ui_element.draw("Solar system", (640,50), self.shop.player_gold, self.shop.player_scrap)
+        self.ui_element.draw("Solar system", (640,40), self.shop.player_gold, self.shop.player_scrap)
 
         # Then, update and draw the player
         for gameObject in self._gameObjects:
@@ -184,7 +184,7 @@ class GameWorld:
             self._fight_initialized = True
 
         turncount = self.turn_order.turncount
-        self.ui_element.draw(f"Turn: {turncount}", (self.width // 2, 50), self.shop.player_gold, self.shop.player_scrap)
+        self.ui_element.draw(f"Turn: {turncount}", (self.width // 2, 40), self.shop.player_gold, self.shop.player_scrap)
 
         # Draw cards and enemy as before
         for gameObject in self._gameObjects:

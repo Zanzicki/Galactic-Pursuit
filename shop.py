@@ -140,4 +140,4 @@ class Shop:
     def draw(self):
         self.screen.blit(self.background, (0, 0))
         self.manager.draw_ui(self.screen)
-        self.ui_element.draw("Intergalactic Trade Sector",(640,50), self.player_gold, self.player_scrap)
+        self.ui_element.draw("Intergalactic Trade Sector",(640,40), self.player_gold, self.player_scrap)

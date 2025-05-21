@@ -20,7 +20,7 @@ class UIElement():
         position[1] // 2 - ui_text.get_height() // 2))
 
         gold_text = self.font.render(f"Gold: {gold}", True, (255,215,0))
-        self.screen.blit(gold_text, (20,10))
+        self.screen.blit(gold_text, (20,5))
 
         scrap_text = self.font.render(f"Scrap: {scrap}", True, (192,192,192))
-        self.screen.blit(scrap_text, (200,10))
+        self.screen.blit(scrap_text, (200,5))
