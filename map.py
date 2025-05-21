@@ -4,15 +4,20 @@ import pygame_gui
 from Components.planet import Planet
 from gameobject import GameObject
 from UI.uielement import UIElement
-from shop import Shop
+
+
+
+
 
 
 class Map:
     def __init__(self, game_world):
         self.game_world = game_world  # Reference to the GameWorld
+        self.screen = game_world.screen
         self.planets = []  # List to store all planets
         self.font = pygame.font.Font(None, 36)
         self.ui_element = UIElement(self.screen)
+        
         
         self.ui_manager = pygame_gui.UIManager((self.game_world.width, self.game_world.height))
         self.back_button = pygame_gui.elements.UIButton(
@@ -78,4 +83,3 @@ class Map:
         for planet in self.planets:
             planet.draw(screen, self.font)
         
-        self.ui_element.draw("Solar system", (640,50), self.shop.player_gold, self.shop.player_scrap)
