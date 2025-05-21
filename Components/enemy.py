@@ -53,4 +53,4 @@ class Enemy(Component):
         pass
     
     def enemy_action(self):
-        self._strategy.choose_action()
+        self._strategy.choose_action(self._attack)

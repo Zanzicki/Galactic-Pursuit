@@ -17,8 +17,6 @@ class Map:
             manager=self.ui_manager
             
         )
-        
-        
     
     def generate_planets(self):
         colors = [

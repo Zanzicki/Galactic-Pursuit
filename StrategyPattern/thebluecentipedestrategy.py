@@ -3,7 +3,7 @@ from StrategyPattern.strategy import Strategy
 from Components.player import Player
 
 
-class ArangelStrategy(Strategy):
+class TheBlueCentipedeStrategy(Strategy):
     def __init__(self,enemny_name):
         self._name = enemny_name
         self._actions = [self.basic_attack, self.basic_defense, self.special_skill]
