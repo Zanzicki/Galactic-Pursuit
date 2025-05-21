@@ -12,14 +12,10 @@ from FactoryPatterns.enemyfactory import EnemyFactory
 from State.map import Map
 from State.shop import Shop
 from Components.planet import Planet
-<<<<<<< HEAD
-from uimanager import UIManager  # Import the UIManager class
-from endgamescreen import EndGameScreen
-=======
 from UI.uimanager import UIManager 
 from turnorder import TurnOrder
 from UI.uielement import UIElement 
->>>>>>> main
+from State.endgamescreen import EndGameScreen
 
 class GameWorld:
     def __init__(self, width, height):
@@ -153,16 +149,13 @@ class GameWorld:
                                                    self.height // 2 - mystery_text.get_height() // 2))
                 self.back_to_map(delta_time)
 
-<<<<<<< HEAD
             elif self._state == "end_game":
                 self.end_game.update(delta_time, events)
                 self.end_game.draw(self.screen)
-                
-=======
+
             if self._state != "game":
                  self._fight_initialized = False
-
->>>>>>> main
+                 
             self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
 
             pygame.display.flip()
