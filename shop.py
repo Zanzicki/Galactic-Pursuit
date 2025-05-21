@@ -16,24 +16,32 @@ class Shop:
 
         # Player setup
         self.player_gold = 50
+        self.player_scrap = 20
         self.player_inventory = []
 
         # Sample items
+        
         self.cards = ['Strike+', 'Defend+', 'Bash', 'Clash', 'Pommel Strike']
         self.potions = ['Strength Potion', 'Dexterity Potion', 'Health Potion']
         self.repair_ship = ['Repair your ship (heal 30% of max health)']
-        self.item_prices = {
+        self.item_gold_prices = {
             'card': 15,
+            'artifact': 25
+        }
+
+        self.item_scrap_prices = {
             'upgrade': 20,
-            'artifact': 25,
             'repair': 8
         }
 
         # Random shop generation
-        self.shop_items = {
+        self.gold_shop_items = {
             'cards': random.sample(self.cards, 3),
-            'upgrade': random.sample(upgrades.selected_dictionaries, 3),
             'potions': random.sample(self.potions, 2),
+        }
+
+        self.scrap_shop_items = {
+            'upgrade': random.sample(upgrades.selected_dictionaries, 3),
             'repair': random.sample(self.repair_ship,1)
         }
 
@@ -43,37 +51,37 @@ class Shop:
     def create_ui_elements(self):
         self.buttons.clear()
         # Create buttons for cards
-        for i, item in enumerate(self.shop_items['cards']):
+        for i, item in enumerate(self.gold_shop_items['cards']):
             button = pygame_gui.elements.UIButton(
                 relative_rect=pygame.Rect((50 + i * 200, 100), (180, 60)),
-                text=f"{item} ({self.item_prices['card']}g)",
+                text=f"{item} ({self.item_gold_prices['card']}g)",
                 manager=self.manager
             )
             self.buttons.append(('card', item, button))
 
         # Create buttons for upgrades
-        for i, item in enumerate(self.shop_items['upgrade']):
+        for i, item in enumerate(self.scrap_shop_items['upgrade']):
             button = pygame_gui.elements.UIButton(
                 relative_rect=pygame.Rect((50 + i * 200, 200), (180, 60)),
-                text=f"{item} ({self.item_prices['upgrade']}g)",
+                text=f"{item} ({self.item_scrap_prices['upgrade']}g)",
                 manager=self.manager
             )
             self.buttons.append(('upgrade', item, button))
 
         # Create buttons for potions
-        for i, item in enumerate(self.shop_items['potions']):
+        for i, item in enumerate(self.gold_shop_items['potions']):
             button = pygame_gui.elements.UIButton(
                 relative_rect=pygame.Rect((50 + i * 200, 300), (180, 60)),
-                text=f"{item} ({self.item_prices['artifact']}g)",
+                text=f"{item} ({self.item_gold_prices['artifact']}g)",
                 manager=self.manager
             )
             self.buttons.append(('artifact', item, button))
 
 
-        for i, item in enumerate(self.shop_items['repair']):
+        for i, item in enumerate(self.scrap_shop_items['repair']):
             button = pygame_gui.elements.UIButton(
                 relative_rect=pygame.Rect((50 + i * 200, 400), (320, 60)),
-                text=f"{item} ({self.item_prices['repair']}g)",
+                text=f"{item} ({self.item_scrap_prices['repair']}g)",
                 manager=self.manager
             )
             self.buttons.append(('repair', item, button))
@@ -84,6 +92,12 @@ class Shop:
             text='Exit',
             manager=self.manager
         )
+        
+        # topbar_layout_rect = pygame_gui.elements.UIWindow(
+        #     pygame.Rect(0,0,1080,50),
+        #     text =f"Credit Score:{self.player_gold} Scrap {self.player_scrap}"
+
+        # )
 
     def enter(self):
         self.create_ui_elements()  # Create buttons when entering shop
@@ -99,13 +113,42 @@ class Shop:
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             for item_type, item_name, button in self.buttons:
                 if event.ui_element == button:
-                    item_cost = self.item_prices[item_type]
-                    if self.player_gold >= item_cost:
-                        self.player_gold -= item_cost
-                        self.player_inventory.append(item_name)
-                        print(f"Bought {item_name} for {item_cost} gold.")
-                    else:
-                        print("Not enough gold.")
+                    if item_type in self.item_gold_prices:
+                        item_cost = self.item_gold_prices[item_type]
+                        if self.player_gold >= item_cost:
+                            self.player_gold -= item_cost
+                            self.player_inventory.append(item_name)
+                            print(f"Bought {item_name} for {item_cost} gold.")
+                        else:
+                            print("Not enough gold.")
+
+                    elif item_type in self.item_scrap_prices:
+                        item_cost = self.item_scrap_prices[item_type]
+                        if self.player_scrap >= item_cost:
+                            self.player_scrap -= item_cost
+                            self.player_inventory.append(item_name)
+                            print(f"Bought {item_name} for {item_cost} scrap.")
+                        else:
+                            print("Not enough scrap")
+        #     for item_type, item_name, button in self.buttons:
+        #         if event.ui_element == button:
+        #             item_cost = self.item_gold_prices[item_type_gold]
+        #             if self.player_gold >= item_cost:
+        #                 self.player_gold -= item_cost
+        #                 self.player_inventory.append(item_name)
+        #                 print(f"Bought {item_name} for {item_cost} gold.")
+        #             else:
+        #                 print("Not enough gold.")
+        # if event.type == pygame_gui.UI_BUTTON_PRESSED:
+        #     for item_type_scrap, item_name, button in self.buttons:
+        #         if event.ui_element == button:
+        #             item_cost = self.item_scrap_prices[item_type_scrap]
+        #             if self.player_scrap >= item_cost:
+        #                 self.player_scrap -= item_cost
+        #                 self.player_inventory.append(item_name)
+        #                 print(f"Bought {item_name} for {item_cost} scrap.")
+        #             else:
+        #                 print("Not enough scrap.")
             if event.ui_element == self.exit_button:
                 print("Returning to map!")
                 self.game_world.state_changed_to_shop = "out"
