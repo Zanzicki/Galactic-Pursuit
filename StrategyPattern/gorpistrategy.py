@@ -11,7 +11,7 @@ class GorpiStrategy(Strategy):
         
     def choose_action(self, attack_value):
         self.strength = attack_value
-        random_action = random.choice(self)
+        random_action = random.choice(self._actions)
         random_action()
 
     def basic_attack(self):
