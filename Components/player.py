@@ -109,8 +109,9 @@ class Player(Component):
             distance = (dx ** 2 + dy ** 2) ** 0.5
             if distance <= planetcomponent._size + 20:  # Check if the player is close enough to the planet
                 planetcomponent._visited = True  # Mark the planet as visited
-                self.database.change_planet_explored(self._id, planetcomponent._name)
                 self.game_world.map.check_and_spawn_boss()
+                self.database.change_planet_explored(self._id, planetcomponent._name)
+                
                   # Check if the boss should spawn
                 if planetcomponent._name == "Boss":
                     print("Boss planet reached!")

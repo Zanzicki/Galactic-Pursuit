@@ -77,6 +77,7 @@ class Map:
 
     # mangler boss functinalitet så der sker noget når vi trykker på planeten
     def check_and_spawn_boss(self):
+        print("are you being called?")
         if all(planet.get_component("Planet").visited for planet in self.planets):
             print("All planets visited. Spawning boss...")
             
