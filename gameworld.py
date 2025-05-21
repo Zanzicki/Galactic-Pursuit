@@ -36,7 +36,7 @@ class GameWorld:
         self.state_changed_to_shop = "out"
         self.turnorder = 0
         self.current_enemy = None
-        self.ui_element = UIElement
+        self.ui_element = UIElement(self.screen)
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
@@ -183,7 +183,7 @@ class GameWorld:
             self._fight_initialized = True
 
         turncount = self.turn_order.turncount
-        self.ui_element.draw(self, f"{turncount}", (self.width // 2, 50))
+        self.ui_element.draw(f"Turn: {turncount}", (self.width // 2, 50), self.shop.player_gold, self.shop.player_scrap)
 
         # Draw cards and enemy as before
         for gameObject in self._gameObjects:

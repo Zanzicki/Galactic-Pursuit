@@ -3,6 +3,7 @@ import random
 
 import pygame_gui
 from Components import artifact, card
+from UI.uielement import UIElement
 import upgrades
 
 class Shop:
@@ -13,6 +14,7 @@ class Shop:
         self.background = pygame.Surface((self.screen.get_size()))
         self.background.fill(pygame.Color('#2e2e2e'))
         self.font = pygame.font.Font(None, 36)
+        self.ui_element = UIElement(self.screen)
 
         # Player setup
         self.player_gold = 50
@@ -92,12 +94,6 @@ class Shop:
             text='Exit',
             manager=self.manager
         )
-        
-        # topbar_layout_rect = pygame_gui.elements.UIWindow(
-        #     pygame.Rect(0,0,1080,50),
-        #     text =f"Credit Score:{self.player_gold} Scrap {self.player_scrap}"
-
-        # )
 
     def enter(self):
         self.create_ui_elements()  # Create buttons when entering shop
@@ -130,25 +126,7 @@ class Shop:
                             print(f"Bought {item_name} for {item_cost} scrap.")
                         else:
                             print("Not enough scrap")
-        #     for item_type, item_name, button in self.buttons:
-        #         if event.ui_element == button:
-        #             item_cost = self.item_gold_prices[item_type_gold]
-        #             if self.player_gold >= item_cost:
-        #                 self.player_gold -= item_cost
-        #                 self.player_inventory.append(item_name)
-        #                 print(f"Bought {item_name} for {item_cost} gold.")
-        #             else:
-        #                 print("Not enough gold.")
-        # if event.type == pygame_gui.UI_BUTTON_PRESSED:
-        #     for item_type_scrap, item_name, button in self.buttons:
-        #         if event.ui_element == button:
-        #             item_cost = self.item_scrap_prices[item_type_scrap]
-        #             if self.player_scrap >= item_cost:
-        #                 self.player_scrap -= item_cost
-        #                 self.player_inventory.append(item_name)
-        #                 print(f"Bought {item_name} for {item_cost} scrap.")
-        #             else:
-        #                 print("Not enough scrap.")
+        
             if event.ui_element == self.exit_button:
                 print("Returning to map!")
                 self.game_world.state_changed_to_shop = "out"
@@ -162,3 +140,4 @@ class Shop:
     def draw(self):
         self.screen.blit(self.background, (0, 0))
         self.manager.draw_ui(self.screen)
+        self.ui_element.draw("Intergalactic Trade Sector",(640,20), self.player_gold, self.player_scrap)
