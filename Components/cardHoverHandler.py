@@ -1,5 +1,6 @@
 import pygame
 from Components.component import Component
+from Components.player import Player
 
 # made by Erik
 
@@ -9,6 +10,7 @@ class CardHoverHandler(Component):
         self._hovered = False
         self.clicked = False
         self.font = pygame.font.Font(None, 36)
+        self.player = Player.get_instance()  # Get the Singleton Player instance
 
     def awake(self, game_world):
         self._game_world = game_world
@@ -35,9 +37,8 @@ class CardHoverHandler(Component):
 
         elif card_type == "Block":
             self.block_card_activated(game_world, target)
-            
-            
-
+        elif card_type == "Deck":
+            print("Deck activated")
 
     def attack_card_activated(self, game_world, target=None):      
         get_card_component = self.get_card_component()
@@ -89,8 +90,12 @@ class CardHoverHandler(Component):
         if not sprite_renderer:
             return
 
-        rect = sprite_renderer.sprite.rect 
-        rect.topleft = self.gameObject.transform.position
+        rect = pygame.Rect(
+            self.gameObject.transform.position[0],
+            self.gameObject.transform.position[1],
+            sprite_renderer.sprite_image.get_width(),
+            sprite_renderer.sprite_image.get_height()
+        )
 
         mouse_pos = pygame.mouse.get_pos()
         self._hovered = rect.collidepoint(mouse_pos)
@@ -138,9 +143,8 @@ class CardHoverHandler(Component):
                          break
                  
                 self.card_type_activated(self._game_world, target=enemy_target) 
+                self.player.deck.discarded_cards.append(self.gameObject.get_component("Card"))
                 self.gameObject.is_destroyed = True
 
         else:
             self.clicked = False
-
-    

@@ -16,8 +16,6 @@ class Map:
             text='Back',
             manager=self.ui_manager
         )
-        
-        
     
     def generate_planets(self):
         colors = [
@@ -27,7 +25,7 @@ class Map:
         (255, 0, 255), # Magenta (Mystery)
         ]
 
-        weigthed_colors = [0.7, 0.1, 0.1, 0.1]
+        weigthed_colors = [0.5, 0.2, 0.2, 0.1]
         colors = random.choices(colors, weights=weigthed_colors, k=10)
 
         planet_names = [
@@ -71,9 +69,6 @@ class Map:
                     self.game_world._gameObjects.append(planet)
                     placed = True
                     break
-
-        
-
 
     def draw(self, screen):
         for planet in self.planets:
