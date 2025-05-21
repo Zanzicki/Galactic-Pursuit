@@ -1,6 +1,7 @@
 from gameobject import GameObject
 import pygame
 from Components.component import Component
+from Components.planet import Planet
 
 
 class Player(Component):
@@ -95,12 +96,25 @@ class Player(Component):
         # Access planets from the Map class
         planets = self.game_world.map.planets
 
+        
+        
         for planet in planets:
             dx = player_position.x - planet.transform.position[0]
             dy = player_position.y - planet.transform.position[1]
             planetcomponent = planet.get_component("Planet")
+            
+            if planetcomponent._visited:
+             continue
+            
             distance = (dx ** 2 + dy ** 2) ** 0.5
             if distance <= planetcomponent._size + 20:  # Check if the player is close enough to the planet
+                planetcomponent._visited = True  # Mark the planet as visited
+                self.game_world.map.check_and_spawn_boss()
+                  # Check if the boss should spawn
+                if planetcomponent._name == "Boss":
+                    print("Boss planet reached!")
+                    self.game_world._state = "end_game"  # Transition to end game state
+                    return
                 if planetcomponent._color == (0, 0, 255):  # Blue (Shop)
                     print(f"{planetcomponent._name} (Blue): Entering shop!")
                     self.game_world._state = "shop"  # Transition to shop state

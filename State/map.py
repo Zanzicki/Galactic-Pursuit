@@ -15,6 +15,7 @@ class Map:
             relative_rect=pygame.Rect((10, 10), (100, 50)),
             text='Back',
             manager=self.ui_manager
+            
         )
     
     def generate_planets(self, planet_specs=None):
@@ -70,3 +71,7 @@ class Map:
         for planet in self.planets:
             planet.draw(screen, self.font)
 
+
+            planet_component = planet.get_component("Planet")
+            if planet_component:
+                planet.draw(screen, self.font)

@@ -94,3 +94,11 @@ class Deck:
             if card:
                 self.hand.append(card)
         return self.hand
+
+    def reset_deck_at_restart_game(self):
+        self.full_deck.clear()
+        self.discarded_cards.clear()
+        self.draw_pile.clear()
+        self.hand.clear()
+        self.create_starter_deck()
+        self.shuffle()
