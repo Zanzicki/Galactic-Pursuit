@@ -70,10 +70,13 @@ class Database:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 player_id INTEGER NOT NULL,
                 name TEXT NOT NULL,
-                type TEXT NOT NULL,
+                r INTEGER NOT NULL,
+                g INTEGER NOT NULL,
+                b INTEGER NOT NULL,
                 explored BOOLEAN NOT NULL,
                 position_x INTEGER NOT NULL,
-                position_y INTEGER NOT NULL
+                position_y INTEGER NOT NULL,
+                size INTEGER NOT NULL                            
             )
         ''')
 
@@ -130,6 +133,11 @@ class Database:
         self.cursor.execute('SELECT * FROM players')
         return self.cursor.fetchall()
     
+    def fetch_player_id(self, name):
+        self.cursor.execute('SELECT id FROM players WHERE name = ?', (name,))
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
     def fetch_player(self, player_id):
         self.cursor.execute('SELECT * FROM players WHERE id = ?', (player_id,))
         return self.cursor.fetchone()
@@ -142,9 +150,10 @@ class Database:
         self.cursor.execute('SELECT * FROM playerartifacts WHERE player_id = ?', (player_id,))
         return self.cursor.fetchall()
     
-    def fetch_planets(self):
-        self.cursor.execute('SELECT * FROM planets')
+    def fetch_planets_for_player(self, player_id):
+        self.cursor.execute('SELECT name, r, g, b, explored, position_x, position_y, size FROM planets WHERE player_id = ?', (player_id,))
         return self.cursor.fetchall()
+
 
     def close(self):
         self.connection.close()

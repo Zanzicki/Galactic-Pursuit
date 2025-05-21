@@ -11,6 +11,7 @@ class Planet(Component):
         self._highlighted = False  # Whether the planet is highlighted
         self.font = pygame.font.Font(None, 24)  # Font for rendering text
         self._gameworld = gameworld
+        self._explored = False  
         self._visited = False  # Track if the planet has been visited
 
     @property

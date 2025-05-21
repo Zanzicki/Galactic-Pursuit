@@ -15,6 +15,7 @@ from Components.planet import Planet
 from UI.uimanager import UIManager 
 from turnorder import TurnOrder
 from UI.uielement import UIElement 
+from State.startgame import NewGame
 from State.endgamescreen import EndGameScreen
 
 class GameWorld:
@@ -53,11 +54,9 @@ class GameWorld:
         # Center the player's position
         builder.get_gameObject().transform.position = pygame.math.Vector2(self.width // 2, self.height // 2)
 
-        self.map = Map(self)  # Pass GameWorld to the Map
+        self.map = Map(self)
         self.shop = Shop(self)  # Pass GameWorld to the Shop
-
-        # Initialize player and planets
-        self.map.generate_planets()
+        self.start_game = NewGame(self)  # Pass GameWorld to the StartGame
 
         self.turn_order = None  # Will be set when a fight starts
 

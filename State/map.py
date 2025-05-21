@@ -18,86 +18,60 @@ class Map:
             
         )
     
-    def generate_planets(self):
-        colors = [
-        (255, 0, 0),   # Red (Fight)
-        (0, 255, 0),   # Green (Artifact)
-        (0, 0, 255),   # Blue (Shop)
-        (255, 0, 255), # Magenta (Mystery)
-        ]
-
-        weigthed_colors = [0.8, 0.05, 0.1, 0.05]
-        rnd_colors = random.choices(colors, weights=weigthed_colors, k=6)
-        all_colors = colors + rnd_colors
-        random.shuffle(all_colors) 
-        
-        planet_names = [
-        "Mercury", "Venus", "Earth", "Mars", "Jupiter",
-        "Saturn", "Uranus", "Neptune", "Pluto", "Eris"
-    ]
-
-        max_attempts = 100  # Max tries to find non-overlapping position per planet
-
-        for i in range(10):
-            name = planet_names[i]
-            size = random.randint(35, 50)
-            color = all_colors[i]
-
-            placed = False
-            for attempt in range(max_attempts):
+    def generate_planets(self, planet_specs=None):
+        self.planets.clear()
+        if planet_specs is not None:
+            for spec in planet_specs:
+                planet = GameObject(spec['position'])
+                planet.add_component(Planet(
+                    spec['name'],
+                    spec['size'],
+                    spec['color'],
+                    spec['position'],
+                    self.game_world
+                ))
+                self.planets.append(planet)
+                self.game_world._gameObjects.append(planet)
+        else:
+            # Default: generate 10 random planets
+            colors = [
+                (255, 0, 0),   # Red (Fight)
+                (0, 255, 0),   # Green (Artifact)
+                (0, 0, 255),   # Blue (Shop)
+                (255, 0, 255), # Magenta (Mystery)
+            ]
+            planet_names = [
+                "Mercury", "Venus", "Earth", "Mars", "Jupiter",
+                "Saturn", "Uranus", "Neptune", "Pluto", "Eris"
+            ]
+            for i in range(10):
+                name = planet_names[i]
+                size = random.randint(35, 50)
+                color = random.choice(colors)
                 x = random.randint(size + 10, self.game_world.width - size - 10)
                 y = random.randint(size + 10, self.game_world.height - size - 10)
-                new_pos = (x, y)
+                position = (x, y)
+                planet = GameObject(position)
+                planet.add_component(Planet(name, size, color, position, self.game_world))
+                self.planets.append(planet)
+                self.game_world._gameObjects.append(planet)
 
-                overlaps = False
-                for other in self.planets:
-                    other_pos = other.transform.position
-                    other_planet = other.get_component("Planet")
-                    if other_planet is None:
-                        continue
-                    other_size = other_planet.size
-
-                    dx = other_pos[0] - x
-                    dy = other_pos[1] - y
-                    distance = (dx**2 + dy**2)**0.5
-
-                    if distance < (size + other_size + 10):
-                     overlaps = True
-                     break
-
-                if not overlaps:
-                    planet = GameObject(new_pos)
-                    planet.add_component(Planet(name, size, color, new_pos, self.game_world))
-                    self.planets.append(planet)
-                    self.game_world._gameObjects.append(planet)
-                    placed = True
-                    break
-
-    # mangler boss functinalitet så der sker noget når vi trykker på planeten
-    def check_and_spawn_boss(self):
-        if all(planet.get_component("Planet").visited for planet in self.planets):
-            print("All planets visited. Spawning boss...")
-            
-            if any(p.get_component("Planet").name == "Boss" for p in self.planets):
-                
-                return
-
-            boss_size = 70
-            boss_color = (205, 127, 50)
-            boss_position = (self.game_world.width // 2, 100)
-            boss = GameObject(boss_position)
-            boss.add_component(Planet("Boss", boss_size, boss_color, boss_position, self.game_world))
-            self.planets.append(boss)
-            self.game_world._gameObjects.append(boss)
-        
-            if boss.get_component("Planet").name == "Boss" and boss.get_component("Planet").visited == True:
-                print("Boss spawned!")
-                self.game_world._state = "end_game"  # Transition to end game state
-                return
-           
+    def load_planets(self, planet_rows):
+        self.planets.clear()
+        for row in planet_rows:
+            name, type, explored, x, y, size, r, g, b = row
+            position = (x, y)
+            color = (r, g, b)
+            planet = GameObject(position)
+            planet.add_component(Planet(name, size, color, position, self.game_world))
+            self.planets.append(planet)
+            self.game_world._gameObjects.append(planet)
 
     def draw(self, screen):
         for planet in self.planets:
+            planet.draw(screen, self.font)
+
+
             planet_component = planet.get_component("Planet")
             if planet_component:
                 planet.draw(screen, self.font)
