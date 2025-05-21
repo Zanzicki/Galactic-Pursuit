@@ -154,6 +154,15 @@ class Database:
         self.cursor.execute('SELECT name, r, g, b, explored, position_x, position_y, size FROM planets WHERE player_id = ?', (player_id,))
         return self.cursor.fetchall()
 
+    def change_planet_explored(self, player_id, planet_name):
+        self.cursor.execute('''
+            UPDATE planets
+            SET explored = True
+            WHERE player_id = ? AND name = ?
+        ''', (player_id, planet_name))
+        if self.cursor.rowcount == 0:
+            print(f"[error] No planet found for player {player_id} with name {planet_name}.")
+        self.connection.commit()
 
     def close(self):
         self.connection.close()

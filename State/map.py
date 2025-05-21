@@ -1,6 +1,7 @@
 import pygame
 import random
 import pygame_gui
+from Components import planet
 from Components.planet import Planet
 from gameobject import GameObject
 
@@ -68,10 +69,9 @@ class Map:
             self.game_world._gameObjects.append(planet)
 
     def draw(self, screen):
-        for planet in self.planets:
-            planet.draw(screen, self.font)
-
-
             planet_component = planet.get_component("Planet")
             if planet_component:
                 planet.draw(screen, self.font)
+    
+    def check_and_spawn_boss(self):
+        pass

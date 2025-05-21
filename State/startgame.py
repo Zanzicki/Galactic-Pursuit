@@ -1,4 +1,5 @@
 from Components.planet import Planet
+from Components.player import Player
 from gameobject import GameObject
 from State.map import Map
 
@@ -11,6 +12,7 @@ class NewGame:
     def create_new_player(self, name):
         self.database.insert_player(name, 100, 0, 100)
         player_id = self.database.fetch_player_id(name)
+        Player.get_instance()._id = player_id
         print(f"New player created: {name} (ID: {player_id})")
 
         self._game_world.map.generate_planets()
@@ -41,6 +43,7 @@ class NewGame:
     def continue_game(self, player_id):
         self.database.fetch_player(player_id)
         print(f"Continuing game for player ID: {player_id}")
+        Player.get_instance()._id = player_id
 
         # Load planets for this player
         planet_rows = self.database.fetch_planets_for_player(player_id)
@@ -48,7 +51,7 @@ class NewGame:
             name, r, g, b, explored, x, y, size = row
             planet = GameObject((x, y))
             planet.add_component(Planet(name, size, (r, g, b), (x, y), self._game_world))  # Use correct color/type
-            planet.get_component("Planet")._explored = explored
+            planet.get_component("Planet")._visited = explored
             self._game_world.map.planets.append(planet)
             self._game_world._gameObjects.append(planet)
 
