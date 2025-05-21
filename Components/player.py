@@ -108,7 +108,12 @@ class Player(Component):
             distance = (dx ** 2 + dy ** 2) ** 0.5
             if distance <= planetcomponent._size + 20:  # Check if the player is close enough to the planet
                 planetcomponent._visited = True  # Mark the planet as visited
-                self.game_world.map.check_and_spawn_boss()  # Check if the boss should spawn
+                self.game_world.map.check_and_spawn_boss()
+                  # Check if the boss should spawn
+                if planetcomponent._name == "Boss":
+                    print("Boss planet reached!")
+                    self.game_world._state = "end_game"  # Transition to end game state
+                    return
                 if planetcomponent._color == (0, 0, 255):  # Blue (Shop)
                     print(f"{planetcomponent._name} (Blue): Entering shop!")
                     self.game_world._state = "shop"  # Transition to shop state

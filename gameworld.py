@@ -12,6 +12,7 @@ from map import Map
 from shop import Shop
 from Components.planet import Planet
 from uimanager import UIManager  # Import the UIManager class
+from endgamescreen import EndGameScreen
 
 class GameWorld:
     def __init__(self, width, height):
@@ -51,6 +52,9 @@ class GameWorld:
         # Initialize player and planets
         self.map.generate_planets()
         self.player_position = [400, 300]  # Example player position
+
+        # Initialize the end game screen
+        self.end_game = EndGameScreen(self)  # Pass GameWorld to the EndGameScreen
 
     @property
     def state(self):
@@ -118,6 +122,10 @@ class GameWorld:
                                                    self.height // 2 - mystery_text.get_height() // 2))
                 self.back_to_map(delta_time)
 
+            elif self._state == "end_game":
+                self.end_game.update(delta_time, events)
+                self.end_game.draw(self.screen)
+                
             self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
 
             pygame.display.flip()

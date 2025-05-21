@@ -79,7 +79,7 @@ class Map:
     def check_and_spawn_boss(self):
         if all(planet.get_component("Planet").visited for planet in self.planets):
             print("All planets visited. Spawning boss...")
-
+            
             if any(p.get_component("Planet").name == "Boss" for p in self.planets):
                 
                 return
@@ -91,6 +91,12 @@ class Map:
             boss.add_component(Planet("Boss", boss_size, boss_color, boss_position, self.game_world))
             self.planets.append(boss)
             self.game_world._gameObjects.append(boss)
+        
+            if boss.get_component("Planet").name == "Boss" and boss.get_component("Planet").visited == True:
+                print("Boss spawned!")
+                self.game_world._state = "end_game"  # Transition to end game state
+                return
+           
 
     def draw(self, screen):
         for planet in self.planets:
