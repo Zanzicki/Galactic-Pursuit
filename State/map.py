@@ -68,10 +68,28 @@ class Map:
             self.planets.append(planet)
             self.game_world._gameObjects.append(planet)
 
+    def check_and_spawn_boss(self):
+        print("are you being called?")
+        if all(planet.get_component("Planet").visited for planet in self.planets):
+            print("All planets visited. Spawning boss...")
+            
+            if any(p.get_component("Planet").name == "Boss" for p in self.planets):
+                
+                return
+
+            boss_size = 70
+            boss_color = (205, 127, 50)
+            boss_position = (self.game_world.width // 2, 100)
+            boss = GameObject(boss_position)
+            boss.add_component(Planet("Boss", boss_size, boss_color, boss_position, self.game_world))
+            self.planets.append(boss)
+            self.game_world._gameObjects.append(boss)
+        
+            
+           
+
     def draw(self, screen):
+        for planet in self.planets:
             planet_component = planet.get_component("Planet")
             if planet_component:
                 planet.draw(screen, self.font)
-    
-    def check_and_spawn_boss(self):
-        pass

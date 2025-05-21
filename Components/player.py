@@ -4,6 +4,7 @@ from Components.component import Component
 from Components.planet import Planet
 from database import Database
 
+
 class Player(Component):
     _instance = None  # Class-level attribute to store the single instance
 
