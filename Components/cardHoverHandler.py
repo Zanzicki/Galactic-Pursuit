@@ -71,6 +71,16 @@ class CardHoverHandler(Component):
         if card_type == "Block":
             print("Block activated")
 
+            player = None
+            for obj in game_world._gameObjects:
+                player_component = obj.get_component("Player")
+                if player_component:
+                    player = player_component
+                    break
+            if player:
+                player.block_points += 5
+                print(f"[card activated] {card_type} activated, block points: {player.block_points}")
+
 
     def update(self, delta_time):
         #  Local import to avoid circular dependency

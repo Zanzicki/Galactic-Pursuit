@@ -20,6 +20,7 @@ class Player(Component):
             self.events = None
             self._initialized = True  # Mark as initialized
             self.deck = None
+            self.block_points = 0 
 
     @staticmethod
     def get_instance():
@@ -44,6 +45,12 @@ class Player(Component):
 
 
     def take_damage(self, damage):
+        if self.block_points > 0:
+            
+            print(f"{self._gameObject} blocked {damage} damage! Remaining block points: {self.block_points}")
+            self.block_points -= 1
+            return
+        
         if self._health > 0:
             self._health -= damage
             if self._health <= 0:
