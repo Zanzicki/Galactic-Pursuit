@@ -25,7 +25,7 @@ class Map:
         (255, 0, 255), # Magenta (Mystery)
         ]
 
-        weigthed_colors = [0.3, 0.3, 0.2, 0.2]
+        weigthed_colors = [0.5, 0.2, 0.2, 0.1]
         colors = random.choices(colors, weights=weigthed_colors, k=10)
 
         planet_names = [

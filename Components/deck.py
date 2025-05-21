@@ -1,13 +1,18 @@
 from Components.card import Card
 from database import Database
+from FactoryPatterns.cardfactory import CardFactory
 
 class Deck:
     def __init__(self):
         self.full_deck = []
         self.discarded_cards = []
-        self.remaining_cards = []
+        self.draw_pile = []
+        self.hand = []
         self.db = Database()
         self.create_starter_deck()
+        self.cardlist = []        
+        self.cardfactory = CardFactory()
+        self.card_positions = [(100,500), (300,500), (500,500), (700,500), (900,500)]
     
     @property
     def cardsindeck(self):
@@ -23,12 +28,17 @@ class Deck:
             self._discarded_cards = value
         else:
             raise ValueError("discarded_cards must be a list")
-
-    def awake(self, game_world):
-        pass
-
-    def start(self):
-        pass
+        
+    @property
+    def draw_pile(self):
+        return self._draw_pile
+    
+    @draw_pile.setter
+    def draw_pile(self, value):
+        if isinstance(value, list):
+            self._draw_pile = value
+        else:
+            raise ValueError("draw_pile must be a list")
 
     def add_card(self, card: Card):
         self.full_deck.append(card)
@@ -67,6 +77,20 @@ class Deck:
                 name, value, type, rarity, description, prize = card_data[1], card_data[2], card_data[3], card_data[4], card_data[5], card_data[6]
                 card = Card(name, value, type, rarity, description, prize)
                 self.add_card(card)
+    
+    def discard_hand(self):
+        self.discarded_cards.extend(self.hand)
+        self.hand.clear()
 
-    def update(self, delta_time):
-        pass
+    def draw_hand(self, hand_size=5):
+        # If deck is empty, reshuffle discard into deck
+        if len(self.full_deck) < hand_size:
+            self.full_deck.extend(self.discarded_cards)
+            self.discarded_cards.clear()
+            self.shuffle()
+        self.hand = []
+        for _ in range(hand_size):
+            card = self.draw_card()
+            if card:
+                self.hand.append(card)
+        return self.hand

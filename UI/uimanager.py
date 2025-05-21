@@ -55,19 +55,19 @@ class UIManager:
         )
 
         self.back_to_map_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((550, 500), (200, 50)),
+            relative_rect=pygame.Rect((self.screen.width - 220, self.screen.height - 320), (200, 50)),
             text="RETURN TO MAP",
             manager=self.ui_manager,
             visible=False 
         )
         
         self.show_deck_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.screen.get_width()/2-420, self.screen.get_height()/2+150), (200, 50)),
+            relative_rect=pygame.Rect((self.screen.width - 220, self.screen.height - 160), (200, 50)),
             text="Show Deck",
             manager=self.ui_manager
         )
         self.show_discard_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.screen.get_width()/2+220, self.screen.get_height()/2+150), (200, 50)),
+            relative_rect=pygame.Rect((self.screen.width - 220, self.screen.height - 240), (200, 50)),
             text="Show Discard",
             manager=self.ui_manager
         )

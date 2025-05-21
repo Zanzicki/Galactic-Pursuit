@@ -171,14 +171,7 @@ class GameWorld:
         # Setup fight if not already done
         if not hasattr(self, "_fight_initialized") or not self._fight_initialized:
             # Create cards and enemy as before
-            i = 0
-            for j in range(5):         
-                card = random.choice(self._deck.full_deck)
-                card = self._deck.full_deck.pop(self._deck.full_deck.index(card))
-                card = self._cardFactory.create_component(card)
-                self.instantiate(card)
-                card.transform.position = pygame.math.Vector2(200 + i, 500)
-                i += 200
+            self.draw_cards(self.player.deck)
             random_enemy = random.choice(["Arangel", "Gorpi", "The Blue Centipede"])
             new_enemy = self._enemyFactory.create_component(random_enemy)
             self.instantiate(new_enemy)
@@ -208,11 +201,24 @@ class GameWorld:
                 self.ui_manager.handle_event(event)
                 if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ui_manager.end_turn_button:
                     self.turn_order.end_turn()
+                    # When player ends turn:
+                    player_deck = self.player.deck  # or wherever you access the player's deck
+                    player_deck.discard_hand()
+                    self.draw_cards(player_deck)
                     self.ui_manager.hide_end_turn_button()
         elif self.turn_order.is_enemy_turn():
             # Enemy acts automatically
             self.current_enemy.enemy_action()
             self.turn_order.end_turn()
+
+    def draw_cards(self, player_deck):
+        # Draw the player's cards
+        player_hand = player_deck.draw_hand()
+        for i in range(len(player_hand)):
+            card = player_hand[i]
+            card_game_object = self._cardFactory.create_component(card)
+            self.instantiate(card_game_object)
+            card_game_object.transform.position = self.player.deck.card_positions[i]
 
     def get_player_position(self):
         for gameObject in self._gameObjects:
