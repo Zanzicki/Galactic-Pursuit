@@ -20,7 +20,7 @@ class UIManager:
         self.player_select_window = None
         self.player_dropdown = None
 
-        self.startgame = NewGame()
+        self.startgame = NewGame(self.game_world)
         self.startgame.database = Database()  # Attach your database
 
         # End turn button

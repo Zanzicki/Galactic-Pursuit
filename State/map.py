@@ -17,59 +17,56 @@ class Map:
             manager=self.ui_manager
         )
     
-    def generate_planets(self):
-        colors = [
-        (255, 0, 0),   # Red (Fight)
-        (0, 255, 0),   # Green (Artifact)
-        (0, 0, 255),   # Blue (Shop)
-        (255, 0, 255), # Magenta (Mystery)
-        ]
-
-        weigthed_colors = [0.5, 0.2, 0.2, 0.1]
-        colors = random.choices(colors, weights=weigthed_colors, k=10)
-
-        planet_names = [
-        "Mercury", "Venus", "Earth", "Mars", "Jupiter",
-        "Saturn", "Uranus", "Neptune", "Pluto", "Eris"
-    ]
-
-        max_attempts = 100  # Max tries to find non-overlapping position per planet
-
-        for i in range(10):
-            name = planet_names[i]
-            size = random.randint(35, 50)
-            color = random.choice(colors)
-
-            placed = False
-            for attempt in range(max_attempts):
+    def generate_planets(self, planet_specs=None):
+        self.planets.clear()
+        if planet_specs is not None:
+            for spec in planet_specs:
+                planet = GameObject(spec['position'])
+                planet.add_component(Planet(
+                    spec['name'],
+                    spec['size'],
+                    spec['color'],
+                    spec['position'],
+                    self.game_world
+                ))
+                self.planets.append(planet)
+                self.game_world._gameObjects.append(planet)
+        else:
+            # Default: generate 10 random planets
+            colors = [
+                (255, 0, 0),   # Red (Fight)
+                (0, 255, 0),   # Green (Artifact)
+                (0, 0, 255),   # Blue (Shop)
+                (255, 0, 255), # Magenta (Mystery)
+            ]
+            planet_names = [
+                "Mercury", "Venus", "Earth", "Mars", "Jupiter",
+                "Saturn", "Uranus", "Neptune", "Pluto", "Eris"
+            ]
+            for i in range(10):
+                name = planet_names[i]
+                size = random.randint(35, 50)
+                color = random.choice(colors)
                 x = random.randint(size + 10, self.game_world.width - size - 10)
                 y = random.randint(size + 10, self.game_world.height - size - 10)
-                new_pos = (x, y)
+                position = (x, y)
+                planet = GameObject(position)
+                planet.add_component(Planet(name, size, color, position, self.game_world))
+                self.planets.append(planet)
+                self.game_world._gameObjects.append(planet)
 
-                overlaps = False
-                for other in self.planets:
-                    other_pos = other.transform.position
-                    other_planet = other.get_component("Planet")
-                    if other_planet is None:
-                        continue
-                    other_size = other_planet.size
-
-                    dx = other_pos[0] - x
-                    dy = other_pos[1] - y
-                    distance = (dx**2 + dy**2)**0.5
-
-                    if distance < (size + other_size + 10):
-                     overlaps = True
-                     break
-
-                if not overlaps:
-                    planet = GameObject(new_pos)
-                    planet.add_component(Planet(name, size, color, new_pos, self.game_world))
-                    self.planets.append(planet)
-                    self.game_world._gameObjects.append(planet)
-                    placed = True
-                    break
+    def load_planets(self, planet_rows):
+        self.planets.clear()
+        for row in planet_rows:
+            name, type, explored, x, y, size, r, g, b = row
+            position = (x, y)
+            color = (r, g, b)
+            planet = GameObject(position)
+            planet.add_component(Planet(name, size, color, position, self.game_world))
+            self.planets.append(planet)
+            self.game_world._gameObjects.append(planet)
 
     def draw(self, screen):
         for planet in self.planets:
             planet.draw(screen, self.font)
+
