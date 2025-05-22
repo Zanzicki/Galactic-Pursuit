@@ -143,7 +143,7 @@ class CardHoverHandler(Component):
 
                 self.card_type_activated(self._game_world, target=enemy_target) 
                 self.player.deck.discarded_cards.append(self.gameObject.get_component("Card"))
-                self._game_world.pool.release(self.gameObject)  # Add to pool instead of just destroying
+                self._game_world.card_pool.release(self.gameObject)  # Add to pool instead of just destroying
                 self.gameObject.is_destroyed = True  # Mark for removal from game world
 
         else:
