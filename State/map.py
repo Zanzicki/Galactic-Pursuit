@@ -84,15 +84,9 @@ class Map:
             boss.add_component(Planet("Boss", boss_size, boss_color, boss_position, self.game_world))
             self.planets.append(boss)
             self.game_world._gameObjects.append(boss)
-        
-            
-           
 
     def draw(self, screen):
         for planet in self.planets:
             planet_component = planet.get_component("Planet")
             if planet_component:
                 planet.draw(screen, self.font)
-
-    def check_and_spawn_boss(self):
-        pass
