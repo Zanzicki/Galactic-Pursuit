@@ -23,14 +23,6 @@ class UIManager:
         self.startgame = NewGame(self.game_world)
         self.startgame.database = Database()  # Attach your database
 
-        # End turn button
-        self.end_turn_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((game_world.width - 220, game_world.height - 80), (200, 60)),
-            text="End Turn",
-            manager=self.ui_manager
-        )
-        self.end_turn_button.hide()
-
     def create_menu_buttons(self):
         # Create your menu buttons and add them to self.menu_buttons
         self.new_game_button = pygame_gui.elements.UIButton(
@@ -71,9 +63,15 @@ class UIManager:
             text="Show Discard",
             manager=self.ui_manager
         )
+                # End turn button
+        self.end_turn_button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((self.screen.width - 220, self.screen.height - 80), (200, 60)),
+            text="End Turn",
+            manager=self.ui_manager
+        )
 
         self.menu_buttons = [self.new_game_button, self.continue_button, self.options_button, self.quit_button]
-        self.game_buttons = [self.show_deck_button, self.show_discard_button]
+        self.game_buttons = [self.show_deck_button, self.show_discard_button, self.end_turn_button]
         
     def show_menu_buttons(self):
         for button in self.menu_buttons:
