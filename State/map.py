@@ -75,3 +75,6 @@ class Map:
             planet_component = planet.get_component("Planet")
             if planet_component:
                 planet.draw(screen, self.font)
+
+    def check_and_spawn_boss(self):
+        pass
