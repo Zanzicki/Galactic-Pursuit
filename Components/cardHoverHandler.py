@@ -132,21 +132,19 @@ class CardHoverHandler(Component):
             
             if pygame.mouse.get_pressed()[0]:  # Left click
                 if not self.clicked:
-                 self.clicked = True
-                 print(f"Card clicked!")                 
-                 
+                    self.clicked = True
+                    print(f"Card clicked!")                 
                 enemy_target = None
                 for obj in self._game_world._gameObjects:
-                     enemy_component = obj.get_component("Enemy")
-                     if enemy_component and enemy_component.is_alive:
-                         enemy_target = obj
-                         break
-                 
+                    enemy_component = obj.get_component("Enemy")
+                    if enemy_component and enemy_component.is_alive:
+                        enemy_target = obj
+                        break
+
                 self.card_type_activated(self._game_world, target=enemy_target) 
                 self.player.deck.discarded_cards.append(self.gameObject.get_component("Card"))
-                self.gameObject.is_destroyed = True
-                # self._game_world.card_pool.release(self.gameObject)  # Return to pool
-                # self.gameObject.is_destroyed = True  # Mark as destroyed so GameWorld removes it from _gameObjects
+                self._game_world.pool.release(self.gameObject)  # Add to pool instead of just destroying
+                self.gameObject.is_destroyed = True  # Mark for removal from game world
 
         else:
             self.clicked = False
