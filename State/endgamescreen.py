@@ -12,7 +12,7 @@ class EndGameScreen:
         self.font = pygame.font.Font(None, 36)
         
         self.restart_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((game_world.width // 2 - 50, game_world.height // 4 - 25), (100, 50)),
+            relative_rect=pygame.Rect((game_world.width // 2 - 50, game_world.height // 3 - 25), (100, 50)),
             text='Restart',
             manager=self.ui_manager
         )
