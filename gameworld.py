@@ -17,6 +17,7 @@ from turnorder import TurnOrder
 from UI.uielement import UIElement 
 from State.startgame import NewGame
 from State.endgamescreen import EndGameScreen
+from ObjectPool.pool import ReusablePool
 
 class GameWorld:
     def __init__(self, width, height):
@@ -39,6 +40,7 @@ class GameWorld:
         self.turnorder = 0
         self.current_enemy = None
         self.ui_element = UIElement
+        self.pool = ReusablePool(10)  # Initialize the object pool
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)

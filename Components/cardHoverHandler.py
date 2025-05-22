@@ -145,6 +145,8 @@ class CardHoverHandler(Component):
                 self.card_type_activated(self._game_world, target=enemy_target) 
                 self.player.deck.discarded_cards.append(self.gameObject.get_component("Card"))
                 self.gameObject.is_destroyed = True
+                # self._game_world.card_pool.release(self.gameObject)  # Return to pool
+                # self.gameObject.is_destroyed = True  # Mark as destroyed so GameWorld removes it from _gameObjects
 
         else:
             self.clicked = False
