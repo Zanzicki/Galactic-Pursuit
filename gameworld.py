@@ -17,6 +17,7 @@ from turnorder import TurnOrder
 from UI.uielement import UIElement 
 from State.startgame import NewGame
 from State.endgamescreen import EndGameScreen
+from ObjectPool.pool import ReusablePool
 
 class GameWorld:
     def __init__(self, width, height):
@@ -39,6 +40,7 @@ class GameWorld:
         self.turnorder = 0
         self.current_enemy = None
         self.ui_element = UIElement
+        self.card_pool = ReusablePool(10)  # Initialize the object pool
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
@@ -178,6 +180,7 @@ class GameWorld:
         # Setup fight if not already done
         if not hasattr(self, "_fight_initialized") or not self._fight_initialized:
             # Create cards and enemy as before
+            self.player.deck.draw_hand()
             self.draw_cards(self.player.deck)
             random_enemy = random.choice(["Arangel", "Gorpi", "The Blue Centipede"])
             new_enemy = self._enemyFactory.create_component(random_enemy)
@@ -202,28 +205,50 @@ class GameWorld:
 
         # Turn logic
         if self.turn_order.is_player_turn():
-            # Enable card play, show "End Turn" button, etc.
+            # Draw a new hand at the start of the player's turn
+            if not hasattr(self, "_hand_drawn") or not self._hand_drawn:
+                self.player.deck.draw_hand()
+                self.draw_cards(self.player.deck)
+                self._hand_drawn = True
+
             self.ui_manager.show_end_turn_button()
             for event in events:
                 self.ui_manager.handle_event(event)
                 if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ui_manager.end_turn_button:
                     self.turn_order.end_turn()
-                    # When player ends turn:
-                    player_deck = self.player.deck  # or wherever you access the player's deck
+                    player_deck = self.player.deck
                     player_deck.discard_hand()
-                    self.draw_cards(player_deck)
+                    self._hand_drawn = False  # Reset for next turn
                     self.ui_manager.hide_end_turn_button()
         elif self.turn_order.is_enemy_turn():
             # Enemy acts automatically
             self.current_enemy.enemy_action()
             self.turn_order.end_turn()
+            self._hand_drawn = False  # Reset for next player turn
 
     def draw_cards(self, player_deck):
-        # Draw the player's cards
-        player_hand = player_deck.draw_hand()
-        for i in range(len(player_hand)):
-            card = player_hand[i]
-            card_game_object = self._cardFactory.create_component(card)
+        player_hand = player_deck.hand  # Assume hand is already drawn
+        print("Player hand:", player_hand)
+        for i, card in enumerate(player_hand):
+            if card is None:
+                print("Card is None")
+                continue
+            # Try to reuse a card GameObject from the pool
+            card_game_object = self.card_pool.acquire()
+            if card_game_object is None:
+                # If pool is empty, create a new one
+                card_game_object = self._cardFactory.create_component(card)
+            else:
+                # If reusing, update the card component with new card data
+                card_component = card_game_object.get_component("Card")
+                card_component._name = card._name
+                card_component._value = card._value
+                card_component._type = card._type
+                card_component._rarity = card._rarity
+                card_component._description = card._description
+                card_component._prize = card._prize
+                card_component.damage = getattr(card, "damage", 0)
+                card_game_object = self._cardFactory.create_component(card)
             self.instantiate(card_game_object)
             card_game_object.transform.position = self.player.deck.card_positions[i]
 
