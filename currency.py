@@ -1,5 +1,5 @@
 import pygame
-import shop
+import State.shop as shop
 credit_score = 0
 scrap = 0
 

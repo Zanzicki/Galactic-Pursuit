@@ -3,7 +3,7 @@ from Components.component import SpriteRenderer
 from gameobject import GameObject
 import pygame
 from FactoryPatterns.factorypattern import Factory
-from Components.cardHoverHandler import CardHoverHandler
+from Components.cardhoverhandler import CardHoverHandler
 
 class CardFactory(Factory):
     def create_component(self):

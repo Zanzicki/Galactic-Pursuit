@@ -1,6 +1,8 @@
 from gameobject import GameObject
 import pygame
 from Components.component import Component
+from Components.planet import Planet
+from database import Database
 
 
 class Player(Component):
@@ -11,7 +13,7 @@ class Player(Component):
             cls._instance = super(Player, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, health=100, speed=300):
+    def __init__(self, health=100, speed=300, id=None):
         if not hasattr(self, "_initialized"):  # Ensure __init__ is only called once
             super().__init__()
             self._speed = speed
@@ -19,7 +21,10 @@ class Player(Component):
             self.game_world = None  # Reference to the GameWorld
             self.events = None
             self._initialized = True  # Mark as initialized
+            self.deck = None
             self.block_points = 0 
+            self.database = Database()
+            self._id = id
 
     @staticmethod
     def get_instance():
@@ -98,8 +103,21 @@ class Player(Component):
             dx = player_position.x - planet.transform.position[0]
             dy = player_position.y - planet.transform.position[1]
             planetcomponent = planet.get_component("Planet")
+            
+            if planetcomponent._visited:
+             continue
+            
             distance = (dx ** 2 + dy ** 2) ** 0.5
             if distance <= planetcomponent._size + 20:  # Check if the player is close enough to the planet
+                planetcomponent._visited = True  # Mark the planet as visited
+                self.game_world.map.check_and_spawn_boss()
+                self.database.change_planet_explored(self._id, planetcomponent._name)
+                
+                  # Check if the boss should spawn
+                if planetcomponent._name == "Boss":
+                    print("Boss planet reached!")
+                    self.game_world._state = "end_game"  # Transition to end game state
+                    return
                 if planetcomponent._color == (0, 0, 255):  # Blue (Shop)
                     print(f"{planetcomponent._name} (Blue): Entering shop!")
                     self.game_world._state = "shop"  # Transition to shop state
@@ -108,7 +126,6 @@ class Player(Component):
                 elif planetcomponent._color == (255, 0, 0):  # Red (Fight)
                     print(f"{planetcomponent._name} (Red): Entering fight!")
                     self.game_world._state = "game"  # Transition to game state
-                    self.game_world.ui_manager.deck_tracker()
                     return
                 elif planetcomponent._color == (0, 255, 0):  # Green (Artifact)
                     print(f"{planetcomponent._name} (Green): Entering artifact!")
