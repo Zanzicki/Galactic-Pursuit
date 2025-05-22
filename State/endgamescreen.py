@@ -25,32 +25,7 @@ class EndGameScreen:
         self.game_world.state = "menu"
         self.game_world.ui_manager.show_menu_buttons()
         
-
-    # Rebuild player
-        builder = PlayerBuilder()
-        builder.build()
-        player = Player.get_instance()
-        self.game_world._gameObjects.append(builder.get_gameObject())
-        builder.get_gameObject().transform.position = pygame.math.Vector2(
-        self.game_world.width // 2, self.game_world.height // 2
-    )
-        self.game_world.player = player
-
         
-       
-    # Reset kort og tilstande
-        self.game_world._deck.reset_deck_at_restart_game()
-        
-
-    # Genskab map
-        self.game_world.map = Map(self.game_world)
-        self.game_world.map.generate_planets()
-        
-         # After all game objects are created and added to self.game_world._gameObjects
-        for game_object in self.game_world._gameObjects:
-            for component in game_object._components.values():
-                    component._game_world = self.game_world
-                    print(f"Set _game_world for {component}")
 
 
     def update(self, time_delta, events):
