@@ -2,6 +2,7 @@ from gameobject import GameObject
 import pygame
 from Components.component import Component
 from Components.planet import Planet
+from database import Database
 
 
 class Player(Component):
@@ -12,7 +13,7 @@ class Player(Component):
             cls._instance = super(Player, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, health=100, speed=300):
+    def __init__(self, health=100, speed=300, id=None):
         if not hasattr(self, "_initialized"):  # Ensure __init__ is only called once
             super().__init__()
             self._speed = speed
@@ -22,6 +23,8 @@ class Player(Component):
             self._initialized = True  # Mark as initialized
             self.deck = None
             self.block_points = 0 
+            self.database = Database()
+            self._id = id
 
     @staticmethod
     def get_instance():
@@ -96,8 +99,6 @@ class Player(Component):
         # Access planets from the Map class
         planets = self.game_world.map.planets
 
-        
-        
         for planet in planets:
             dx = player_position.x - planet.transform.position[0]
             dy = player_position.y - planet.transform.position[1]
@@ -110,6 +111,8 @@ class Player(Component):
             if distance <= planetcomponent._size + 20:  # Check if the player is close enough to the planet
                 planetcomponent._visited = True  # Mark the planet as visited
                 self.game_world.map.check_and_spawn_boss()
+                self.database.change_planet_explored(self._id, planetcomponent._name)
+                
                   # Check if the boss should spawn
                 if planetcomponent._name == "Boss":
                     print("Boss planet reached!")
