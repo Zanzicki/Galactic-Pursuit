@@ -1,16 +1,17 @@
 import pygame
 import pygame_gui
 from BuilderPattern.playerbuilder import PlayerBuilder
+from Components import player
 from Components.player import Player
 from State.map import Map
 from gameobject import GameObject
 
 class EndGameScreen:
-    def __init__(self, game_world):
+    def __init__(self, game_world,):
         self.game_world = game_world
         self.ui_manager = pygame_gui.UIManager((game_world.width, game_world.height))
         self.font = pygame.font.Font(None, 36)
-        
+        self.player = Player()
         self.restart_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((game_world.width // 2 - 50, game_world.height // 3 - 25), (100, 50)),
             text='Restart',
@@ -25,7 +26,9 @@ class EndGameScreen:
         self.game_world.state = "menu"
         self.game_world.ui_manager.show_menu_buttons()
         
-        
+    # depending on the palyers health write and message on the end screen
+    def get_player_status_alive_or_dead(self):
+        return "You Saved the galaxy" if self.player.health > 0 else "Game over you are dead"
 
 
     def update(self, time_delta, events):
@@ -40,6 +43,6 @@ class EndGameScreen:
 
     def draw(self, screen):
         screen.fill((0, 0, 0))
-        text = self.font.render("Game Over", True, (255, 0, 0))
-        screen.blit(text, (self.game_world.width // 2 - text.get_width() // 2, self.game_world.height // 4 - text.get_height() // 2))
+        status_text = self.font.render(f"{self.get_player_status_alive_or_dead()}", True, (255, 255, 255))
+        screen.blit(status_text, (self.game_world.width // 2 - status_text.get_width() // 2, self.game_world.height // 2))
         self.ui_manager.draw_ui(screen)
