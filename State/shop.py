@@ -6,7 +6,12 @@ from Components import artifact, card
 import upgrades
 
 class Shop:
+    _instance = None
+
     def __init__(self, game_world):
+        if Shop._instance is not None:
+            raise Exception("Shop is a singleton! Use Shop.get_instance().")
+        Shop._instance = self
         self.game_world = game_world
         self.screen = game_world.screen
         self.manager = game_world.ui_manager.ui_manager  # Use the shared UIManager
@@ -37,6 +42,12 @@ class Shop:
 
         # UI elements
         self.buttons = []
+
+    @staticmethod
+    def get_instance():
+        if Shop._instance is None:
+            raise Exception("Shop has not been initialized! Call Shop(game_world) first.")
+        return Shop._instance
 
     def create_ui_elements(self):
         self.buttons.clear()

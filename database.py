@@ -164,6 +164,23 @@ class Database:
             print(f"[error] No planet found for player {player_id} with name {planet_name}.")
         self.connection.commit()
 
+    def update_player_currency(self, player_id, credits=None, scraps=None):
+        if credits is not None:
+            self.cursor.execute('''
+                UPDATE players
+                SET credits = ?
+                WHERE id = ?
+            ''', (credits, player_id))
+        
+        if scraps is not None:
+            self.cursor.execute('''
+                UPDATE players
+                SET scraps = ?
+                WHERE id = ?
+            ''', (scraps, player_id))
+        
+        self.connection.commit()
+
     def close(self):
         self.connection.close()
 
