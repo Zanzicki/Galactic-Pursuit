@@ -14,7 +14,8 @@ class Database:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 rarity TEXT NOT NULL,
-                prize INTEGER NOT NULL
+                description TEXT NOT NULL,
+                price INTEGER NOT NULL
             )
         ''')
 
@@ -45,7 +46,6 @@ class Database:
         # Create the players artifacts table
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS playerartifacts (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 player_id INTEGER NOT NULL,
                 artifact_id INTEGER NOT NULL,
                 FOREIGN KEY (player_id) REFERENCES players(id),
@@ -82,11 +82,11 @@ class Database:
 
         self.connection.commit()
 
-    def insert_artifact(self, name, rarity, prize):
+    def insert_artifact(self, name, rarity, description, price):
         self.cursor.execute('''
-            INSERT INTO artifacts (name, rarity, prize)
-            VALUES (?, ?, ?)
-        ''', (name, rarity, prize))
+            INSERT INTO artifacts (name, rarity, description, price)
+            VALUES (?, ?, ?, ?)
+        ''', (name, rarity, description, price))
         self.connection.commit()
 
     def insert_card(self, name, value, type, rarity, description, prize):
@@ -188,7 +188,9 @@ if __name__ == "__main__":
     db = Database()
 
     # Insert sample data
-    db.insert_artifact("Tooth Necklace", "Rare", 243)
+    db.insert_artifact("Double AA Battery", "Common", "Increase energy by 1", 100)
+    db.insert_artifact("Motherboard", "Rare", "Increase CPU by 2", 200)
+    db.insert_artifact("Old Scart Cable", "Epic", "Increase RAM by 4", 300)
     db.insert_card("Laser Cannon", 1, "Attack", "Basic", "Deal 2 damage", 10)
     db.insert_card("Protective Barrier", 1, "Block", "Basic", "Gain 2 shield", 10)
 

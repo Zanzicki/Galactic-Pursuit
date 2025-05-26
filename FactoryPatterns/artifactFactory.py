@@ -4,6 +4,7 @@ from FactoryPatterns.factorypattern import Factory
 from Components.artifact import Artifact
 from gameobject import GameObject
 from database import Database
+import random
 
 class ArtifactFactory(Factory):
     def __init__(self):
@@ -13,11 +14,13 @@ class ArtifactFactory(Factory):
         artifacts = self.db.fetch_artifacts() 
         if not artifacts:
             raise ValueError("No artifacts found in the database.")
-
-        artifact_data = artifacts[0]
-        name, rarity, prize = artifact_data[1], artifact_data[2], artifact_data[3]
+        
+        random_artifact = random.randint(0, len(artifacts) - 1)
+        
+        artifact_data = random_artifact[0]
+        name, rarity, description, price = artifact_data[1], artifact_data[2], artifact_data[3], artifact_data[4]
 
         go = GameObject(pygame.math.Vector2(50, 50))
-        go.add_component(Artifact(name, rarity, prize))
-        go.add_component(SpriteRenderer("Artifacts/Icon34.png")) 
+        go.add_component(Artifact(name, rarity, description, price))
+        go.add_component(SpriteRenderer(f"Artifacts/{name}.png")) 
         return go
