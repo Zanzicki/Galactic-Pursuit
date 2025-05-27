@@ -201,8 +201,8 @@ class GameWorld:
                 gameObject.get_component("Card").draw_cardtext(self.screen, gameObject)
             if gameObject.get_component("Enemy") is not None:
                 gameObject.update(delta_time)
-                self.ui_element.draw_healthbar(self, self.screen, gameObject.get_component("Enemy").health, (300, 100))
-        self.ui_element.draw_healthbar(self, self.screen, self.player.health, (self.width - 300, 100))
+                self.ui_element.draw_healthbar( self.screen, gameObject.get_component("Enemy").health, (300, 100))
+        self.ui_element.draw_healthbar(self.screen, self.player.health, (self.width - 300, 100))
 
         # Turn logic
         if self.turn_order.is_player_turn():
