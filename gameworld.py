@@ -248,7 +248,7 @@ class GameWorld:
                 # If pool is empty, create a new one
                 card_game_object = self._cardFactory.create_component(card)
             else:
-                # If reusing, update the card component with new card data
+                # Update card_component fields here, do NOT create a new component
                 card_component = card_game_object.get_component("Card")
                 card_component._name = card._name
                 card_component._value = card._value
@@ -257,7 +257,6 @@ class GameWorld:
                 card_component._description = card._description
                 card_component._prize = card._prize
                 card_component.damage = getattr(card, "damage", 0)
-                card_game_object = self._cardFactory.create_component(card)
             self.instantiate(card_game_object)
             card_game_object.transform.position = self.player.deck.card_positions[i]
 
