@@ -13,7 +13,7 @@ from State.map import Map
 from State.shop import Shop
 from Components.planet import Planet
 from UI.uimanager import UIManager 
-from turnorder import TurnOrder
+from UI.turnorder import TurnOrder
 from UI.uielement import UIElement 
 from State.startgame import NewGame
 from State.endgamescreen import EndGameScreen
@@ -57,7 +57,7 @@ class GameWorld:
         builder.get_gameObject().transform.position = pygame.math.Vector2(self.width // 2, self.height // 2)
 
         self.map = Map(self)
-        self.shop = Shop(self)  # Pass GameWorld to the Shop
+        self.shop = Shop(self)  # Initialize singleton with game_world
         self.start_game = NewGame(self)  # Pass GameWorld to the StartGame
 
         self.turn_order = None  # Will be set when a fight starts
