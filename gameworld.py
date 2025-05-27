@@ -49,9 +49,12 @@ class GameWorld:
         builder = PlayerBuilder()
         builder.build()
         self.playerGo = builder.get_gameObject()
+        self.player = builder.player  # This is Player.get_instance()
+        Player._instance = self.player  # Explicitly set the singleton (redundant but safe)
+        self._gameObjects.append(self.playerGo)
 
-        self.player = Player.get_instance()
-        self._gameObjects.append(builder.get_gameObject())  # Add the player to the game objects
+        # Debug print
+        print("Player deck in GameWorld:", getattr(Player.get_instance(), "deck", None))
 
         # Center the player's position
         builder.get_gameObject().transform.position = pygame.math.Vector2(self.width // 2, self.height // 2)
@@ -201,7 +204,7 @@ class GameWorld:
                 gameObject.get_component("Card").draw_cardtext(self.screen, gameObject)
             if gameObject.get_component("Enemy") is not None:
                 gameObject.update(delta_time)
-                self.ui_element.draw_healthbar( self.screen, gameObject.get_component("Enemy").health, (300, 100))
+                self.ui_element.draw_healthbar(self.screen, gameObject.get_component("Enemy").health, (300, 100))
         self.ui_element.draw_healthbar(self.screen, self.player.health, (self.width - 300, 100))
 
         # Turn logic

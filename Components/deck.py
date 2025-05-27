@@ -4,19 +4,18 @@ from FactoryPatterns.cardfactory import CardFactory
 
 class Deck:
     def __init__(self):
-        self.full_deck = []
-        self.discarded_cards = []
         self.draw_pile = []
+        self.discarded_cards = []
         self.hand = []
         self.db = Database()
+        self.decklist = []        
         self.create_starter_deck()
-        self.cardlist = []        
         self.cardfactory = CardFactory()
         self.card_positions = [(100,500), (300,500), (500,500), (700,500), (900,500)]
     
     @property
     def cardsindeck(self):
-        return self.full_deck
+        return self.decklist
     
     @property
     def discarded_cards(self):
@@ -41,23 +40,23 @@ class Deck:
             raise ValueError("draw_pile must be a list")
 
     def add_card(self, card: Card):
-        self.full_deck.append(card)
+        self.decklist.append(card)
 
     def remove_card(self, card: Card):
-        if card in self.full_deck:
-            self.full_deck.remove(card)
+        if card in self.decklist:
+            self.decklist.remove(card)
 
     def shuffle(self):
         import random
-        random.shuffle(self.full_deck)
+        random.shuffle(self.decklist)
 
     def draw_card(self):
-        if self.full_deck:
-            return self.full_deck.pop(0)  # Remove and return the top card
+        if self.decklist:
+            return self.decklist.pop(0)  # Remove and return the top card
         return None  # Return None if the deck is empty
 
     def __len__(self):
-        return len(self.full_deck)
+        return len(self.decklist)
     
     def create_starter_deck(self):
         cardfromdb = self.db.fetch_basic_cards() 
@@ -84,8 +83,8 @@ class Deck:
 
     def draw_hand(self, hand_size=5):
         # If deck is empty, reshuffle discard into deck
-        if len(self.full_deck) < hand_size:
-            self.full_deck.extend(self.discarded_cards)
+        if len(self.decklist) < hand_size:
+            self.decklist.extend(self.discarded_cards)
             self.discarded_cards.clear()
             self.shuffle()
         self.hand = []
@@ -96,7 +95,7 @@ class Deck:
         return self.hand
 
     def reset_deck_at_restart_game(self):
-        self.full_deck.clear()
+        self.decklist.clear()
         self.discarded_cards.clear()
         self.draw_pile.clear()
         self.hand.clear()

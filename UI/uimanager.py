@@ -245,13 +245,15 @@ class UIManager:
 
         # Get the deck from the player
         player = Player.get_instance()
-        deck = player.deck if isinstance(player, Player) else None
-        if not deck:
+        print("UIManager sees player:", player)
+        print("UIManager sees deck:", getattr(player, 'deck', None))
+        deck = getattr(player, "deck", None)
+        if deck is None:
             print("No deck found!")
             return
 
         if deck_type == "deck":
-            card_list = deck.cardsindeck
+            card_list = deck.draw_pile
             title = "Cards in Deck"
         else:
             card_list = deck.discarded_cards
