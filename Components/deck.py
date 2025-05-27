@@ -9,7 +9,6 @@ class Deck:
         self.hand = []
         self.db = Database()
         self.decklist = []        
-        self.create_starter_deck()
         self.cardfactory = CardFactory()
         self.card_positions = [(100,500), (300,500), (500,500), (700,500), (900,500)]
     
@@ -51,8 +50,8 @@ class Deck:
         random.shuffle(self.decklist)
 
     def draw_card(self):
-        if self.decklist:
-            return self.decklist.pop(0)  # Remove and return the top card
+        if self.draw_pile:
+            return self.draw_pile.pop(0)
         return None  # Return None if the deck is empty
 
     def __len__(self):
@@ -83,10 +82,10 @@ class Deck:
 
     def draw_hand(self, hand_size=5):
         # If deck is empty, reshuffle discard into deck
-        if len(self.decklist) < hand_size:
-            self.decklist.extend(self.discarded_cards)
+        if len(self.draw_pile) < hand_size:
+            self.draw_pile.extend(self.discarded_cards)
             self.discarded_cards.clear()
-            self.shuffle()
+            self.shuffle_draw_pile()
         self.hand = []
         for _ in range(hand_size):
             card = self.draw_card()
@@ -96,8 +95,24 @@ class Deck:
 
     def reset_deck_at_restart_game(self):
         self.decklist.clear()
+        self.clear_draw_pile()
         self.discarded_cards.clear()
         self.draw_pile.clear()
         self.hand.clear()
         self.create_starter_deck()
         self.shuffle()
+
+    def initialize_draw_pile(self):
+        self.draw_pile = list(self.decklist)
+        self.hand = []
+        self.discarded_cards = []
+        self.shuffle_draw_pile()
+
+    def shuffle_draw_pile(self):
+        import random
+        random.shuffle(self.draw_pile)
+
+    def play_card(self, card):
+        if card in self.hand:
+            self.hand.remove(card)
+            self.discarded_cards.append(card)

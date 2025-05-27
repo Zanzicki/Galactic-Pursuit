@@ -41,6 +41,7 @@ class GameWorld:
         self.current_enemy = None
         self.ui_element = UIElement(self.screen)
         self.card_pool = ReusablePool(10)  # Initialize the object pool
+        self._fight_initialized = False  # Flag to check if fight has been initialized
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
@@ -52,6 +53,7 @@ class GameWorld:
         self.player = builder.player  # This is Player.get_instance()
         Player._instance = self.player  # Explicitly set the singleton (redundant but safe)
         self._gameObjects.append(self.playerGo)
+        self.player.deck.create_starter_deck()
 
         # Debug print
         print("Player deck in GameWorld:", getattr(Player.get_instance(), "deck", None))
@@ -157,11 +159,6 @@ class GameWorld:
                 self.end_game.update(delta_time, events)
                 self.end_game.draw(self.screen)
 
-            if self._state != "game":
-                 self._fight_initialized = False
-                 
-            self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
-
             pygame.display.flip()
 
         pygame.quit()
@@ -181,16 +178,24 @@ class GameWorld:
                 gameObject.update(delta_time)
 
     def draw_and_update_fight(self, delta_time, events):
-        # Setup fight if not already done
+        # Always clean up previous enemies and reset deck before a new fight
         if not hasattr(self, "_fight_initialized") or not self._fight_initialized:
-            # Create cards and enemy as before
-            self.player.deck.draw_hand()
-            self.draw_cards(self.player.deck)
+            print("Initializing fight...")
+
+            # --- Remove previous enemy GameObjects ---
+            for gameObject in self._gameObjects:
+                if gameObject.get_component("Enemy") is not None:
+                    gameObject.destroy()
+            self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
+
+            # --- Reset the player's deck ---
+            self.player.deck.initialize_draw_pile()
+
+            # --- Now create the new enemy and set up the fight ---
             random_enemy = random.choice(["Arangel", "Gorpi", "The Blue Centipede"])
             new_enemy = self._enemyFactory.create_component(random_enemy)
             self.instantiate(new_enemy)
             self.current_enemy = new_enemy.get_component("Enemy")
-            # Setup turn order
             self.turn_order = TurnOrder(self.player, self.current_enemy)
             self._fight_initialized = True
 

@@ -223,6 +223,7 @@ class UIManager:
         print("Returning to Map")
         self.game_world.state = "map"
         self.back_to_map_button.hide()
+        self.game_world._fight_initialized = False
     
     def show_options(self):
         print("Showing Options")
