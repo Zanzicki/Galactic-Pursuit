@@ -78,7 +78,7 @@ class CardHoverHandler(Component):
                     player = player_component
                     break
             if player:
-                player.block_points += 5
+                player.block_points += 2
                 print(f"[card activated] {card_type} activated, block points: {player.block_points}")
 
 

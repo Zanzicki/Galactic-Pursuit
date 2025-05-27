@@ -1,6 +1,7 @@
 from Components.component import Component
 import pygame
 
+
 class Planet(Component):
     def __init__(self, name, size, color, position, gameworld):
         super().__init__()
