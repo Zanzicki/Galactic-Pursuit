@@ -39,7 +39,7 @@ class GameWorld:
         self.state_changed_to_shop = "out"
         self.turnorder = 0
         self.current_enemy = None
-        self.ui_element = UIElement
+        self.ui_element = UIElement(self.screen)
         self.card_pool = ReusablePool(10)  # Initialize the object pool
 
         # Initialize UIManager
@@ -169,6 +169,7 @@ class GameWorld:
             if gameObject.get_component("Planet") is not None:
                 gameObject.update(delta_time)
                 gameObject.get_component("Planet").draw(self.screen, self.font)
+        self.ui_element.draw("Solar system", (640,40), self.shop.player_gold, self.shop.player_scrap)
 
         # Then, update and draw the player
         for gameObject in self._gameObjects:
@@ -191,7 +192,7 @@ class GameWorld:
             self._fight_initialized = True
 
         turncount = self.turn_order.turncount
-        self.ui_element.draw(self, f"{turncount}", (self.width // 2, 50))
+        self.ui_element.draw(f"Turn: {turncount}", (self.width // 2, 40), self.shop.player_gold, self.shop.player_scrap)
 
         # Draw cards and enemy as before
         for gameObject in self._gameObjects:
