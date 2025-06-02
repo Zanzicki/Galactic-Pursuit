@@ -18,6 +18,7 @@ from UI.uielement import UIElement
 from State.startgame import NewGame
 from State.endgamescreen import EndGameScreen
 from ObjectPool.pool import ReusablePool
+from soundmanager   import SoundManager
 
 class GameWorld:
     def __init__(self, width, height):
@@ -42,6 +43,7 @@ class GameWorld:
         self.ui_element = UIElement(self.screen)
         self.card_pool = ReusablePool(10)  # Initialize the object pool
         self._fight_initialized = False  # Flag to check if fight has been initialized
+        self.sound_manager = SoundManager()  # Play background music
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
