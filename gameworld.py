@@ -43,7 +43,7 @@ class GameWorld:
         self.ui_element = UIElement(self.screen)
         self.card_pool = ReusablePool(10)  # Initialize the object pool
         self._fight_initialized = False  # Flag to check if fight has been initialized
-        self.sound_manager = SoundManager()  # Play background music
+        SoundManager().play_music()  # Play background music
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
