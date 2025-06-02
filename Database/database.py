@@ -98,6 +98,10 @@ class Database:
     def fetch_artifact_by_name(self, name):
         self.cursor.execute('SELECT * FROM artifacts WHERE name = ?', (name,))
         return self.cursor.fetchone() 
+    
+    def fetch_artifact_by_id(self, artifact_id):
+        self.cursor.execute('SELECT * FROM artifacts WHERE id = ?', (artifact_id,))
+        return self.cursor.fetchone()
 
     def fetch_all_artifacts(self):
         self.cursor.execute('SELECT * FROM artifacts')

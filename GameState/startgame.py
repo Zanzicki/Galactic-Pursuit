@@ -1,6 +1,7 @@
 from Components.planet import Planet
 from Components.player import Player
 from Database.sqlrepository import SQLRepository
+from FactoryPatterns.artifactFactory import ArtifactFactory
 from gameobject import GameObject
 from GameState.map import Map
 
@@ -9,6 +10,7 @@ class NewGame:
     def __init__(self, game_world):
         self._game_world = game_world
         self.repository = SQLRepository()
+        self.artifact_factory = ArtifactFactory()
         
     def create_new_player(self, name):
         player = Player.get_instance()
@@ -62,6 +64,17 @@ class NewGame:
             planet.get_component("Planet")._visited = explored
             self._game_world.map.planets.append(planet)
             self._game_world._gameObjects.append(planet)
+
+        artifacts_rows = self.repository.fetch_player_artifacts(player_id)
+        for row in artifacts_rows:
+            artifact_id = row[1]
+            artifact_data = self.repository.fetch_artifact_by_id(artifact_id)
+            if artifact_data:
+                artifact_go = self.artifact_factory.create_component(artifact_data)
+                player.artifacts.append(artifact_go)
+                self._game_world.instantiate(artifact_go)
+        player.update_artifacts()
+                
 
     def get_player_list(self):
         return self.repository.fetch_players()

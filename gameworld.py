@@ -161,10 +161,9 @@ class GameWorld:
 
             if self._game_state != "menu":
                 for gameObject in self._gameObjects:
-                    if gameObject.get_component("artifact") is not None:
+                    if gameObject.get_component("Artifact") is not None:
                         gameObject.update(delta_time)
-                        print("Drawing artifact" + gameObject.get_component("artifact")._name)
-
+                        
             #press key for gameobject list
             if pygame.pressed_keys[pygame.K_g]:
                 print("GameObjects in GameWorld:")

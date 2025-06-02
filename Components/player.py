@@ -28,7 +28,6 @@ class Player(Component):
             self._scraps = scraps
             self._max_health = max_health
             self.artifacts = []
-            self.artifact_positions = [(20,20), (20, 60), (20, 100), (20, 140), (20, 180)]
 
     @staticmethod
     def get_instance():
@@ -155,7 +154,7 @@ class Player(Component):
 
     def update_artifacts(self):
         self.artifact_positions.clear()
-        self.artifact_positions = [(20, 20 + i * 40) for i in range(len(self.artifacts))]
+        self.artifact_positions = [(20 + i * 40, 60) for i in range(len(self.artifacts))]
 
         # Update artifact positions based on the current artifacts
         for index, artifact in enumerate(self.artifacts):

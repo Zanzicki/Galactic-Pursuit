@@ -13,6 +13,9 @@ class SQLRepository:
     
     def fetch_artifact_by_name(self, name):
         return self.db.fetch_artifact_by_name(name)
+    
+    def fetch_artifact_by_id(self, artifact_id):
+        return self.db.fetch_artifact_by_id(artifact_id)
 
     def fetch_all_artifacts(self):
         return self.db.fetch_all_artifacts()
