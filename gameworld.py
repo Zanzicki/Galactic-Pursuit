@@ -163,7 +163,10 @@ class GameWorld:
                 for gameObject in self._gameObjects:
                     if gameObject.get_component("Artifact") is not None:
                         gameObject.update(delta_time)
-                        
+
+            # Remove destroyed objects (including played cards)
+            self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
+
             #press key for gameobject list
             if pygame.pressed_keys[pygame.K_g]:
                 print("GameObjects in GameWorld:")
@@ -260,7 +263,7 @@ class GameWorld:
                 # If pool is empty, create a new one
                 card_game_object = self._cardFactory.create_component(card)
             else:
-                # Update card_component fields here, do NOT create a new component
+                # update card fields...
                 card_component = card_game_object.get_component("Card")
                 card_component._name = card._name
                 card_component._value = card._value

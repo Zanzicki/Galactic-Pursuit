@@ -28,6 +28,7 @@ class Player(Component):
             self._scraps = scraps
             self._max_health = max_health
             self.artifacts = []
+            self.artifact_positions = []
 
     @staticmethod
     def get_instance():
