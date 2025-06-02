@@ -1,15 +1,13 @@
 import pygame
 from Components.player import Player
-from State.shop import Shop
-from database import Database
+from GameState.shop import Shop
+from Database.sqlrepository import SQLRepository
 
 class Currency:
-    def __init__(self, player):
-        self.player = player  
+    def __init__(self):
+        self.player = Player.get_instance()
         self.shop = Shop.get_instance()
-        self.db = Database()
-        self.credits = 0
-        self.scrap = 0
+        self.repository = SQLRepository()
 
     @staticmethod
     def get_instance(player):
@@ -18,26 +16,26 @@ class Currency:
         return Currency._instance
 
     def addCredit(self, credit_amount):
-        self.credits += credit_amount
-        print(f"Credit score increased to {self.credits}.")
-        self.db.update_player_currency(self.player.id, credits=self.credits)  # Updateself.db
+        self.player._credits += credit_amount
+        print(f"Credit score increased to {self.player._credits}.")
+        self.repository.update_player_currency(self.player._id, credits=self.player._credits)
 
     def addScrap(self, scrap_amount):
-        self.scrap += scrap_amount
-        print(f"Scrap increased to {self.scrap}.")
-        self.db.update_player_currency(self.player.id, scrap=self.scrap)  # Updateself.db
+        self.player._scraps += scrap_amount
+        print(f"Scrap increased to {self.player._scraps}.")
+        self.db.update_player_currency(self.player._id, scrap=self.player._scraps)
 
     def buyingWithScrap(self):
-        if self.scrap - self.shop.item_cost > 0:
-            self.scrap -= self.shop.item_cost
-            self.db.update_player_currency(self.player.id, scrap=self.scrap)
+        if self.player._scraps - self.shop.item_cost > 0:
+            self.player._scraps -= self.shop.item_cost
+            self.db.update_player_currency(self.player._id, scrap=self.player._scraps)
         else:
             print("I cannot afford that.")
 
     def buyingWithCredits(self):
-        if self.credits - self.shop.item_cost > 0:
-            self.credits -= self.shop.item_cost
-            self.db.update_player_currency(self.player.id, credits=self.credits)
+        if self.player._credits - self.shop.item_cost > 0:
+            self.player._credits -= self.shop.item_cost
+            self.db.update_player_currency(self.player._id, credits=self.player._credits)
         else:
             print("I cannot afford that.")
 

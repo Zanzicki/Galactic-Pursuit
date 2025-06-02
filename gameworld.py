@@ -9,14 +9,14 @@ from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.deck import Deck
 from FactoryPatterns.enemyfactory import EnemyFactory
-from State.map import Map
-from State.shop import Shop
+from GameState.map import Map
+from GameState.shop import Shop
 from Components.planet import Planet
 from UI.uimanager import UIManager 
 from UI.turnorder import TurnOrder
 from UI.uielement import UIElement 
-from State.startgame import NewGame
-from State.endgamescreen import EndGameScreen
+from GameState.startgame import NewGame
+from GameState.endgamescreen import EndGameScreen
 from ObjectPool.pool import ReusablePool
 
 class GameWorld:
@@ -27,7 +27,7 @@ class GameWorld:
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Galactic Pursuit")
         self._running = True
-        self._state = "menu"  # Start in the menu state
+        self._game_state = "menu"  # Start in the menu GameState
         self._clock = pygame.time.Clock()
         self._gameObjects = []  # List of all game objects
         self.font = pygame.font.Font(None, 36)
@@ -71,17 +71,18 @@ class GameWorld:
         self.end_game = EndGameScreen(self)  # Pass GameWorld to the EndGameScreen
 
     @property
-    def state(self):
-        return self._state
+    def GameState(self):
+        return self._GameState
     
-    @state.setter
-    def state(self, value):
-        self._state = value
+    @GameState.setter
+    def GameState(self, value):
+        self._game_state = value
 
     def instantiate(self, gameObject):
         gameObject.awake(self)
         gameObject.start()
         self._gameObjects.append(gameObject)
+        print(f"Instantiated GameObject: {gameObject}")
 
     def awake(self):
         for gameObject in self._gameObjects[:]:
@@ -102,7 +103,7 @@ class GameWorld:
 
                 # Delegate UI events to the UIManager
                 self.ui_manager.handle_event(event)
-                if self.state == "shop":
+                if self._game_state == "shop":
                     self.shop.handle_event(event)
         
             pygame.pressed_keys = pygame.key.get_pressed()
@@ -111,7 +112,7 @@ class GameWorld:
 
             self.screen.fill("black")
 
-            if self._state == "menu":
+            if self._game_state == "menu":
                 self.ui_manager.show_menu_buttons()
                 self.ui_manager.hide_game_buttons()
                 self.ui_manager.update(delta_time)
@@ -119,46 +120,58 @@ class GameWorld:
             else:
                 self.ui_manager.hide_menu_buttons()
 
-            if self._state == "map":
+            if self._game_state == "map":
                 pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)  # Sun in the center
                 self.draw_and_update_map(delta_time, events)
                 self.ui_manager.hide_game_buttons()
-            elif self._state == "shop":
+            elif self._game_state == "shop":
                 if self.state_changed_to_shop == "into":
                     self.state_changed_to_shop = "in"
                     self.shop.enter()
                 self.shop.update(delta_time)
                 self.shop.draw()
-                # When leaving shop and entering menu or map:
                 if self.state_changed_to_shop == "out":
-                    self.state = "map" 
+                    self._game_state = "map"
                     self.shop.exit()
-            elif self._state == "game":
+            elif self._game_state == "game":
                 self.ui_manager.show_game_buttons()
                 self.draw_and_update_fight(delta_time, events)
                 self.back_to_map(delta_time)
-            elif self._state == "game_over":
+            elif self._game_state == "game_over":
                 self.screen.fill((0, 0, 0))
                 game_over_text = self.font.render("Game Over", True, (255, 0, 0))
                 self.screen.blit(game_over_text, (self.width // 2 - game_over_text.get_width() // 2,
                                                    self.height // 2 - game_over_text.get_height() // 2))
-            elif self._state == "artifact":
+            elif self._game_state == "artifact":
                 self.screen.fill((0, 0, 0))
                 artifact_text = self.font.render("Artifact", True, (255, 0, 0))
                 self.screen.blit(artifact_text, (self.width // 2 - artifact_text.get_width() // 2,
                                                    self.height // 2 - artifact_text.get_height() // 2))
                 self.back_to_map(delta_time)
-            elif self._state == "mystery":
+            elif self._game_state == "mystery":
                 self.screen.fill((0, 0, 0))
                 mystery_text = self.font.render("Mystery", True, (255, 0, 0))
                 self.screen.blit(mystery_text, (self.width // 2 - mystery_text.get_width() // 2,
                                                    self.height // 2 - mystery_text.get_height() // 2))
                 self.back_to_map(delta_time)
 
-            elif self._state == "end_game":
+            elif self._game_state == "end_game":
                 self.end_game.update(delta_time, events)
                 self.end_game.draw(self.screen)
 
+            if self._game_state != "menu":
+                for gameObject in self._gameObjects:
+                    if gameObject.get_component("artifact") is not None:
+                        gameObject.update(delta_time)
+                        print("Drawing artifact" + gameObject.get_component("artifact")._name)
+
+            #press key for gameobject list
+            if pygame.pressed_keys[pygame.K_g]:
+                print("GameObjects in GameWorld:")
+                for gameObject in self._gameObjects:
+                    if gameObject.get_component("artifact") is not None:
+                        print(f"Artifact: {gameObject.get_component('artifact')._name}")
+                        
             pygame.display.flip()
 
         pygame.quit()
@@ -169,7 +182,7 @@ class GameWorld:
             if gameObject.get_component("Planet") is not None:
                 gameObject.update(delta_time)
                 gameObject.get_component("Planet").draw(self.screen, self.font)
-        self.ui_element.draw("Solar system", (640,40), self.shop.player_gold, self.shop.player_scrap)
+        self.ui_element.draw("Solar system", (640,40), self.player._credits, self.player._scraps, self.player._health, self.player._max_health)
 
         # Then, update and draw the player
         for gameObject in self._gameObjects:
@@ -200,7 +213,7 @@ class GameWorld:
             self._fight_initialized = True
 
         turncount = self.turn_order.turncount
-        self.ui_element.draw(f"Turn: {turncount}", (self.width // 2, 40), self.shop.player_gold, self.shop.player_scrap)
+        self.ui_element.draw(f"Turn: {turncount}", (self.width // 2, 40), self.player._credits, self.player._scraps, self.player._health, self.player._max_health)
 
         # Draw cards and enemy as before
         for gameObject in self._gameObjects:

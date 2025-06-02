@@ -1,8 +1,8 @@
 import pygame
 import pygame_gui
 from Components.player import Player
-from State.startgame import NewGame
-from database import Database
+from GameState.startgame import NewGame
+from Database.database import Database
 
 
 class UIManager:
@@ -121,7 +121,7 @@ class UIManager:
                 self.name_entry_window.kill()
                 self.name_entry_window = None
                 self.name_entry_line = None
-                self.game_world.state = "map"
+                self.game_world._game_state = "map"
 
         # Handle dropdown selection for continue
         if self.player_dropdown and event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
@@ -132,7 +132,7 @@ class UIManager:
                 self.player_select_window.kill()
                 self.player_select_window = None
                 self.player_dropdown = None
-                self.game_world.state = "map"
+                self.game_world._game_state = "map"
                 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if hasattr(self, "save_slot_buttons"):
@@ -147,7 +147,7 @@ class UIManager:
                         for b in self.save_slot_buttons:
                             b.kill()
                         self.save_slot_buttons = []
-                        self.game_world.state = "map"
+                        self.game_world._game_state = "map"
 
     def show_new_player_dialog(self):
         if self.name_entry_window:
@@ -207,14 +207,14 @@ class UIManager:
 
     def start_game(self):
         print("Starting Game")
-        self.game_world.state = "map"  # Transition to the map state
+        self.game_world._game_state = "map"  # Transition to the map state
         self.play_button.hide()
         self.options_button.hide()
         self.quit_button.hide()
 
     def start_new_game(self):
         print("Starting New Game")
-        self.game_world.state = "map"
+        self.game_world._game_state = "map"
         
     def quit_game(self):
         print("Quitting Game")
@@ -222,7 +222,7 @@ class UIManager:
 
     def return_to_map(self):
         print("Returning to Map")
-        self.game_world.state = "map"
+        self.game_world._game_state = "map"
         self.back_to_map_button.hide()
         self.game_world._fight_initialized = False
     

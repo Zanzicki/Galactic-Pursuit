@@ -3,7 +3,7 @@ import pygame_gui
 from BuilderPattern.playerbuilder import PlayerBuilder
 from Components import player
 from Components.player import Player
-from State.map import Map
+from GameState.map import Map
 from gameobject import GameObject
 
 class EndGameScreen:
@@ -23,7 +23,7 @@ class EndGameScreen:
         self.game_world._gameObjects.clear()
         #genskab menu
         
-        self.game_world.state = "menu"
+        self.game_world.game_state  = "menu"
         self.game_world.ui_manager.show_menu_buttons()
         
     # depending on the palyers health write and message on the end screen
@@ -37,7 +37,7 @@ class EndGameScreen:
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.restart_button:
                     self.restart_game()
-                    self.game_world.state ="menu"
+                    self.game_world.game_state  ="menu"
                     print("Restarting game...")
         self.ui_manager.update(time_delta)
 

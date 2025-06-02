@@ -39,7 +39,7 @@ class Enemy(Component):
                 print(f"{self._name} has been defeated!")
                 self.gameObject.is_destroyed = True #remove enemy from game world
                 
-                self.game_world.state = "map" # Transition to the map state
+                self.game_world.game_state = "map" # Transition to the map state
         else:
             print(f"{self._name} is already defeated.")
 

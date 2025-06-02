@@ -7,14 +7,9 @@ class UIElement():
         self.screen = screen
         self.font = pygame.font.Font("Assets/Fonts/ImpactfulBits.ttf", 24)
 
-    def draw(self, text, position, gold, scrap):
+    def draw(self, text, position, gold, scrap, health, max_health):
         pygame.draw.rect(self.screen, (40,40,40),(0,0,1280,40))
 
-        # round_rendered = self.font.render(text, True, (255, 0, 0))
-        # self.screen.blit(
-        #     round_rendered,
-        #     (540 - round_rendered.get_width() // 2, 25 - round_rendered.get_height() // 2)
-        # )
         ui_text = self.font.render(text, True, (255, 0, 0))
         self.screen.blit(ui_text, (position[0] - ui_text.get_width() // 2,
         position[1] // 2 - ui_text.get_height() // 2))
@@ -24,6 +19,9 @@ class UIElement():
 
         scrap_text = self.font.render(f"Scrap: {scrap}", True, (192,192,192))
         self.screen.blit(scrap_text, (200,5))
+
+        health_text = self.font.render(f"Health: {health}/{max_health}", True, (0,255,0))
+        self.screen.blit(health_text, (1120,5))
     
         # Draws the health bar of a game object
     def draw_healthbar(self, screen, max_health, position):
