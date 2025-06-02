@@ -151,7 +151,6 @@ class Player(Component):
                     print(f"{planetcomponent._name} (Magenta): Entering mystery!")
                     self.game_world._game_state = "mystery"
 
-
     def update_artifacts(self):
         self.artifact_positions.clear()
         self.artifact_positions = [(20 + i * 40, 60) for i in range(len(self.artifacts))]
