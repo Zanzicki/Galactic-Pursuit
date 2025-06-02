@@ -16,7 +16,7 @@ class TheBlueCentipedeStrategy(Strategy):
         random_action()
 
     def basic_attack(self):
-        self._target.take_damage(self.strength)
+        self._target.health -= self.strength
         print(f"{self._name} performs a basic attack for {self.strength} damage!")
         print(f"{self._target} has {self._target.health} health left.")
 

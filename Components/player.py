@@ -1,8 +1,7 @@
-from gameobject import GameObject
 import pygame
+from Database.sqlrepository import SQLRepository
 from Components.component import Component
-from Components.planet import Planet
-from database import Database
+from Database.database import Database
 
 
 class Player(Component):
@@ -13,7 +12,7 @@ class Player(Component):
             cls._instance = super(Player, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, health=100, speed=300, id=None):
+    def __init__(self, health=100, speed=300, id=None, credits=0, scraps=0, max_health=100):
         if not hasattr(self, "_initialized"):  # Ensure __init__ is only called once
             super().__init__()
             self._speed = speed
@@ -23,8 +22,12 @@ class Player(Component):
             self._initialized = True  # Mark as initialized
             self.deck = None
             self.block_points = 0 
-            self.database = Database()
+            self.repository = SQLRepository()
             self._id = id
+            self._credits = credits
+            self._scraps = scraps
+            self._max_health = max_health
+            self.artifacts = []
 
     @staticmethod
     def get_instance():
@@ -38,15 +41,29 @@ class Player(Component):
 
     @health.setter
     def health(self, value):
-        if value < 0:
-            self._health = 0
+        if value > self._max_health:
+            self._health = self._max_health
         else:
             self._health = value
+        self.update_db()
+    
+    @property
+    def credits(self):
+        return self._credits
+    
+    @credits.setter
+    def credits(self, value):
+        self._credits = value
+        self.update_db()
 
     @property
-    def take_damage(self):
-        return self._health
-
+    def scraps(self):
+        return self._scraps
+    
+    @scraps.setter
+    def scraps(self, value):
+        self._scraps = value
+        self.update_db()
 
     def take_damage(self, damage):
         if self.block_points > 0:
@@ -111,32 +128,43 @@ class Player(Component):
             if distance <= planetcomponent._size + 20:  # Check if the player is close enough to the planet
                 planetcomponent._visited = True  # Mark the planet as visited
                 self.game_world.map.check_and_spawn_boss()
-                self.database.change_planet_explored(self._id, planetcomponent._name)
+                self.repository.change_planet_explored(self._id, planetcomponent._name)
                 
                   # Check if the boss should spawn
                 if planetcomponent._name == "Boss":
                     print("Boss planet reached!")
-                    self.game_world._state = "end_game"  # Transition to end game state
+                    self.game_world._game_state = "end_game"  # Transition to end game state
                     return
                 if planetcomponent._color == (0, 0, 255):  # Blue (Shop)
                     print(f"{planetcomponent._name} (Blue): Entering shop!")
-                    self.game_world._state = "shop"  # Transition to shop state
                     self.game_world.state_changed_to_shop = "into"
+                    self.game_world._game_state= "shop"  # Transition to shop state
                     return
                 elif planetcomponent._color == (255, 0, 0):  # Red (Fight)
                     print(f"{planetcomponent._name} (Red): Entering fight!")
-                    self.game_world._state = "game"  # Transition to game state
+                    self.game_world._game_state = "game"  # Transition to game state
                     return
                 elif planetcomponent._color == (0, 255, 0):  # Green (Artifact)
                     print(f"{planetcomponent._name} (Green): Entering artifact!")
-                    self.game_world._state = "artifact"
+                    self.game_world._game_state = "artifact"
                 elif planetcomponent._color == (255, 0, 255):
                     print(f"{planetcomponent._name} (Magenta): Entering mystery!")
-                    self.game_world._state = "mystery"
+                    self.game_world._game_state = "mystery"
 
+    def update_artifacts(self):
+        self.artifact_positions.clear()
+        self.artifact_positions = [(20 + i * 40, 60) for i in range(len(self.artifacts))]
+
+        # Update artifact positions based on the current artifacts
+        for index, artifact in enumerate(self.artifacts):
+            artifact.transform.position = self.artifact_positions[index]
     def draw(self, screen):
         pygame.draw.rect(screen, (255, 255, 255), (self._gameObject.transform.position.x - 10,
                                                    self._gameObject.transform.position.y - 10, 20, 20))
 
     def get_events(self, events):
         self.events = events
+
+    def update_db(self):
+        player_id = self.repository.fetch_player_id(self.name)
+        self.repository.update_player_currency(player_id, credits=self.credits, scrap=self.scraps, health=self.health, max_health=self._max_health)
