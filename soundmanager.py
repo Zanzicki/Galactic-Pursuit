@@ -21,7 +21,7 @@ class SoundManager:
             "shield_up": pygame.mixer.Sound("Assets/SoundsFiles/shield_up.wav"),
             "alienspawn": pygame.mixer.Sound("Assets/SoundsFiles/alienspawnsound.mp3"),
         }
-        self.music_volume = 1.0
+        self.music_volume = 0.3
         self.sound_volume = 0.5
         pygame.mixer.music.set_volume(self.music_volume)
 

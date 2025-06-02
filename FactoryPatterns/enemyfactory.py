@@ -8,6 +8,7 @@ from Components.enemy import Enemy
 from StrategyPattern.arangelstrategy import ArangelStrategy
 from StrategyPattern.gorpistrategy import GorpiStrategy
 from StrategyPattern.thebluecentipedestrategy import TheBlueCentipedeStrategy
+from soundmanager import SoundManager
 
 class EnemyFactory(Factory):
     def create_component(self, enemy_type):
@@ -15,12 +16,15 @@ class EnemyFactory(Factory):
         if enemy_type == "Arangel":
             go.add_component(Enemy(enemy_type, 100, 20, ArangelStrategy(enemy_type)))
             go.add_component(SpriteRenderer("Enemies/Arangel.png"))
+            SoundManager().play_sound("alienspawn")
         elif enemy_type == "Gorpi":
             go.add_component(Enemy(enemy_type, 120, 25, GorpiStrategy(enemy_type)))
             go.add_component(SpriteRenderer("Enemies/Gorpi.png"))
+            SoundManager().play_sound("alienspawn")
         elif enemy_type == "The Blue Centipede":
             go.add_component(Enemy(enemy_type, 150, 30, TheBlueCentipedeStrategy(enemy_type)))
             go.add_component(SpriteRenderer("Enemies/The Blue Centipede.png"))
+            SoundManager().play_sound("alienspawn")
         else:
             raise ValueError("Unknown enemy type")
         
