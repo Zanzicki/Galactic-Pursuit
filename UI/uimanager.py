@@ -133,6 +133,7 @@ class UIManager:
                 self.player_select_window = None
                 self.player_dropdown = None
                 self.game_world.state = "map"
+                
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if hasattr(self, "save_slot_buttons"):
                 for btn in self.save_slot_buttons:
