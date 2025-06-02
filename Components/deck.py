@@ -1,13 +1,14 @@
+from Database.sqlrepository import SQLRepository
 from Components.card import Card
-from database import Database
+from Database.database import Database
 from FactoryPatterns.cardfactory import CardFactory
 
 class Deck:
     def __init__(self):
+        self.repository = SQLRepository()
         self.draw_pile = []
         self.discarded_cards = []
         self.hand = []
-        self.db = Database()
         self.decklist = []        
         self.cardfactory = CardFactory()
         self.card_positions = [(100,500), (300,500), (500,500), (700,500), (900,500)]
@@ -58,7 +59,7 @@ class Deck:
         return len(self.decklist)
     
     def create_starter_deck(self):
-        cardfromdb = self.db.fetch_basic_cards() 
+        cardfromdb = self.repository.fetch_basic_cards() 
         if not cardfromdb:
             raise ValueError("No cards found in the database.")
         
