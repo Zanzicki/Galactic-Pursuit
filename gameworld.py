@@ -4,7 +4,7 @@ import pygame_gui
 
 from BuilderPattern.playerbuilder import PlayerBuilder
 from Components.player import Player
-from gameObject import GameObject
+from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from Components.deck import Deck
