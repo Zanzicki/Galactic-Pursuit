@@ -23,7 +23,7 @@ class EndGameScreen:
         self.game_world._gameObjects.clear()
         #genskab menu
         
-        self.game_world.game_state  = "menu"
+        self.game_world._game_state  = "menu"
         self.game_world.ui_manager.show_menu_buttons()
         
     # depending on the palyers health write and message on the end screen

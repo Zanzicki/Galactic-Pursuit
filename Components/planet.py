@@ -1,6 +1,8 @@
 from Components.component import Component
 import pygame
 
+from Components.player import Player
+
 
 class Planet(Component):
     def __init__(self, name, size, color, position, gameworld):
@@ -13,6 +15,7 @@ class Planet(Component):
         self.font = pygame.font.Font(None, 24)  # Font for rendering text
         self._gameworld = gameworld
         self._visited = False  # Track if the planet has been visited
+        self.player = Player.get_instance()
 
     @property
     def name(self):
@@ -45,10 +48,14 @@ class Planet(Component):
         pass
 
     def update(self, delta_time):
-        # Check if the planet is close to the player
-        dx = self._gameworld.get_player_position()[0] - self._position[0]
-        dy = self._gameworld.get_player_position()[1] - self._position[1]
-        distance = (dx ** 2 + dy ** 2) ** 0.5
+        player_pos= self._gameworld.get_player_position()
+
+        if player_pos is None:
+            return
+
+        dx = player_pos[0] - self._position[0]
+        dy = player_pos[1] - self._position[1]
+        distance = (dx  2 + dy  2) ** 0.5
         self._highlighted = distance <= self._size + 20
 
     def draw(self, screen, font):

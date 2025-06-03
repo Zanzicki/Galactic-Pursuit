@@ -1,5 +1,4 @@
 class ReusablePool():
-
     def __init__(self, max_size):
         self._pool = []
         self._max_size = max_size
@@ -12,4 +11,4 @@ class ReusablePool():
 
     def release(self, obj):
         if len(self._pool) < self._max_size:
-            self._pool.append(obj)    
+            self._pool.append(obj)
