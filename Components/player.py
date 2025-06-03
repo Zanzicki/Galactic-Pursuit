@@ -68,7 +68,6 @@ class Player(Component):
         self.update_db()
 
     def take_damage(self, damage):
-        
 
         if self.block_points > 0:
             print("BLOCKING damage!")

@@ -223,18 +223,18 @@ class GameWorld:
                     healthbar_pos
                 )
 
-        self.ui_element.draw_text("Cards in hand:", (100, 80), (255, 255, 0))
-        for i in range(len(self.player.deck.hand)):
-            card = self.player.deck.hand[i]
-            self.ui_element.draw_text(card._name, (100,100 + i*30))
-        self.ui_element.draw_text("Cards in drawpile:", (100, 380), (255, 255, 0))
-        for i in range(len(self.player.deck.draw_pile)):
-            card = self.player.deck.draw_pile[i]
-            self.ui_element.draw_text(card._name, (100,400 + i*30))
-        self.ui_element.draw_text("Cards in discardpile:", (300, 380), (255, 255, 0))
-        for i in range(len(self.player.deck.discarded_cards)):
-            card = self.player.deck.discarded_cards[i]
-            self.ui_element.draw_text(card._name, (300,400 + i*30))
+        # self.ui_element.draw_text("Cards in hand:", (100, 80), (255, 255, 0))
+        # for i in range(len(self.player.deck.hand)):
+        #     card = self.player.deck.hand[i]
+        #     self.ui_element.draw_text(card._name, (100,100 + i*30))
+        # self.ui_element.draw_text("Cards in drawpile:", (100, 380), (255, 255, 0))
+        # for i in range(len(self.player.deck.draw_pile)):
+        #     card = self.player.deck.draw_pile[i]
+        #     self.ui_element.draw_text(card._name, (100,400 + i*30))
+        # self.ui_element.draw_text("Cards in discardpile:", (300, 380), (255, 255, 0))
+        # for i in range(len(self.player.deck.discarded_cards)):
+        #     card = self.player.deck.discarded_cards[i]
+        #     self.ui_element.draw_text(card._name, (300,400 + i*30))
 
         # Draw hand if needed (start of fight or after enemy acts)
         if not hasattr(self, "_hand_drawn") or not self._hand_drawn:
@@ -266,6 +266,7 @@ class GameWorld:
         self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
         
         # --- Reset deck ---
+        self.turn_count = 1  # Reset turn count
         self.player.deck.initialize_draw_pile()  # This clears hand, discard, and shuffles draw pile
 
         # --- Draw a new hand ---
