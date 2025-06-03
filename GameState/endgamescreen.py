@@ -30,16 +30,10 @@ class EndGameScreen:
         self.game_world.ui_manager.show_menu_buttons()
         self.restart_player()        
         SoundManager().fade_in_music("Assets/SoundsFiles/backgroundmusiclooped.mp3", loop=True, fade_time_ms=3000)
-        
-
-
-       
 
     # depending on the palyers health write and message on the end screen
     def get_player_status_alive_or_dead(self):
         return "You Saved the galaxy" if self.player.health > 0 else "Game over you are dead"
-        
-
 
     def update(self, time_delta, events):
         for event in events:
