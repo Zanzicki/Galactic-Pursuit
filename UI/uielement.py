@@ -39,3 +39,8 @@ class UIElement():
         health_text = font.render(f"Health: {max_health}", True, (255, 255, 255))
         text_rect = health_text.get_rect(center=(x + bar_width // 2, y + bar_height // 2))
         screen.blit(health_text, text_rect)
+    
+    def draw_text(self, text, position, color=(255, 255, 255)):
+        text_surface = self.font.render(text, True, color)
+        text_rect = text_surface.get_rect(center=position)
+        self.screen.blit(text_surface, text_rect)

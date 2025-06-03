@@ -21,18 +21,15 @@ class SoundManager:
             "shield_up": pygame.mixer.Sound("Assets/SoundsFiles/shield_up.wav"),
             "alienspawn": pygame.mixer.Sound("Assets/SoundsFiles/alienspawnsound.mp3"),
         }
-        self.music_volume = 0.3
+        self.music_volume = 0.1
         self.sound_volume = 0.5
         pygame.mixer.music.set_volume(self.music_volume)
 
     def play_music(self, loop=True):
         
-        
-            pygame.mixer.music.load(self.background_music_path)
-            pygame.mixer.music.set_volume(self.music_volume)
-            pygame.mixer.music.play(-1 if loop else 0)
-            
-        
+        pygame.mixer.music.load(self.background_music_path)
+        pygame.mixer.music.set_volume(self.music_volume)
+        pygame.mixer.music.play(-1 if loop else 0)
 
     def stop_music(self):
         pygame.mixer.music.stop()
@@ -57,3 +54,11 @@ class SoundManager:
 
     def set_sound_volume(self, volume):
         self.sound_volume = volume
+
+    def fade_out_music(self, time):
+        pygame.mixer.music.fadeout(time)
+    
+    def fade_in_music(self, music_file, loop=True, fade_time_ms=2000):
+        pygame.mixer.music.load(music_file)
+        pygame.mixer.music.set_volume(self.music_volume)
+        pygame.mixer.music.play(loops=-1 if loop else 0, fade_ms=fade_time_ms)

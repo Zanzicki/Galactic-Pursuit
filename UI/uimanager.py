@@ -247,8 +247,6 @@ class UIManager:
 
         # Get the deck from the player
         player = Player.get_instance()
-        print("UIManager sees player:", player)
-        print("UIManager sees deck:", getattr(player, 'deck', None))
         deck = getattr(player, "deck", None)
         if deck is None:
             print("No deck found!")

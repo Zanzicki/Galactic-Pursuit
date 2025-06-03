@@ -93,7 +93,7 @@ class GameWorld:
         gameObject.awake(self)
         gameObject.start()
         self._gameObjects.append(gameObject)
-        print(f"Instantiated GameObject: {gameObject}")
+        # print(f"Instantiated GameObject: {gameObject}")
 
     # --- Game Loop ---
     def update(self):
@@ -125,6 +125,7 @@ class GameWorld:
             self.ui_manager.hide_game_buttons()
             self.ui_manager.update(delta_time)
             self.ui_manager.draw(self.screen)
+            
         else:
             self.ui_manager.hide_menu_buttons()
 
@@ -196,39 +197,53 @@ class GameWorld:
         if not hasattr(self, "_fight_initialized") or not self._fight_initialized:
             self._initialize_fight()
 
-        turncount = self.turn_order.turncount
-        self.ui_element.draw(f"Turn: {turncount}", (self.width // 2, 40), self.player._credits, self.player._scraps, self.player._health, self.player._max_health)
+        # Draw UI
+        self.ui_element.draw(f"Turn: {getattr(self, 'turn_count', 1)}", (self.width // 2, 40),
+                             self.player._credits, self.player._scraps, self.player._health, self.player._max_health)
 
-        # Draw cards and enemy as before
+        # Draw cards and enemy
         for gameObject in self._gameObjects:
-            if gameObject.get_component("Card") is not None:
+            if gameObject.get_component("CardDisplay") is not None:
                 gameObject.update(delta_time)
-                gameObject.get_component("Card").draw_cardtext(self.screen, gameObject)
+                gameObject.get_component("CardDisplay").draw_cardtext(self.screen, gameObject)
             if gameObject.get_component("Enemy") is not None:
                 gameObject.update(delta_time)
                 self.ui_element.draw_healthbar(self.screen, gameObject.get_component("Enemy").health, (300, 100))
         self.ui_element.draw_healthbar(self.screen, self.player.health, (self.width - 300, 100))
 
-        # Turn logic
-        if self.turn_order.is_player_turn():
-            if not hasattr(self, "_hand_drawn") or not self._hand_drawn:
-                self.player.deck.draw_hand()
-                self.draw_cards(self.player.deck)
-                self._hand_drawn = True
+        self.ui_element.draw_text("Cards in hand:", (100, 80), (255, 255, 0))
+        for i in range(len(self.player.deck.hand)):
+            card = self.player.deck.hand[i]
+            self.ui_element.draw_text(card._name, (100,100 + i*30))
+        self.ui_element.draw_text("Cards in drawpile:", (100, 380), (255, 255, 0))
+        for i in range(len(self.player.deck.draw_pile)):
+            card = self.player.deck.draw_pile[i]
+            self.ui_element.draw_text(card._name, (100,400 + i*30))
+        self.ui_element.draw_text("Cards in discardpile:", (300, 380), (255, 255, 0))
+        for i in range(len(self.player.deck.discarded_cards)):
+            card = self.player.deck.discarded_cards[i]
+            self.ui_element.draw_text(card._name, (300,400 + i*30))
 
-            self.ui_manager.show_end_turn_button()
-            for event in events:
-                self.ui_manager.handle_event(event)
-                if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ui_manager.end_turn_button:
-                    self.turn_order.end_turn()
-                    player_deck = self.player.deck
-                    player_deck.discard_hand()
-                    self._hand_drawn = False
-                    self.ui_manager.hide_end_turn_button()
-        elif self.turn_order.is_enemy_turn():
-            self.current_enemy.enemy_action()
-            self.turn_order.end_turn()
-            self._hand_drawn = False
+        # Draw hand if needed (start of fight or after enemy acts)
+        if not hasattr(self, "_hand_drawn") or not self._hand_drawn:
+            self.player.deck.draw_hand()
+            for card in self.player.deck.hand:
+                print(f"Card drawn: {card._name} - Type: {card._type} - Value: {card._value}")
+            self.draw_cards(self.player.deck)
+            self._hand_drawn = True
+
+        for event in events:
+            self.ui_manager.handle_event(event)
+            if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ui_manager.end_turn_button:
+                # End turn: discard hand, enemy acts, increment turn
+                player_deck = self.player.deck
+                player_deck.discard_hand()
+                self.current_enemy.enemy_action()
+                if not hasattr(self, "turn_count"):
+                    self.turn_count = 1
+                self.turn_count += 1
+                self._hand_drawn = False  # Let the main loop draw the new hand next frame
+                self.ui_manager.hide_end_turn_button()
 
     def _initialize_fight(self):
         print("Initializing fight...")
@@ -248,26 +263,24 @@ class GameWorld:
         self._fight_initialized = True
 
     def draw_cards(self, player_deck):
-        player_hand = player_deck.hand
-        print("Player hand:", player_hand)
-        for i, card in enumerate(player_hand):
-            if card is None:
-                print("Card is None")
-                continue
+        # Remove old card GameObjects
+        for obj in self._gameObjects:
+            if obj.get_component("CardDisplay") is not None:
+                obj.is_destroyed = True
+        self._cleanup_destroyed_objects()
+
+        for i, card in enumerate(player_deck.hand):
             card_game_object = self.card_pool.acquire()
             if card_game_object is None:
                 card_game_object = self._cardFactory.create_component(card)
             else:
-                card_component = card_game_object.get_component("Card")
-                card_component._name = card._name
-                card_component._value = card._value
-                card_component._type = card._type
-                card_component._rarity = card._rarity
-                card_component._description = card._description
-                card_component._prize = card._prize
-                card_component.damage = getattr(card, "damage", 0)
+                # Just update the CardDisplay's reference, do NOT overwrite fields!
+                card_game_object.get_component("CardDisplay").card_data = card
+                card_game_object.is_destroyed = False
+
             self.instantiate(card_game_object)
             card_game_object.transform.position = self.player.deck.card_positions[i]
+
 
     def get_player_position(self):
         for gameObject in self._gameObjects:

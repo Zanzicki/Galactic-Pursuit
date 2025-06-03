@@ -2,6 +2,7 @@ import pygame
 from Database.sqlrepository import SQLRepository
 from Components.component import Component
 from Database.database import Database
+from soundmanager import SoundManager
 
 
 class Player(Component):
@@ -67,10 +68,12 @@ class Player(Component):
         self.update_db()
 
     def take_damage(self, damage):
+        
+
         if self.block_points > 0:
-            
-            print(f"{self._gameObject} blocked {damage} damage! Remaining block points: {self.block_points}")
+            print("BLOCKING damage!")
             self.block_points -= 1
+            print(f"Block points left: {self.block_points}")
             return
         
         if self._health > 0:
@@ -78,6 +81,7 @@ class Player(Component):
             if self._health <= 0:
                 self._gameObject.is_destroyed = True
                 print(f"{self._gameObject} has been defeated!")
+                SoundManager().play_sound("explosion")
         else:
             print(f"{self._gameObject} is already defeated.")
 

@@ -1,6 +1,8 @@
 import pygame
+from Components.card import Card
 from Components.component import Component
 from Components.player import Player
+from soundmanager import SoundManager
 
 # made by Erik
 
@@ -19,7 +21,7 @@ class CardHoverHandler(Component):
         pass
     
     def get_card_component(self):
-        card_component = self.gameObject.get_component("Card")
+        card_component = self.gameObject.get_component("CardDisplay").card_data
         if not card_component:
             print("[error] No Card component found on this GameObject.")
             return None
@@ -56,6 +58,7 @@ class CardHoverHandler(Component):
                     card_damage= 10
                     enemy_component.take_damage(card_damage)
                     print(f"[card activated] {card_type} dealt {card_damage} to {enemy_component.name}")
+                    SoundManager().play_sound("laser")
                 else:
                     print("[error] Target does not have an Enemy component.")
 
@@ -80,6 +83,7 @@ class CardHoverHandler(Component):
             if player:
                 player.block_points += 2
                 print(f"[card activated] {card_type} activated, block points: {player.block_points}")
+                SoundManager().play_sound("shield_up")
 
 
     def update(self, delta_time):
@@ -103,9 +107,10 @@ class CardHoverHandler(Component):
         if self._hovered:
             pygame.draw.rect(self._game_world.screen, (255, 0, 0), rect, 2)
 
-            card_info = self.gameObject.get_component("Card")
+            card_info = self.gameObject.get_component("CardDisplay").card_data
             if not card_info:
                 return
+
 
             info_text = f"Name: {getattr(card_info, '_name', '???')} - rarity: {getattr(card_info, '_rarity', '???')} - value: {getattr(card_info, '_value', '???')}"
             description = f"Description: {getattr(card_info, '_description', '???')}"
@@ -142,10 +147,13 @@ class CardHoverHandler(Component):
                         break
 
                 self.card_type_activated(self._game_world, target=enemy_target) 
-                self.player.deck.play_card(self.gameObject.get_component("Card"))
-                print(f"Card {card_info._name} discarded to player's discard pile.")
-                self._game_world.card_pool.release(self.gameObject)  # Add to pool instead of just destroying
-                self.gameObject.is_destroyed = True  # Mark for removal from game world
+                self.play_card()
 
         else:
             self.clicked = False
+
+    def play_card(self):
+        card = self.gameObject.get_component("CardDisplay").card_data
+        self.player.deck.play_card(card)
+        self._game_world.card_pool.release(self.gameObject)
+        self.gameObject.is_destroyed = True
