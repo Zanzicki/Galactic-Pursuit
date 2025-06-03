@@ -207,9 +207,21 @@ class GameWorld:
                 gameObject.update(delta_time)
                 gameObject.get_component("CardDisplay").draw_cardtext(self.screen, gameObject)
             if gameObject.get_component("Enemy") is not None:
+                enemy = gameObject.get_component("Enemy")
                 gameObject.update(delta_time)
-                self.ui_element.draw_healthbar(self.screen, gameObject.get_component("Enemy").health, (300, 100))
-        self.ui_element.draw_healthbar(self.screen, self.player.health, (self.width - 300, 100))
+                # Center enemy and health bar
+                enemy_x = self.width // 2
+                enemy_y = self.height // 3  # 1/3 down the screen
+                gameObject.transform.position = (enemy_x - 75, enemy_y - 75)  # Center enemy sprite (assuming 150x150)
+                enemy.draw(self.screen, gameObject.transform.position, gameObject.get_component("SpriteRenderer")._sprite_image)
+                # Draw health bar
+                healthbar_pos = (enemy_x - 100, enemy_y - 100)  # Centered, above enemy
+                self.ui_element.draw_healthbar(
+                    self.screen,
+                    enemy.health,
+                    enemy._max_health,
+                    healthbar_pos
+                )
 
         self.ui_element.draw_text("Cards in hand:", (100, 80), (255, 255, 0))
         for i in range(len(self.player.deck.hand)):
@@ -252,8 +264,15 @@ class GameWorld:
             if gameObject.get_component("Enemy") is not None:
                 gameObject.destroy()
         self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
-        # Reset deck
-        self.player.deck.initialize_draw_pile()
+        
+        # --- Reset deck ---
+        self.player.deck.initialize_draw_pile()  # This clears hand, discard, and shuffles draw pile
+
+        # --- Draw a new hand ---
+        self.player.deck.draw_hand()
+        self.draw_cards(self.player.deck)
+        self._hand_drawn = True  # So you don't draw again until next turn
+
         # Create new enemy
         random_enemy = random.choice(["Arangel", "Gorpi", "The Blue Centipede"])
         new_enemy = self._enemyFactory.create_component(random_enemy)
@@ -269,6 +288,7 @@ class GameWorld:
                 obj.is_destroyed = True
         self._cleanup_destroyed_objects()
 
+        card_positions = self.player.deck.get_card_positions(self.width, y=self.height - 350, card_count=len(player_deck.hand))
         for i, card in enumerate(player_deck.hand):
             card_game_object = self.card_pool.acquire()
             if card_game_object is None:
@@ -279,7 +299,7 @@ class GameWorld:
                 card_game_object.is_destroyed = False
 
             self.instantiate(card_game_object)
-            card_game_object.transform.position = self.player.deck.card_positions[i]
+            card_game_object.transform.position = card_positions[i]
 
 
     def get_player_position(self):

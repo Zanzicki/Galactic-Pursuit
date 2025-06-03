@@ -1,8 +1,7 @@
 import pygame
 from Components.component import Transform
 
-# the GameObject sets the rules for how we interact with components and other classes.
-# Every object in game will have a transform, and other components added as needed.
+
 class GameObject:
 
     def __init__(self, position) -> None:

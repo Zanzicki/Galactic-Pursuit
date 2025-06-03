@@ -11,7 +11,7 @@ class Deck:
         self.hand = []
         self.decklist = []        
         self.cardfactory = CardFactory()
-        self.card_positions = [(100,500), (300,500), (500,500), (700,500), (900,500)]
+        self.card_positions = []
 
     def add_card(self, card: Card):
         self.decklist.append(card)
@@ -71,3 +71,9 @@ class Deck:
                     name, value, type, rarity, description, prize = card_data[1], card_data[2], card_data[3], card_data[4], card_data[5], card_data[6]
                     card = Card(name, value, type, rarity, description, prize)
                     self.add_card(card)
+
+    # In Deck.__init__ or dynamically in draw_cards
+    def get_card_positions(self, screen_width, y=500, card_count=5, card_width=150, spacing=40):
+        total_width = card_count * card_width + (card_count - 1) * spacing
+        start_x = (screen_width - total_width) // 2
+        return [(start_x + i * (card_width + spacing), y) for i in range(card_count)]
