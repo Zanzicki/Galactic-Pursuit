@@ -125,6 +125,7 @@ class GameWorld:
             self.ui_manager.hide_game_buttons()
             self.ui_manager.update(delta_time)
             self.ui_manager.draw(self.screen)
+            
         else:
             self.ui_manager.hide_menu_buttons()
 

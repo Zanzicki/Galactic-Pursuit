@@ -45,9 +45,14 @@ class Planet(Component):
         pass
 
     def update(self, delta_time):
+        player_pos= self._gameworld.get_player_position()
+
+        if player_pos is None:
+            return
+        
         # Check if the planet is close to the player
-        dx = self._gameworld.get_player_position()[0] - self._position[0]
-        dy = self._gameworld.get_player_position()[1] - self._position[1]
+        dx = player_pos[0] - self._position[0]
+        dy = player_pos[1] - self._position[1]
         distance = (dx ** 2 + dy ** 2) ** 0.5
         self._highlighted = distance <= self._size + 20
 

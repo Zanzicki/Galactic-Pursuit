@@ -5,6 +5,7 @@ from Components import player
 from Components.player import Player
 from GameState.map import Map
 from gameobject import GameObject
+from soundmanager import SoundManager
 
 class EndGameScreen:
     def __init__(self, game_world,):
@@ -17,18 +18,23 @@ class EndGameScreen:
             text='Restart',
             manager=self.ui_manager
         )
-    
+
     def restart_game(self):
     # Ryd gameObjects
+        
         self.game_world._gameObjects.clear()
         #genskab menu
-        
+
         self.game_world.game_state  = "menu"
         self.game_world.ui_manager.show_menu_buttons()
-        
+        SoundManager().fade_in_music("Assets/SoundsFiles/backgroundmusiclooped.mp3", loop=True, fade_time_ms=3000)
+
+       
+
     # depending on the palyers health write and message on the end screen
     def get_player_status_alive_or_dead(self):
         return "You Saved the galaxy" if self.player.health > 0 else "Game over you are dead"
+        
 
 
     def update(self, time_delta, events):
@@ -37,8 +43,11 @@ class EndGameScreen:
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.restart_button:
                     self.restart_game()
-                    self.game_world.game_state  ="menu"
+                    self.game_world._game_state  ="menu"
+                    
                     print("Restarting game...")
+        SoundManager().fade_out_music(5000)
+        
         self.ui_manager.update(time_delta)
 
     def draw(self, screen):
