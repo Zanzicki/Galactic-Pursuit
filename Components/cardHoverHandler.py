@@ -2,6 +2,7 @@ import pygame
 from Components.card import Card
 from Components.component import Component
 from Components.player import Player
+from soundmanager import SoundManager
 
 # made by Erik
 
@@ -57,6 +58,7 @@ class CardHoverHandler(Component):
                     card_damage= 10
                     enemy_component.take_damage(card_damage)
                     print(f"[card activated] {card_type} dealt {card_damage} to {enemy_component.name}")
+                    SoundManager().play_sound("laser")
                 else:
                     print("[error] Target does not have an Enemy component.")
 
@@ -81,6 +83,7 @@ class CardHoverHandler(Component):
             if player:
                 player.block_points += 2
                 print(f"[card activated] {card_type} activated, block points: {player.block_points}")
+                SoundManager().play_sound("shield_up")
 
 
     def update(self, delta_time):

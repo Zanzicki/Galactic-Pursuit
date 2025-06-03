@@ -1,6 +1,7 @@
 import random
 from StrategyPattern.strategy import Strategy
 from Components.player import Player
+from soundmanager import SoundManager
 
 
 class TheBlueCentipedeStrategy(Strategy):
@@ -16,12 +17,15 @@ class TheBlueCentipedeStrategy(Strategy):
         random_action()
 
     def basic_attack(self):
-        self._target.health -= self.strength
+        self._target.take_damage(self.strength)
         print(f"{self._name} performs a basic attack for {self.strength} damage!")
         print(f"{self._target} has {self._target.health} health left.")
+        SoundManager().play_sound("laser")
+        
 
     def basic_defense(self):
         print(f"{self._name} performs a basic defense!")
+        SoundManager().play_sound("shield_up")
 
     def special_skill(self):
         print(f"{self._name} uses a special skill!")
