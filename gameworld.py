@@ -121,7 +121,7 @@ class GameWorld:
     # --- State Handling ---
     def _handle_state(self, delta_time, events):
         if self._game_state == "menu":
-            #SoundManager().play_music()
+            SoundManager().play_music()
             self.ui_manager.show_menu_buttons()
             self.ui_manager.hide_game_buttons()
             self.ui_manager.update(delta_time)
@@ -158,7 +158,7 @@ class GameWorld:
         elif self._game_state == "end_game":
             self.end_game.update(delta_time, events)
             self.end_game.draw(self.screen)
-            #SoundManager().stop_music()
+            SoundManager().stop_music()
 
         # Update artifacts (if not in menu)
         if self._game_state != "menu":
