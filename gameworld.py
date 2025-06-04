@@ -363,8 +363,14 @@ class GameWorld:
                 # Center boss and health bar
                 boss_x = self.width // 2
                 boss_y = self.height // 3  # 1/3 down the screen
-                gameObject.transform.position = (boss_x - 75, boss_y - 75)  # Center boss sprite (assuming 150x150)
-                boss.draw(self.screen, gameObject.transform.position, gameObject.get_component("SpriteRenderer")._sprite_image)
+                gameObject.transform.position = (
+                boss_x - gameObject.get_component("SpriteRenderer").sprite_image.width/2, 
+                boss_y - gameObject.get_component("SpriteRenderer").sprite_image.height/2)  # Center boss sprite
+                gameObject.get_component("Boss").draw(
+                    self.screen,
+                    gameObject.transform.position,
+                    gameObject.get_component("SpriteRenderer")._sprite_image
+                )
                 # Draw health bar
                 healthbar_pos = (boss_x - 100, boss_y - 100)  # Centered, above boss
                 self.ui_element.draw_healthbar(
@@ -388,7 +394,7 @@ class GameWorld:
                 # End turn: discard hand, boss acts, increment turn
                 player_deck = self.player.deck
                 player_deck.discard_hand()
-                self.current_boss.boss_action()  # Assuming boss_action exists
+                self.current_boss.boss_action() 
                 if not hasattr(self, "turn_count"):
                     self.turn_count = 1
                 self.turn_count += 1
