@@ -2,8 +2,8 @@ import os
 import pygame
 from BuilderPattern.builder import Builder
 from Components.component import Animator, SpriteRenderer
-from gameobject import GameObject
 from Components.boss import Boss
+from gameobject import GameObject
 
 
 class BossBuilder(Builder):

@@ -222,10 +222,6 @@ class GameWorld:
             self.player._credits, self.player._scraps,
             self.player._health + self.player.temp_health, self.player._max_health, self.player.temp_health
         )
-        if self.player.temp_health > 0:
-            self.ui_element.draw_text(str(self.player.temp_health), (self.width // 2, 40), (0, 0, 255))
-        else:
-            self.ui_element.draw_text(str(self.player.temp_health), (self.width // 2, 80), (0, 0, 255))
 
         # Draw cards and enemy/boss
         for gameObject in self._gameObjects:
@@ -261,7 +257,6 @@ class GameWorld:
                     icon_x = boss_x - icon_img.get_width() // 2 - 150
                     icon_y = boss_y - icon_img.get_height() / 2 - 80
                     self.screen.blit(icon_img, (icon_x, icon_y))
-                    print(f"Boss state icon drawn: {icon_type}", "at position:", (icon_x, icon_y))
 
             elif not boss_fight and gameObject.get_component("Enemy") is not None:
                 enemy = gameObject.get_component("Enemy")
@@ -338,3 +333,39 @@ class GameWorld:
         if self.playerGo and self.playerGo.transform:
             return self.playerGo.transform.position
         return pygame.math.Vector2(self.width // 2, self.height // 2)
+    
+    def draw_cards(self, player_deck):
+        # Remove old card GameObjects
+        for obj in self._gameObjects:
+            if obj.get_component("CardDisplay") is not None:
+                obj.is_destroyed = True
+        self._cleanup_destroyed_objects()
+
+        # Ensure card_positions is long enough
+        hand_size = len(player_deck.hand)
+        if len(self.player.deck.card_positions) < hand_size:
+            # Generate positions for all cards in hand
+            self.player.deck.card_positions = [
+                pygame.math.Vector2(
+                    200 + i * 180,  # X position (adjust spacing as needed)
+                    self.height - 200  # Y position
+                ) for i in range(hand_size)
+            ]
+
+        for i, card in enumerate(player_deck.hand):
+            card_game_object = self.card_pool.acquire()
+            if card_game_object is None:
+                card_game_object = self._cardFactory.create_component(card)
+            else:
+                # Just update the CardDisplay's reference, do NOT overwrite fields!
+                card_game_object.get_component("CardDisplay").card_data = card
+                card_game_object.is_destroyed = False
+
+            self.instantiate(card_game_object)
+            card_game_object.transform.position = self.player.deck.card_positions[i]
+
+    def back_to_map(self, delta_time):
+        self.ui_manager.back_to_map_button.show()
+        self.ui_manager.update(delta_time)
+        self.ui_manager.draw(self.screen)
+
