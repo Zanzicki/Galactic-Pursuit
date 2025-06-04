@@ -137,7 +137,7 @@ class Player(Component):
                   # Check if the boss should spawn
                 if planetcomponent._name == "Boss":
                     print("Boss planet reached!")
-                    self.game_world._game_state = "end_game"  # Transition to end game state
+                    self.game_world._game_state = "boss_fight"  # Transition to end game state
                     return
                 if planetcomponent._color == (0, 0, 255):  # Blue (Shop)
                     print(f"{planetcomponent._name} (Blue): Entering shop!")

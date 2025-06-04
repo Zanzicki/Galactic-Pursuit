@@ -19,6 +19,7 @@ from GameState.startgame import NewGame
 from GameState.endgamescreen import EndGameScreen
 from ObjectPool.pool import ReusablePool
 from soundmanager   import SoundManager
+from BuilderPattern.bossbuilder import BossBuilder
 
 class GameWorld:
     def __init__(self, width, height):
@@ -125,11 +126,7 @@ class GameWorld:
             self.ui_manager.hide_game_buttons()
             self.ui_manager.update(delta_time)
             self.ui_manager.draw(self.screen)
-            
-        else:
-            self.ui_manager.hide_menu_buttons()
-
-        if self._game_state == "map":
+        elif self._game_state == "map":
             pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)
             self.draw_and_update_map(delta_time, events)
             self.ui_manager.hide_game_buttons()
@@ -157,12 +154,18 @@ class GameWorld:
         elif self._game_state == "end_game":
             self.end_game.update(delta_time, events)
             self.end_game.draw(self.screen)
+        elif self._game_state == "boss_fight":
+            self.ui_manager.show_game_buttons()
+            self.draw_and_update_boss_fight(delta_time, events)
+            self.back_to_map(delta_time)
 
         # Update artifacts (if not in menu)
         if self._game_state != "menu":
             for gameObject in self._gameObjects:
                 if gameObject.get_component("Artifact") is not None:
                     gameObject.update(delta_time)
+            self.ui_manager.hide_menu_buttons()
+
 
     def _draw_centered_text(self, text, color):
         self.screen.fill((0, 0, 0))
@@ -281,6 +284,30 @@ class GameWorld:
         self.current_enemy = new_enemy.get_component("Enemy")
         self.turn_order = TurnOrder(self.player, self.current_enemy)
         self._fight_initialized = True
+
+    def _initialize_boss_fight(self):
+        print("Initializing boss fight...")
+        # Remove previous enemies
+        for gameObject in self._gameObjects:
+            if gameObject.get_component("Enemy") is not None or gameObject.get_component("Boss") is not None:
+                gameObject.destroy()
+        self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
+
+        # Reset deck
+        self.turn_count = 1
+        self.player.deck.initialize_draw_pile()
+        self.player.deck.draw_hand()
+        self.draw_cards(self.player.deck)
+        self._hand_drawn = True
+
+        # Spawn the boss using BossBuilder
+        boss_builder = BossBuilder()
+        boss_builder.build()
+        boss_game_object = boss_builder.get_gameObject()
+        self.instantiate(boss_game_object)
+        self.current_boss = boss_game_object.get_component("Boss")
+        self.turn_order = TurnOrder(self.player, self.current_boss)
+        self._boss_fight_initialized = True
 
     def draw_cards(self, player_deck):
         # Remove old card GameObjects

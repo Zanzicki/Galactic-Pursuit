@@ -120,7 +120,7 @@ class Animator(Component):
         frames = []
         for arg in args:
             #sprite_image = pygame.image.load(f"Assets\\{arg}")
-            sprite_image = pygame.image.load(f"Assets\\{arg}") # Load each frame
+            sprite_image = pygame.image.load(f"{arg}") # Load each frame
             frames.append(sprite_image)
         
         self._animations[name] = frames

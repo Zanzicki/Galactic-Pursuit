@@ -77,7 +77,7 @@ class Map:
 
             planet = GameObject(position)
             if not planet.transform or not hasattr(planet.transform, "position"):
-                print(f"❗Fejl: transform ikke initialiseret korrekt på planet {name}")
+                print(f"Fejl: transform ikke initialiseret korrekt på planet {name}")
                 continue
 
         # Sikrer at transform.position sættes korrekt (hvis ikke allerede gjort)
@@ -87,7 +87,7 @@ class Map:
             self.planets.append(planet)
             self.game_world._gameObjects.append(planet)
 
-            print(f"✅ Placerede planet '{name}' ved {position} med farve {color}")
+            print(f"Placerede planet '{name}' ved {position} med farve {color}")
 
 
 
