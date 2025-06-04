@@ -9,7 +9,3 @@ class BossStateMachine:
             self.current_state.exit(self.boss, self.player)
         self.current_state = new_state
         self.current_state.enter(self.boss, self.player)
-
-    def update(self):
-        if self.current_state:
-            self.current_state.execute(self.boss, self.player)

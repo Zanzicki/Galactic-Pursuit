@@ -53,7 +53,7 @@ class CardHoverHandler(Component):
             print(f"[card activated] {card_type} activated")        
             if target: 
                 
-                enemy_component = target.get_component("Enemy")
+                enemy_component = target.get_component("Enemy") or target.get_component("Boss")
                 if enemy_component:
                     card_damage= 10
                     enemy_component.take_damage(card_damage)
@@ -81,8 +81,8 @@ class CardHoverHandler(Component):
                     player = player_component
                     break
             if player:
-                player.block_points += 2
-                print(f"[card activated] {card_type} activated, block points: {player.block_points}")
+                player.add_temp_health(5)
+                print(f"[card activated] {card_type} activated, block points: {player.temp_health}")
                 SoundManager().play_sound("shield_up")
 
 
@@ -141,13 +141,18 @@ class CardHoverHandler(Component):
                     print(f"Card clicked!")                 
                 enemy_target = None
                 for obj in self._game_world._gameObjects:
+                    boss_component = obj.get_component("Boss")
+                    if boss_component and boss_component._is_alive:
+                        enemy_target = obj
+                        break
                     enemy_component = obj.get_component("Enemy")
                     if enemy_component and enemy_component.is_alive:
                         enemy_target = obj
                         break
 
-                self.card_type_activated(self._game_world, target=enemy_target) 
-                self.play_card()
+                if enemy_target:
+                    self.card_type_activated(self._game_world, target=enemy_target)
+                    self.play_card()
 
         else:
             self.clicked = False

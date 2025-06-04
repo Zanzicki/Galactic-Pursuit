@@ -30,6 +30,7 @@ class Player(Component):
             self._max_health = max_health
             self.artifacts = []
             self.artifact_positions = []
+            self.temp_health = 0
 
     @staticmethod
     def get_instance():
@@ -67,6 +68,9 @@ class Player(Component):
         self._scraps = value
         self.update_db()
 
+    def add_temp_health(self, amount):
+        self.temp_health += amount
+
     def take_damage(self, damage):
 
         if self.block_points > 0:
@@ -75,7 +79,14 @@ class Player(Component):
             print(f"Block points left: {self.block_points}")
             return
         
-        if self._health > 0:
+        if self.temp_health > 0:
+            if damage <= self.temp_health:
+                self.temp_health -= damage
+                damage = 0
+            else:
+                damage -= self.temp_health
+                self.temp_health = 0
+        if damage > 0:
             self._health -= damage
             if self._health <= 0:
                 self._gameObject.is_destroyed = True
@@ -107,53 +118,6 @@ class Player(Component):
 
         # Apply movement
         self._gameObject.transform.translate(movement * delta_time)
-
-        # Check for interaction with planets when spacebar is pressed
-        for event in self.events:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.check_planet_interaction()
-
-    def check_planet_interaction(self):
-        print("Checking planet interaction...")
-        player_position = self._gameObject.transform.position
-
-        # Access planets from the Map class
-        planets = self.game_world.map.planets
-
-        for planet in planets:
-            dx = player_position.x - planet.transform.position[0]
-            dy = player_position.y - planet.transform.position[1]
-            planetcomponent = planet.get_component("Planet")
-            
-            if planetcomponent._visited:
-             continue
-            
-            distance = (dx ** 2 + dy ** 2) ** 0.5
-            if distance <= planetcomponent._size + 20:  # Check if the player is close enough to the planet
-                planetcomponent._visited = True  # Mark the planet as visited
-                self.game_world.map.check_and_spawn_boss()
-                self.repository.change_planet_explored(self._id, planetcomponent._name)
-                
-                  # Check if the boss should spawn
-                if planetcomponent._name == "Boss":
-                    print("Boss planet reached!")
-                    self.game_world._game_state = "boss_fight"  # Transition to end game state
-                    return
-                if planetcomponent._color == (0, 0, 255):  # Blue (Shop)
-                    print(f"{planetcomponent._name} (Blue): Entering shop!")
-                    self.game_world.state_changed_to_shop = "into"
-                    self.game_world._game_state= "shop"  # Transition to shop state
-                    return
-                elif planetcomponent._color == (255, 0, 0):  # Red (Fight)
-                    print(f"{planetcomponent._name} (Red): Entering fight!")
-                    self.game_world._game_state = "game"  # Transition to game state
-                    return
-                elif planetcomponent._color == (0, 255, 0):  # Green (Artifact)
-                    print(f"{planetcomponent._name} (Green): Entering artifact!")
-                    self.game_world._game_state = "artifact"
-                elif planetcomponent._color == (255, 0, 255):
-                    print(f"{planetcomponent._name} (Magenta): Entering mystery!")
-                    self.game_world._game_state = "mystery"
 
     def update_artifacts(self):
         self.artifact_positions.clear()
