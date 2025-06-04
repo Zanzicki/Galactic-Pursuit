@@ -1,6 +1,6 @@
 import os
 import pygame
-from Components.builder import Builder
+from BuilderPattern.builder import Builder
 from Components.component import Animator, SpriteRenderer
 from gameobject import GameObject
 from Components.boss import Boss
@@ -19,17 +19,17 @@ class BossBuilder(Builder):
         self.spritesheet = [
             os.path.join(boss_folder, f)
             for f in os.listdir(boss_folder)
-            if f.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif'))
+            if f.lower().endswith(('.png'))
         ]
         # Optionally sort for consistent animation order
         self.spritesheet.sort()
         # Use the first sprite as the default
         if self.spritesheet:
             self._gameObject.add_component(SpriteRenderer(self.spritesheet[0]))
-            self._gameObject.get_component("SpriteRenderer").sprite_image.convert_alpha()
-        # self._gameObject.add_component(Animator())
-        # self._gameObject.get_component("Animator").add_animation("idle", *self.spritesheet)
-        # self._gameObject.get_component("Animator").play_animation("idle")
+            # self._gameObject.get_component("SpriteRenderer").sprite_image.convert_alpha()
 
+        self._gameObject.add_component(Animator())
+        self._gameObject.get_component("Animator").add_animation("idle", *self.spritesheet)
+        self._gameObject.get_component("Animator").play_animation("idle")
     def get_gameObject(self) -> GameObject:
         return self._gameObject

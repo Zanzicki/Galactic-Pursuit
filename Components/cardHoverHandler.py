@@ -81,8 +81,8 @@ class CardHoverHandler(Component):
                     player = player_component
                     break
             if player:
-                player.block_points += 2
-                print(f"[card activated] {card_type} activated, block points: {player.block_points}")
+                player.add_temp_health(5)
+                print(f"[card activated] {card_type} activated, block points: {player.temp_health}")
                 SoundManager().play_sound("shield_up")
 
 

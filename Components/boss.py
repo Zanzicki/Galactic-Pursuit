@@ -75,12 +75,13 @@ class Boss(Component, HitEffect):
                 print(f"{self._name} has been defeated!")
                 self.gameObject.is_destroyed = True #remove enemy from game world
                 
-                self.game_world.state = "end_game" # Transition to the map state
+                self.game_world._game_state = "end_game" # Transition to the map state
         else:
             print(f"{self._name} is already defeated.")
 
     def awake(self, game_world):
         self.game_world = game_world
+        
     
     def start(self):
         pass
@@ -88,16 +89,21 @@ class Boss(Component, HitEffect):
     def update(self, delta_time):
         if self.state_machine.player is None:
             self.state_machine.player = Player.get_instance()
-
         self.update_hit_effect(delta_time)
+        animator = self.gameObject.get_component("Animator")
+        if hasattr(self, "is_hit_animating") and self.is_hit_animating:
+            if animator:
+                animator.run_animation = False
+        else:
+            if animator:
+                animator.run_animation = True
 
     def draw(self, screen, base_position, sprite_image):
         self.draw_hit_effect(screen, sprite_image, base_position)
 
     def defend(self):
-        # Example: Heal or gain block
-        heal_amount = 10
-        self._health = min(self._health + heal_amount, self._max_health)
+        heal_amount = 10  # or whatever value
+        self._health += heal_amount  # Allow overheal
         print(f"{self._name} heals for {heal_amount}! Current health: {self._health}")
 
     def enraged_attack(self, player):
@@ -109,3 +115,8 @@ class Boss(Component, HitEffect):
     def boss_action(self):
         if self.state_machine.current_state:
             self.state_machine.current_state.execute(self, self.state_machine.player)
+
+    def get_state_icon(self):
+        if self.state_machine.current_state is None:
+            return None
+        return getattr(self.state_machine.current_state, "icon_type", None)

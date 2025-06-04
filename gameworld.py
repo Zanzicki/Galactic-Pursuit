@@ -72,6 +72,13 @@ class GameWorld:
         self.turn_order = None
         self.current_enemy = None
 
+        self.state_icons = {
+            "attack": pygame.image.load("Assets/Icons/attack.png").convert_alpha(),
+            "defend": pygame.image.load("Assets/Icons/defend.png").convert_alpha(),
+            "skill": pygame.image.load("Assets/Icons/skill.png").convert_alpha(),
+        }
+        
+
     # --- Properties ---
     @property
     def GameState(self):
@@ -142,7 +149,7 @@ class GameWorld:
                     self.shop.exit()
             case "game":
                 self.ui_manager.show_game_buttons()
-                self.draw_and_update_fight(delta_time, events)
+                self.draw_and_update_fight(delta_time, events, boss_fight=False)
                 self.back_to_map(delta_time)
             case "game_over":
                 self._draw_centered_text("Game Over", (255, 0, 0))
@@ -157,7 +164,7 @@ class GameWorld:
                 self.end_game.draw(self.screen)
             case "boss_fight":
                 self.ui_manager.show_game_buttons()
-                self.draw_and_update_boss_fight(delta_time, events)
+                self.draw_and_update_fight(delta_time, events, boss_fight=True)
                 self.back_to_map(delta_time)
             case _:
                 print(f"Unknown game state: {self._game_state}")
@@ -200,29 +207,70 @@ class GameWorld:
                 gameObject.update(delta_time)
         self.map.check_player_planet_interaction(self.player, events)
 
-    def draw_and_update_fight(self, delta_time, events):
-        if not hasattr(self, "_fight_initialized") or not self._fight_initialized:
-            self._initialize_fight()
+    def draw_and_update_fight(self, delta_time, events, boss_fight=False):
+        # Initialize fight if needed
+        if boss_fight:
+            if not hasattr(self, "_boss_fight_initialized") or not self._boss_fight_initialized:
+                self._initialize_fight(boss_fight=True)
+        else:
+            if not hasattr(self, "_fight_initialized") or not self._fight_initialized:
+                self._initialize_fight(boss_fight=False)
 
         # Draw UI
-        self.ui_element.draw(f"Turn: {getattr(self, 'turn_count', 1)}", (self.width // 2, 40),
-                             self.player._credits, self.player._scraps, self.player._health, self.player._max_health)
+        self.ui_element.draw(
+            f"Turn: {getattr(self, 'turn_count', 1)}", (self.width // 2, 40),
+            self.player._credits, self.player._scraps,
+            self.player._health + self.player.temp_health, self.player._max_health, self.player.temp_health
+        )
+        if self.player.temp_health > 0:
+            self.ui_element.draw_text(str(self.player.temp_health), (self.width // 2, 40), (0, 0, 255))
+        else:
+            self.ui_element.draw_text(str(self.player.temp_health), (self.width // 2, 80), (0, 0, 255))
 
-        # Draw cards and enemy
+        # Draw cards and enemy/boss
         for gameObject in self._gameObjects:
             if gameObject.get_component("CardDisplay") is not None:
                 gameObject.update(delta_time)
                 gameObject.get_component("CardDisplay").draw_cardtext(self.screen, gameObject)
-            if gameObject.get_component("Enemy") is not None:
+
+            if boss_fight and gameObject.get_component("Boss") is not None:
+                boss = gameObject.get_component("Boss")
+                gameObject.update(delta_time)
+                boss_x = self.width // 2
+                boss_y = self.height // 3
+                gameObject.transform.position = (
+                    boss_x - gameObject.get_component("SpriteRenderer").sprite_image.width / 2,
+                    boss_y - gameObject.get_component("SpriteRenderer").sprite_image.height / 2
+                )
+                boss.draw(
+                    self.screen,
+                    gameObject.transform.position,
+                    gameObject.get_component("SpriteRenderer")._sprite_image
+                )
+                healthbar_pos = (boss_x - 100, boss_y - 100)
+                self.ui_element.draw_healthbar(
+                    self.screen,
+                    boss.health,
+                    boss._max_health,
+                    healthbar_pos
+                )
+                icon_type = boss.get_state_icon()
+                if icon_type and icon_type in self.state_icons:
+                    icon_img = self.state_icons[icon_type]
+                    sprite_rect = gameObject.get_component("SpriteRenderer").sprite_image.get_rect(topleft=gameObject.transform.position)
+                    icon_x = boss_x - icon_img.get_width() // 2 - 150
+                    icon_y = boss_y - icon_img.get_height() / 2 - 80
+                    self.screen.blit(icon_img, (icon_x, icon_y))
+                    print(f"Boss state icon drawn: {icon_type}", "at position:", (icon_x, icon_y))
+
+            elif not boss_fight and gameObject.get_component("Enemy") is not None:
                 enemy = gameObject.get_component("Enemy")
                 gameObject.update(delta_time)
-                # Center enemy and health bar
                 enemy_x = self.width // 2
-                enemy_y = self.height // 3  # 1/3 down the screen
-                gameObject.transform.position = (enemy_x - 75, enemy_y - 75)  # Center enemy sprite (assuming 150x150)
+                enemy_y = self.height // 3
+                gameObject.transform.position = (enemy_x - 75, enemy_y - 75)
                 enemy.draw(self.screen, gameObject.transform.position, gameObject.get_component("SpriteRenderer")._sprite_image)
-                # Draw health bar
-                healthbar_pos = (enemy_x - 100, enemy_y - 100)  # Centered, above enemy
+                healthbar_pos = (enemy_x - 100, enemy_y - 100)
                 self.ui_element.draw_healthbar(
                     self.screen,
                     enemy.health,
@@ -230,20 +278,7 @@ class GameWorld:
                     healthbar_pos
                 )
 
-        # self.ui_element.draw_text("Cards in hand:", (100, 80), (255, 255, 0))
-        # for i in range(len(self.player.deck.hand)):
-        #     card = self.player.deck.hand[i]
-        #     self.ui_element.draw_text(card._name, (100,100 + i*30))
-        # self.ui_element.draw_text("Cards in drawpile:", (100, 380), (255, 255, 0))
-        # for i in range(len(self.player.deck.draw_pile)):
-        #     card = self.player.deck.draw_pile[i]
-        #     self.ui_element.draw_text(card._name, (100,400 + i*30))
-        # self.ui_element.draw_text("Cards in discardpile:", (300, 380), (255, 255, 0))
-        # for i in range(len(self.player.deck.discarded_cards)):
-        #     card = self.player.deck.discarded_cards[i]
-        #     self.ui_element.draw_text(card._name, (300,400 + i*30))
-
-        # Draw hand if needed (start of fight or after enemy acts)
+        # Draw hand if needed
         if not hasattr(self, "_hand_drawn") or not self._hand_drawn:
             self.player.deck.draw_hand()
             for card in self.player.deck.hand:
@@ -251,47 +286,25 @@ class GameWorld:
             self.draw_cards(self.player.deck)
             self._hand_drawn = True
 
+        # Handle events
         for event in events:
             self.ui_manager.handle_event(event)
             if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ui_manager.end_turn_button:
-                # End turn: discard hand, enemy acts, increment turn
                 player_deck = self.player.deck
                 player_deck.discard_hand()
-                self.current_enemy.enemy_action()
+                if boss_fight:
+                    self.current_boss.boss_action()
+                else:
+                    self.current_enemy.enemy_action()
                 if not hasattr(self, "turn_count"):
                     self.turn_count = 1
                 self.turn_count += 1
-                self._hand_drawn = False  # Let the main loop draw the new hand next frame
+                self._hand_drawn = False
                 self.ui_manager.hide_end_turn_button()
 
-    def _initialize_fight(self):
+    def _initialize_fight(self, boss_fight=False):
         print("Initializing fight...")
-        # Remove previous enemies
-        for gameObject in self._gameObjects:
-            if gameObject.get_component("Enemy") is not None:
-                gameObject.destroy()
-        self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
-        
-        # --- Reset deck ---
-        self.turn_count = 1  # Reset turn count
-        self.player.deck.initialize_draw_pile()  # This clears hand, discard, and shuffles draw pile
-
-        # --- Draw a new hand ---
-        self.player.deck.draw_hand()
-        self.draw_cards(self.player.deck)
-        self._hand_drawn = True  # So you don't draw again until next turn
-
-        # Create new enemy
-        random_enemy = random.choice(["Arangel", "Gorpi", "The Blue Centipede"])
-        new_enemy = self._enemyFactory.create_component(random_enemy)
-        self.instantiate(new_enemy)
-        self.current_enemy = new_enemy.get_component("Enemy")
-        self.turn_order = TurnOrder(self.player, self.current_enemy)
-        self._fight_initialized = True
-
-    def _initialize_boss_fight(self):
-        print("Initializing boss fight...")
-        # Remove previous enemies
+        # Remove previous enemies and bosses
         for gameObject in self._gameObjects:
             if gameObject.get_component("Enemy") is not None or gameObject.get_component("Boss") is not None:
                 gameObject.destroy()
@@ -304,100 +317,24 @@ class GameWorld:
         self.draw_cards(self.player.deck)
         self._hand_drawn = True
 
-        # Spawn the boss using BossBuilder
-        boss_builder = BossBuilder("Gorkron the Destroyer", 20, 200)
-        boss_builder.build()
-        boss_game_object = boss_builder.get_gameObject()
-        self.instantiate(boss_game_object)
-        self.current_boss = boss_game_object.get_component("Boss")
-        self.turn_order = TurnOrder(self.player, self.current_boss)
-        self._boss_fight_initialized = True
-
-    def draw_cards(self, player_deck):
-        # Remove old card GameObjects
-        for obj in self._gameObjects:
-            if obj.get_component("CardDisplay") is not None:
-                obj.is_destroyed = True
-        self._cleanup_destroyed_objects()
-
-        card_positions = self.player.deck.get_card_positions(self.width, y=self.height - 200, card_count=len(player_deck.hand))
-        for i, card in enumerate(player_deck.hand):
-            card_game_object = self.card_pool.acquire()
-            if card_game_object is None:
-                card_game_object = self._cardFactory.create_component(card)
-            else:
-                # Just update the CardDisplay's reference, do NOT overwrite fields!
-                card_game_object.get_component("CardDisplay").card_data = card
-                card_game_object.is_destroyed = False
-
-            self.instantiate(card_game_object)
-            card_game_object.transform.position = card_positions[i]
-
+        if boss_fight:
+            boss_builder = BossBuilder("Gorkron the Destroyer", 20, 100)
+            boss_builder.build()
+            boss_game_object = boss_builder.get_gameObject()
+            self.instantiate(boss_game_object)
+            self.current_boss = boss_game_object.get_component("Boss")
+            self._boss_fight_initialized = True
+            self._fight_initialized = True
+        else:
+            random_enemy = random.choice(["Arangel", "Gorpi", "The Blue Centipede"])
+            new_enemy = self._enemyFactory.create_component(random_enemy)
+            self.instantiate(new_enemy)
+            self.current_enemy = new_enemy.get_component("Enemy")
+            self.turn_order = TurnOrder(self.player, self.current_enemy)
+            self._fight_initialized = True
+            self._boss_fight_initialized = False
 
     def get_player_position(self):
-        for gameObject in self._gameObjects:
-            if gameObject.get_component("Player") is not None:
-                return gameObject.transform.position
-
-    def back_to_map(self, delta_time):
-        self.ui_manager.back_to_map_button.show()
-        self.ui_manager.update(delta_time)
-        self.ui_manager.draw(self.screen)
-
-    def draw_and_update_boss_fight(self, delta_time, events):
-        if not hasattr(self, "_boss_fight_initialized") or not self._boss_fight_initialized:
-            self._initialize_boss_fight()
-
-        # Draw UI
-        self.ui_element.draw(f"Turn: {getattr(self, 'turn_count', 1)}", (self.width // 2, 40),
-                             self.player._credits, self.player._scraps, self.player._health, self.player._max_health)
-
-        # Draw cards and boss
-        for gameObject in self._gameObjects:
-            if gameObject.get_component("CardDisplay") is not None:
-                gameObject.update(delta_time)
-                gameObject.get_component("CardDisplay").draw_cardtext(self.screen, gameObject)
-            if gameObject.get_component("Boss") is not None:
-                boss = gameObject.get_component("Boss")
-                gameObject.update(delta_time)
-                # Center boss and health bar
-                boss_x = self.width // 2
-                boss_y = self.height // 3  # 1/3 down the screen
-                gameObject.transform.position = (
-                boss_x - gameObject.get_component("SpriteRenderer").sprite_image.width/2, 
-                boss_y - gameObject.get_component("SpriteRenderer").sprite_image.height/2)  # Center boss sprite
-                gameObject.get_component("Boss").draw(
-                    self.screen,
-                    gameObject.transform.position,
-                    gameObject.get_component("SpriteRenderer")._sprite_image
-                )
-                # Draw health bar
-                healthbar_pos = (boss_x - 100, boss_y - 100)  # Centered, above boss
-                self.ui_element.draw_healthbar(
-                    self.screen,
-                    boss.health,
-                    boss._max_health,
-                    healthbar_pos
-                )
-
-        # Draw hand if needed (start of fight or after boss acts)
-        if not hasattr(self, "_hand_drawn") or not self._hand_drawn:
-            self.player.deck.draw_hand()
-            for card in self.player.deck.hand:
-                print(f"Card drawn: {card._name} - Type: {card._type} - Value: {card._value}")
-            self.draw_cards(self.player.deck)
-            self._hand_drawn = True
-
-        for event in events:
-            self.ui_manager.handle_event(event)
-            if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ui_manager.end_turn_button:
-                # End turn: discard hand, boss acts, increment turn
-                player_deck = self.player.deck
-                player_deck.discard_hand()
-                self.current_boss.boss_action() 
-                if not hasattr(self, "turn_count"):
-                    self.turn_count = 1
-                self.turn_count += 1
-                self._hand_drawn = False  # Let the main loop draw the new hand next frame
-                self.ui_manager.hide_end_turn_button()
-
+        if self.playerGo and self.playerGo.transform:
+            return self.playerGo.transform.position
+        return pygame.math.Vector2(self.width // 2, self.height // 2)

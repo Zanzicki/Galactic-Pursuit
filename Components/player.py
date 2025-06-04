@@ -30,6 +30,7 @@ class Player(Component):
             self._max_health = max_health
             self.artifacts = []
             self.artifact_positions = []
+            self.temp_health = 0
 
     @staticmethod
     def get_instance():
@@ -67,6 +68,9 @@ class Player(Component):
         self._scraps = value
         self.update_db()
 
+    def add_temp_health(self, amount):
+        self.temp_health += amount
+
     def take_damage(self, damage):
 
         if self.block_points > 0:
@@ -75,7 +79,14 @@ class Player(Component):
             print(f"Block points left: {self.block_points}")
             return
         
-        if self._health > 0:
+        if self.temp_health > 0:
+            if damage <= self.temp_health:
+                self.temp_health -= damage
+                damage = 0
+            else:
+                damage -= self.temp_health
+                self.temp_health = 0
+        if damage > 0:
             self._health -= damage
             if self._health <= 0:
                 self._gameObject.is_destroyed = True
