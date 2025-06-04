@@ -3,10 +3,11 @@ from StatePattern.statemachine import BossStateMachine
 from StatePattern.boss_states import IdleState
 
 class Boss(Component):
-    def __init__(self, name: str, health: int, damage: int, max_health: int):
-        super().__init__("Boss")
+    def __init__(self, name: str, damage: int, max_health: int):
+        super().__init__()
         self._name = name
-        self._health = health
+        self._health = max_health
+        self._max_health = max_health
         self._damage = damage
         self._is_alive = True
         self.state_machine = BossStateMachine(self, None)  # Set player later

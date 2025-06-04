@@ -107,7 +107,7 @@ class GameWorld:
                 self.ui_manager.handle_event(event)
                 if self._game_state == "shop":
                     self.shop.handle_event(event)
-
+                    
             pygame.pressed_keys = pygame.key.get_pressed()
             if pygame.pressed_keys[pygame.K_ESCAPE]:
                 self._running = False
@@ -121,43 +121,46 @@ class GameWorld:
 
     # --- State Handling ---
     def _handle_state(self, delta_time, events):
-        if self._game_state == "menu":
-            self.ui_manager.show_menu_buttons()
-            self.ui_manager.hide_game_buttons()
-            self.ui_manager.update(delta_time)
-            self.ui_manager.draw(self.screen)
-        elif self._game_state == "map":
-            pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)
-            self.draw_and_update_map(delta_time, events)
-            self.ui_manager.hide_game_buttons()
-        elif self._game_state == "shop":
-            if self.state_changed_to_shop == "into":
-                self.state_changed_to_shop = "in"
-                self.shop.enter()
-            self.shop.update(delta_time)
-            self.shop.draw()
-            if self.state_changed_to_shop == "out":
-                self._game_state = "map"
-                self.shop.exit()
-        elif self._game_state == "game":
-            self.ui_manager.show_game_buttons()
-            self.draw_and_update_fight(delta_time, events)
-            self.back_to_map(delta_time)
-        elif self._game_state == "game_over":
-            self._draw_centered_text("Game Over", (255, 0, 0))
-        elif self._game_state == "artifact":
-            self._draw_centered_text("Artifact", (255, 0, 0))
-            self.back_to_map(delta_time)
-        elif self._game_state == "mystery":
-            self._draw_centered_text("Mystery", (255, 0, 0))
-            self.back_to_map(delta_time)
-        elif self._game_state == "end_game":
-            self.end_game.update(delta_time, events)
-            self.end_game.draw(self.screen)
-        elif self._game_state == "boss_fight":
-            self.ui_manager.show_game_buttons()
-            self.draw_and_update_boss_fight(delta_time, events)
-            self.back_to_map(delta_time)
+        match self._game_state:
+            case "menu":
+                self.ui_manager.show_menu_buttons()
+                self.ui_manager.hide_game_buttons()
+                self.ui_manager.update(delta_time)
+                self.ui_manager.draw(self.screen)
+            case "map":
+                pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)
+                self.draw_and_update_map(delta_time, events)
+                self.ui_manager.hide_game_buttons()
+            case "shop":
+                if self.state_changed_to_shop == "into":
+                    self.state_changed_to_shop = "in"
+                    self.shop.enter()
+                self.shop.update(delta_time)
+                self.shop.draw()
+                if self.state_changed_to_shop == "out":
+                    self._game_state = "map"
+                    self.shop.exit()
+            case "game":
+                self.ui_manager.show_game_buttons()
+                self.draw_and_update_fight(delta_time, events)
+                self.back_to_map(delta_time)
+            case "game_over":
+                self._draw_centered_text("Game Over", (255, 0, 0))
+            case "artifact":
+                self._draw_centered_text("Artifact", (255, 0, 0))
+                self.back_to_map(delta_time)
+            case "mystery":
+                self._draw_centered_text("Mystery", (255, 0, 0))
+                self.back_to_map(delta_time)
+            case "end_game":
+                self.end_game.update(delta_time, events)
+                self.end_game.draw(self.screen)
+            case "boss_fight":
+                self.ui_manager.show_game_buttons()
+                self.draw_and_update_boss_fight(delta_time, events)
+                self.back_to_map(delta_time)
+            case _:
+                print(f"Unknown game state: {self._game_state}")
 
         # Update artifacts (if not in menu)
         if self._game_state != "menu":
@@ -195,6 +198,7 @@ class GameWorld:
             if gameObject.get_component("Player") is not None:
                 gameObject.get_component("Player").get_events(events)
                 gameObject.update(delta_time)
+        self.map.check_player_planet_interaction(self.player, events)
 
     def draw_and_update_fight(self, delta_time, events):
         if not hasattr(self, "_fight_initialized") or not self._fight_initialized:
@@ -301,7 +305,7 @@ class GameWorld:
         self._hand_drawn = True
 
         # Spawn the boss using BossBuilder
-        boss_builder = BossBuilder()
+        boss_builder = BossBuilder("Gorkron the Destroyer", 20, 200)
         boss_builder.build()
         boss_game_object = boss_builder.get_gameObject()
         self.instantiate(boss_game_object)
@@ -316,7 +320,7 @@ class GameWorld:
                 obj.is_destroyed = True
         self._cleanup_destroyed_objects()
 
-        card_positions = self.player.deck.get_card_positions(self.width, y=self.height - 350, card_count=len(player_deck.hand))
+        card_positions = self.player.deck.get_card_positions(self.width, y=self.height - 200, card_count=len(player_deck.hand))
         for i, card in enumerate(player_deck.hand):
             card_game_object = self.card_pool.acquire()
             if card_game_object is None:
@@ -339,4 +343,55 @@ class GameWorld:
         self.ui_manager.back_to_map_button.show()
         self.ui_manager.update(delta_time)
         self.ui_manager.draw(self.screen)
+
+    def draw_and_update_boss_fight(self, delta_time, events):
+        if not hasattr(self, "_boss_fight_initialized") or not self._boss_fight_initialized:
+            self._initialize_boss_fight()
+
+        # Draw UI
+        self.ui_element.draw(f"Turn: {getattr(self, 'turn_count', 1)}", (self.width // 2, 40),
+                             self.player._credits, self.player._scraps, self.player._health, self.player._max_health)
+
+        # Draw cards and boss
+        for gameObject in self._gameObjects:
+            if gameObject.get_component("CardDisplay") is not None:
+                gameObject.update(delta_time)
+                gameObject.get_component("CardDisplay").draw_cardtext(self.screen, gameObject)
+            if gameObject.get_component("Boss") is not None:
+                boss = gameObject.get_component("Boss")
+                gameObject.update(delta_time)
+                # Center boss and health bar
+                boss_x = self.width // 2
+                boss_y = self.height // 3  # 1/3 down the screen
+                gameObject.transform.position = (boss_x - 75, boss_y - 75)  # Center boss sprite (assuming 150x150)
+                boss.draw(self.screen, gameObject.transform.position, gameObject.get_component("SpriteRenderer")._sprite_image)
+                # Draw health bar
+                healthbar_pos = (boss_x - 100, boss_y - 100)  # Centered, above boss
+                self.ui_element.draw_healthbar(
+                    self.screen,
+                    boss.health,
+                    boss._max_health,
+                    healthbar_pos
+                )
+
+        # Draw hand if needed (start of fight or after boss acts)
+        if not hasattr(self, "_hand_drawn") or not self._hand_drawn:
+            self.player.deck.draw_hand()
+            for card in self.player.deck.hand:
+                print(f"Card drawn: {card._name} - Type: {card._type} - Value: {card._value}")
+            self.draw_cards(self.player.deck)
+            self._hand_drawn = True
+
+        for event in events:
+            self.ui_manager.handle_event(event)
+            if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.ui_manager.end_turn_button:
+                # End turn: discard hand, boss acts, increment turn
+                player_deck = self.player.deck
+                player_deck.discard_hand()
+                self.current_boss.boss_action()  # Assuming boss_action exists
+                if not hasattr(self, "turn_count"):
+                    self.turn_count = 1
+                self.turn_count += 1
+                self._hand_drawn = False  # Let the main loop draw the new hand next frame
+                self.ui_manager.hide_end_turn_button()
 
