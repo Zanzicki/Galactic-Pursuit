@@ -30,12 +30,19 @@ class HitEffect:
         # Flash white if hit
         if self.hit_timer > 0:
             white_sprite = sprite_image.copy()
-            white_sprite.fill((255,255,255), special_flags=pygame.BLEND_RGB_ADD)
+            # Always use RGBA for surfaces with alpha
+            if white_sprite.get_flags() & pygame.SRCALPHA or white_sprite.get_bitsize() == 32:
+                white_sprite.fill((255,255,255,128), special_flags=pygame.BLEND_RGBA_ADD)
+            else:
+                white_sprite.fill((255,255,255), special_flags=pygame.BLEND_RGB_ADD)
             screen.blit(white_sprite, pos)
         else:
             screen.blit(sprite_image, pos)
-        # Draw damage popup
+        # Draw damage popup in the center of the sprite
         if self.damage_popup is not None:
             font = pygame.font.Font(None, 48)
             dmg_text = font.render(f"-{self.damage_popup}", True, (255, 0, 0))
-            screen.blit(dmg_text, (pos[0] + 40, pos[1]))
+            sprite_rect = sprite_image.get_rect(topleft=pos)
+            popup_x = sprite_rect.centerx - dmg_text.get_width() // 2
+            popup_y = sprite_rect.centery - dmg_text.get_height() // 2
+            screen.blit(dmg_text, (popup_x, popup_y))

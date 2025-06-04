@@ -1,6 +1,6 @@
 import os
 import pygame
-from BuilderPattern.builder import Builder
+from Components.builder import Builder
 from Components.component import Animator, SpriteRenderer
 from gameobject import GameObject
 from Components.boss import Boss
@@ -26,6 +26,7 @@ class BossBuilder(Builder):
         # Use the first sprite as the default
         if self.spritesheet:
             self._gameObject.add_component(SpriteRenderer(self.spritesheet[0]))
+            self._gameObject.get_component("SpriteRenderer").sprite_image.convert_alpha()
         # self._gameObject.add_component(Animator())
         # self._gameObject.get_component("Animator").add_animation("idle", *self.spritesheet)
         # self._gameObject.get_component("Animator").play_animation("idle")
