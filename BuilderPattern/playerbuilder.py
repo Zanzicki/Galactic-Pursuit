@@ -17,7 +17,6 @@ class PlayerBuilder(Builder):
         self._gameObject.get_component("SpriteRenderer").sprite_image = pygame.transform.scale(self._gameObject.get_component("SpriteRenderer").sprite_image, (50, 50))
         self._gameObject.transform.position = [800 // 2, 600 // 2]  # Center the ship
         self.player.deck = Deck()  # Set the deck for the player
-        self.player.deck.create_starter_deck()
 
     def get_gameObject(self) -> GameObject:
         return self._gameObject

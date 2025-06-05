@@ -343,7 +343,7 @@ class GameWorld:
             self.player.deck.card_positions = [
                 pygame.math.Vector2(
                     200 + i * 180,  # X position (adjust spacing as needed)
-                    self.height - 200  # Y position
+                    self.height - 250  # Y position
                 ) for i in range(hand_size)
             ]
 

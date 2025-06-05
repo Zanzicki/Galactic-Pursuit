@@ -14,7 +14,7 @@ class NewGame:
         
     def create_new_player(self, name):
         player = Player.get_instance()
-        player._credits = 50
+        player._credits = 300
         player._scraps = 10
         player._health = 100
         player._max_health = 100
@@ -65,6 +65,7 @@ class NewGame:
             self._game_world.map.planets.append(planet)
             self._game_world._gameObjects.append(planet)
 
+        # Load artifacts for this player
         artifacts_rows = self.repository.fetch_player_artifacts(player_id)
         for row in artifacts_rows:
             artifact_id = row[1]
@@ -74,7 +75,20 @@ class NewGame:
                 player.artifacts.append(artifact_go)
                 self._game_world.instantiate(artifact_go)
         player.update_artifacts()
-                
+
+        # --------- Load cards for this player and add to deck ---------
+        cards_rows = self.repository.fetch_player_cards(player_id)
+        for row in cards_rows:
+            print(f"Card row: {row}")
+        for row in cards_rows:
+            card_id = row[1]  # Adjust index if needed
+            card_data = self.repository.fetch_card_by_id(card_id)
+            if card_data:
+                player.deck.add_card(card_data)
+                print(f"Loaded card: {card_data['name']} for player {player.name}")
+
+        for card in player.deck.decklist:
+            print(f"Card in deck: {card.name}")
 
     def get_player_list(self):
         return self.repository.fetch_players()

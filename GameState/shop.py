@@ -1,7 +1,8 @@
 import pygame
 import random
 import pygame_gui
-from Components import artifact, card
+from Components.artifact import Artifact
+from Components.card import Card
 from Components.player import Player
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from UI.uielement import UIElement
@@ -47,7 +48,7 @@ class Shop:
         # Example column names, adjust as needed
         all_cards = [
             dict(zip(['id', 'name', 'value', 'type', 'rarity', 'description', 'price'], card))
-            for card in self.repository.fetch_all_cards()
+            for card in self.repository.fetch_all_non_basic_cards()
         ]
         cards = random.sample(all_cards, min(2, len(all_cards)))
         all_artifacts = [
@@ -127,7 +128,11 @@ class Shop:
         price = card_data['price']
         if self.player._credits >= price:
             self.player._credits -= price
-            # Add card to player's deck here
+            # Add card to player's deck in memory
+            
+            self.player.deck.add_card(Card(card_data['name'], card_data['value'], card_data['type'],card_data['rarity'],card_data['description'],card_data['price'] ))
+            # Save to database
+            self.repository.insert_player_card(self.player._id, card_data['id'])
             print(f"Bought {card_data['name']} for {price} credits.")
         else:
             print("Not enough credits.")
@@ -137,7 +142,10 @@ class Shop:
         price = artifact_data['price']
         if self.player._credits >= price:
             self.player._credits -= price
-            # Add artifact to player here
+            # Add artifact to player in memory
+            self.player.artifacts.append(artifact_data)
+            # Save to database
+            self.repository.insert_player_artifact(self.player._id, artifact_data['id'])
             print(f"Bought {artifact_data['name']} for {price} credits.")
         else:
             print("Not enough credits.")

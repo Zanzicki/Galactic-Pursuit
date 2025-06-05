@@ -123,6 +123,10 @@ class Database:
         self.cursor.execute('SELECT * FROM cards')
         return self.cursor.fetchall()
 
+    def fetch_card_by_id(self, card_id):
+        self.cursor.execute('SELECT * FROM cards WHERE id = ?', (card_id,))
+        return self.cursor.fetchone()
+    
     def fetch_basic_cards(self):
         self.cursor.execute('SELECT * FROM cards WHERE rarity = "Basic"')
         return self.cursor.fetchall()
@@ -134,6 +138,10 @@ class Database:
     def fetch_all_card_names(self):
         self.cursor.execute('SELECT name FROM cards')
         return [row[0] for row in self.cursor.fetchall()]
+    
+    def fetch_all_non_basic_cards(self):
+        self.cursor.execute('SELECT * FROM cards WHERE rarity != "Basic"')
+        return self.cursor.fetchall()
 
     # ---------- Player Methods ----------
     def insert_player(self, name, credits, scraps, health, max_health):
@@ -244,12 +252,12 @@ if __name__ == "__main__":
     db.insert_artifact("Double AA Battery", "Common", "Increase energy by 1", 100)
     db.insert_artifact("Motherboard", "Rare", "Increase CPU by 2", 200)
     db.insert_artifact("Old Scart Cable", "Epic", "Increase RAM by 4", 300)
-    db.insert_card("Laser Cannon", 1, "Attack", "Basic", "Deal 10 damage", 10)
-    db.insert_card("Protective Barrier", 1, "Block", "Basic", "Gain 2 shield", 25)
-    db.insert_card("Railgun", 1, "Attack", "Common", "Deal 15 damage", 25)
-    db.insert_card("Fusion shield", 1, "Block", "Common", "Gain 5 shield", 25)
-    db.insert_card("Exterminator", 1, "Attack", "Rare", "Deal 20 damage", 50)
-    db.insert_card("Vortex shield", 1, "Block", "Rare", "Gain 10 shield", 50)
+    db.insert_card("Laser Cannon", 10, "Attack", "Basic", "Deal 10 damage", 10)
+    db.insert_card("Protective Barrier", 2, "Block", "Basic", "Gain 2 shield", 10)
+    db.insert_card("Railgun", 15, "Attack", "Common", "Deal 15 damage", 25)
+    db.insert_card("Fusion shield", 5, "Block", "Common", "Gain 5 shield", 25)
+    db.insert_card("Exterminator", 20, "Attack", "Rare", "Deal 20 damage", 50)
+    db.insert_card("Vortex shield", 10, "Block", "Rare", "Gain 10 shield", 50)
 
     # Fetch and print data
     print("Artifacts:", db.fetch_artifacts())
