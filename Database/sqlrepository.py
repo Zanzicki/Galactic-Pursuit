@@ -38,6 +38,9 @@ class SQLRepository:
     
     def fetch_all_card_names(self):
         return self.db.fetch_all_card_names()
+    
+    def fetch_all_non_basic_cards(self):
+        return [card for card in self.db.fetch_all_cards() if not card['Basic']]
 
     # --- Player methods ---
     def insert_player(self, name, credits, scraps, health, max_health):

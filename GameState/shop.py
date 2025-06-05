@@ -44,60 +44,60 @@ class Shop:
 
     # -------------------- Shop Inventory Generation --------------------
     def generate_shop_items(self):
-        all_cards = self.repository.fetch_all_card_names()
-        all_artifacts = self.repository.fetch_all_artifact_names()
-        cards = random.sample(all_cards, min(3, len(all_cards)))
+        # Example column names, adjust as needed
+        all_cards = [
+            dict(zip(['id', 'name', 'value', 'type', 'rarity', 'description', 'price'], card))
+            for card in self.repository.fetch_all_cards()
+        ]
+        cards = random.sample(all_cards, min(2, len(all_cards)))
+        all_artifacts = [
+            dict(zip(['id', 'name', 'rarity', 'description', 'price'], artifact))
+            for artifact in self.repository.fetch_all_artifacts()
+        ]
         artifacts = random.sample(all_artifacts, min(2, len(all_artifacts)))
-        self.gold_shop_items = {
-            'cards': cards,
-            'artifacts': artifacts
-        }
-        self.scrap_shop_items = {
-            'upgrade': random.sample(upgrades.selected_dictionaries, 3),
-            'repair': ['Repair Bot']
-        }
+        self.shop_cards = cards
+        self.shop_artifacts = artifacts
 
     # -------------------- UI Creation --------------------
     def create_ui_elements(self):
         self.buttons.clear()
-        # Cards
-        for i, item in enumerate(self.gold_shop_items['cards']):
+        screen_width = 1280
+        button_width = 220
+        button_height = 60
+        spacing = 60  # space between buttons
+
+        # Center the two card buttons
+        total_width = 2 * button_width + spacing
+        start_x = (screen_width - total_width) // 2
+
+        # Cards (credits)
+        for i, card in enumerate(self.shop_cards):
+            x = start_x + i * (button_width + spacing)
             button = pygame_gui.elements.UIButton(
-                relative_rect=pygame.Rect((50 + i * 200, 100), (180, 60)),
-                text=f"{item} ({self.item_gold_prices['card']}g)",
+                relative_rect=pygame.Rect((x, 200), (button_width, button_height)),
+                text=card['name'],
                 manager=self.manager
             )
-            self.buttons.append(('card', item, button))
-        # Upgrades
-        for i, item in enumerate(self.scrap_shop_items['upgrade']):
+            self.buttons.append(('card', card, button))
+
+        # Center the two artifact buttons below cards
+        for i, artifact in enumerate(self.shop_artifacts):
+            x = start_x + i * (button_width + spacing)
             button = pygame_gui.elements.UIButton(
-                relative_rect=pygame.Rect((50 + i * 200, 200), (180, 60)),
-                text=f"{item} ({self.item_scrap_prices['upgrade']}g)",
+                relative_rect=pygame.Rect((x, 350), (button_width, button_height)),
+                text=artifact['name'],
                 manager=self.manager
             )
-            self.buttons.append(('upgrade', item, button))
-        # Artifacts
-        for i, item in enumerate(self.gold_shop_items['artifacts']):
-            button = pygame_gui.elements.UIButton(
-                relative_rect=pygame.Rect((50 + i * 200, 300), (180, 60)),
-                text=f"{item} ({self.item_gold_prices['artifact']}g)",
-                manager=self.manager
-            )
-            self.buttons.append(('artifact', item, button))
-        # Repairs
-        for i, item in enumerate(self.scrap_shop_items['repair']):
-            button = pygame_gui.elements.UIButton(
-                relative_rect=pygame.Rect((50 + i * 200, 400), (320, 60)),
-                text=f"{item} ({self.item_scrap_prices['repair']}g)",
-                manager=self.manager
-            )
-            self.buttons.append(('repair', item, button))
-        # Exit
-        self.exit_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((490, 500), (100, 50)),
-            text='Exit',
+            self.buttons.append(('artifact', artifact, button))
+
+        # Center the repair button below artifacts
+        repair_x = (screen_width - button_width) // 2
+        button = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((repair_x, 500), (button_width, button_height)),
+            text="Repair Ship",
             manager=self.manager
         )
+        self.buttons.append(('repair', None, button))
 
     def enter(self):
         self.create_ui_elements()
@@ -112,83 +112,42 @@ class Shop:
     # -------------------- Event Handling --------------------
     def handle_event(self, event):
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
-            for item_type, item_name, button in self.buttons:
+            for item_type, item_data, button in self.buttons:
                 if event.ui_element == button:
                     if item_type == 'card':
-                        self.buy_card(item_name)
+                        self.buy_card(item_data)
                     elif item_type == 'artifact':
-                        self.buy_artifact(item_name)
-                    elif item_type == 'upgrade':
-                        self.handle_upgrade()
+                        self.buy_artifact(item_data)
                     elif item_type == 'repair':
                         self.handle_repair()
-            if event.ui_element == self.exit_button:
-                print("Returning to map!")
-                self._game_world.state_changed_to_shop = "out"
         self.manager.process_events(event)
 
     # -------------------- Card Service --------------------
-    def buy_card(self, card_name):
-        item_cost = self.item_gold_prices['card']
-        if self.player._credits >= item_cost:
-            self.player.credits -= item_cost
-            self.player_inventory.append(card_name)
-            print(f"Bought {card_name} for {item_cost} gold.")
-            # TODO: Add card to player's deck and database here
+    def buy_card(self, card_data):
+        price = card_data['price']
+        if self.player._credits >= price:
+            self.player._credits -= price
+            # Add card to player's deck here
+            print(f"Bought {card_data['name']} for {price} credits.")
         else:
-            print("Not enough gold.")
+            print("Not enough credits.")
 
     # -------------------- Artifact Service --------------------
-    def buy_artifact(self, artifact_name):
-        item_cost = self.item_gold_prices['artifact']
-        if self.player._credits >= item_cost:
-            artifact_data = self.repository.fetch_artifact_by_name(artifact_name)
-            if not artifact_data:
-                print("Artifact not found!")
-                return
-            self.player.credits -= item_cost
-            self.repository.insert_player_artifact(self.player._id, artifact_data[0])
-            # Draw artifact in game using ArtifactFactory
-            artifact_go = self.artifact_factory.create_component(artifact_data)
-            self.player.artifacts.append(artifact_go)
-            self._game_world.instantiate(artifact_go)
-            self.player.update_artifacts()
-            print(f"Bought {artifact_name} for {item_cost} gold.")
+    def buy_artifact(self, artifact_data):
+        price = artifact_data['price']
+        if self.player._credits >= price:
+            self.player._credits -= price
+            # Add artifact to player here
+            print(f"Bought {artifact_data['name']} for {price} credits.")
         else:
-            print("Not enough gold.")
-
-    # -------------------- Upgrade Service --------------------
-    def handle_upgrade(self):
-        if self.player._scraps >= self.item_scrap_prices['upgrade']:
-            self.show_upgrade_card_window()
-        else:
-            print("Not enough scrap for upgrade.")
-
-    def show_upgrade_card_window(self):
-        player_deck = self.self._game_world.player.deck
-        card_names = [card.name for card in player_deck.decklist]
-        print("Select a card to upgrade:")
-        for index, card_name in enumerate(card_names):
-            print(f"{index + 1}: {card_name}")
-        if card_names:
-            self.upgrade_card(card_names[0])
-
-    def upgrade_card(self, card_name):
-        player_deck = self.self._game_world.player.deck
-        card_to_upgrade = next((card for card in player_deck.decklist if card.name == card_name), None)
-        if card_to_upgrade:
-            card_to_upgrade.upgraded = True
-            self.player._scraps -= self.item_scrap_prices['upgrade']
-            print(f"Upgraded {card_to_upgrade.name}!")
-            # TODO: Optionally update the database here
-        else:
-            print("Card not found in deck.")
+            print("Not enough credits.")
 
     # -------------------- Repair Service --------------------
     def handle_repair(self):
-        if self.player._scraps >= self.item_scrap_prices['repair']:
+        price = 15
+        if self.player._scraps >= price:
+            self.player._scraps -= price
             self.heal_player()
-            self.player.scraps -= self.item_scrap_prices['repair']
             print("Player healed!")
         else:
             print("Not enough scrap for repair.")
@@ -204,4 +163,45 @@ class Shop:
     def draw(self):
         self.screen.blit(self.background, (0, 0))
         self.manager.draw_ui(self.screen)
+        # Draw icons next to buttons
+        for i, (_, card, button) in enumerate(self.buttons):
+            if card and 'price' in card:
+                # Draw credit icon next to card/artifact buttons
+                self.ui_element.screen.blit(self.ui_element.credit_img, (button.relative_rect.x + button.relative_rect.width + 10, button.relative_rect.y + 10))
+            elif _ == 'repair':
+                self.ui_element.screen.blit(self.ui_element.scrap_img, (button.relative_rect.x + button.relative_rect.width + 10, button.relative_rect.y + 10))
         self.ui_element.draw("Intergalactic Trade Sector", (640, 40), self.player._credits, self.player._scraps, self.player._health, self.player._max_health)
+    
+    def draw_shop_prices_and_descriptions(self, screen, font):
+        # Draw descriptions and prices for each button
+        for item_type, item, button in self.buttons:
+            bx, by = button.relative_rect.x, button.relative_rect.y
+            bw, bh = button.relative_rect.width, button.relative_rect.height
+
+            # Draw description under the button (if card or artifact)
+            if item_type in ('card', 'artifact') and item:
+                desc = item.get('description', '')
+                if desc:
+                    desc_surf = font.render(desc, True, (200, 200, 200))
+                    desc_rect = desc_surf.get_rect(center=(bx + bw // 2, by + bh + 25))
+                    self.screen.blit(desc_surf, desc_rect)
+
+            # Draw price icon and number under the button
+            if item_type == 'card' and item:
+                price = item['price']
+                icon = self.ui_element.credit_img
+            elif item_type == 'artifact' and item:
+                price = item['price']
+                icon = self.ui_element.credit_img
+            elif item_type == 'repair':
+                price = 15
+                icon = self.ui_element.scrap_img
+            else:
+                continue
+
+            icon_y = by + bh + 45
+            icon_x = bx + bw // 2 - 30
+            self.screen.blit(icon, (icon_x, icon_y))
+            price_surf = font.render(str(price), True, (255, 255, 255))
+            price_rect = price_surf.get_rect(midleft=(icon_x + icon.get_width() + 8, icon_y + icon.get_height() // 2))
+            self.screen.blit(price_surf, price_rect)

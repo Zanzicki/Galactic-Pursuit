@@ -48,7 +48,6 @@ class GameWorld:
         # --- UI and Managers ---
         self.ui_element = UIElement(self.screen)
         self.card_pool = ReusablePool(10)  # Initialize the object pool
-        self._fight_initialized = False  # Flag to check if fight has been initialized
         SoundManager().play_music()  # Play background music
 
         # Initialize UIManager
@@ -146,7 +145,7 @@ class GameWorld:
                 self.shop.draw()
                 if self.state_changed_to_shop == "out":
                     self._game_state = "map"
-                    self.shop.exit()
+                self.back_to_map(delta_time)
             case "game":
                 self.ui_manager.show_game_buttons()
                 self.draw_and_update_fight(delta_time, events, boss_fight=False)
@@ -208,13 +207,10 @@ class GameWorld:
         self.map.check_player_planet_interaction(self.player, events)
 
     def draw_and_update_fight(self, delta_time, events, boss_fight=False):
-        # Initialize fight if needed
-        if boss_fight:
-            if not hasattr(self, "_boss_fight_initialized") or not self._boss_fight_initialized:
-                self._initialize_fight(boss_fight=True)
-        else:
-            if not hasattr(self, "_fight_initialized") or not self._fight_initialized:
-                self._initialize_fight(boss_fight=False)
+        print(self._fight_initialized)
+        if self._fight_initialized is False:
+            print("Fight not initialized, initializing now...")
+            self._initialize_fight(boss_fight)
 
         # Draw UI
         self.ui_element.draw(
@@ -298,7 +294,6 @@ class GameWorld:
                 self.ui_manager.hide_end_turn_button()
 
     def _initialize_fight(self, boss_fight=False):
-        print("Initializing fight...")
         # Remove previous enemies and bosses
         for gameObject in self._gameObjects:
             if gameObject.get_component("Enemy") is not None or gameObject.get_component("Boss") is not None:
@@ -312,22 +307,22 @@ class GameWorld:
         self.draw_cards(self.player.deck)
         self._hand_drawn = True
 
-        if boss_fight:
+        print (f"Boss fight initialized: {boss_fight}")
+        if boss_fight is True:
             boss_builder = BossBuilder("Gorkron the Destroyer", 20, 100)
             boss_builder.build()
             boss_game_object = boss_builder.get_gameObject()
             self.instantiate(boss_game_object)
             self.current_boss = boss_game_object.get_component("Boss")
-            self._boss_fight_initialized = True
             self._fight_initialized = True
         else:
+            print("Initializing random enemy fight...")
             random_enemy = random.choice(["Arangel", "Gorpi", "The Blue Centipede"])
             new_enemy = self._enemyFactory.create_component(random_enemy)
             self.instantiate(new_enemy)
             self.current_enemy = new_enemy.get_component("Enemy")
             self.turn_order = TurnOrder(self.player, self.current_enemy)
             self._fight_initialized = True
-            self._boss_fight_initialized = False
 
     def get_player_position(self):
         if self.playerGo and self.playerGo.transform:

@@ -7,18 +7,25 @@ class UIElement():
         self.screen = screen
         self.font = pygame.font.Font("Assets/Fonts/ImpactfulBits.ttf", 24)
 
-    def draw(self, text, position, gold, scrap, health, max_health, tmp_health=0):
+        self.credit_img = pygame.image.load("Assets/Icons/credit.png").convert_alpha()
+        self.scrap_img = pygame.image.load("Assets/Icons/scrap.png").convert_alpha()
+
+    def draw(self, text, position, credits, scraps, health, max_health, tmp_health=0):
         pygame.draw.rect(self.screen, (40,40,40),(0,0,1280,40))
 
         ui_text = self.font.render(text, True, (255, 0, 0))
         self.screen.blit(ui_text, (position[0] - ui_text.get_width() // 2,  
         position[1] // 2 - ui_text.get_height() // 2))
 
-        gold_text = self.font.render(f"Gold: {gold}", True, (255,215,0))
-        self.screen.blit(gold_text, (20,5))
+        # Draw credit icon and value
+        self.screen.blit(self.credit_img, (20, 5))
+        credits_text = self.font.render(f"{credits}", True, (255,215,0))
+        self.screen.blit(credits_text, (60, 5))  
 
-        scrap_text = self.font.render(f"Scrap: {scrap}", True, (192,192,192))
-        self.screen.blit(scrap_text, (200,5))
+        # Draw scrap icon and value
+        self.screen.blit(self.scrap_img, (140, 5))
+        scraps_text = self.font.render(f"{scraps}", True, (192,192,192))
+        self.screen.blit(scraps_text, (180, 5)) 
 
         if tmp_health > 0:
             health_text = self.font.render(f"Health: {health}/{max_health} (+{tmp_health})", True, (0,0,255))

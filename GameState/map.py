@@ -144,6 +144,7 @@ class Map:
                         # Handle transitions
                         if planetcomponent._name == "Boss":
                             print("Boss planet reached!")
+                            self.game_world._fight_initialized = False
                             self.game_world._game_state = "boss_fight"
                             return
                         if planetcomponent._color == (0, 0, 255):
@@ -153,7 +154,8 @@ class Map:
                             return
                         elif planetcomponent._color == (255, 0, 0):
                             print(f"{planetcomponent._name} (Red): Entering fight!")
-                            self.game_world._game_state = "boss_fight"
+                            self.game_world._fight_initialized = False
+                            self.game_world._game_state = "game"
                             return
                         elif planetcomponent._color == (0, 255, 0):
                             print(f"{planetcomponent._name} (Green): Entering artifact!")

@@ -28,7 +28,7 @@ class Database:
                 type TEXT NOT NULL,
                 rarity TEXT NOT NULL,
                 description TEXT NOT NULL,
-                prize INTEGER NOT NULL
+                price INTEGER NOT NULL
             )
         ''')
 
@@ -112,11 +112,11 @@ class Database:
         return [row[0] for row in self.cursor.fetchall()]
 
     # ---------- Card Methods ----------
-    def insert_card(self, name, value, type, rarity, description, prize):
+    def insert_card(self, name, value, type, rarity, description, price):
         self.cursor.execute('''
-            INSERT INTO cards (name, value, type, rarity, description, prize)
+            INSERT INTO cards (name, value, type, rarity, description, price)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (name, value, type, rarity, description, prize))
+        ''', (name, value, type, rarity, description, price))
         self.connection.commit()
 
     def fetch_cards(self):
@@ -244,8 +244,12 @@ if __name__ == "__main__":
     db.insert_artifact("Double AA Battery", "Common", "Increase energy by 1", 100)
     db.insert_artifact("Motherboard", "Rare", "Increase CPU by 2", 200)
     db.insert_artifact("Old Scart Cable", "Epic", "Increase RAM by 4", 300)
-    db.insert_card("Laser Cannon", 1, "Attack", "Basic", "Deal 2 damage", 10)
-    db.insert_card("Protective Barrier", 1, "Block", "Basic", "Gain 2 shield", 10)
+    db.insert_card("Laser Cannon", 1, "Attack", "Basic", "Deal 10 damage", 10)
+    db.insert_card("Protective Barrier", 1, "Block", "Basic", "Gain 2 shield", 25)
+    db.insert_card("Railgun", 1, "Attack", "Common", "Deal 15 damage", 25)
+    db.insert_card("Fusion shield", 1, "Block", "Common", "Gain 5 shield", 25)
+    db.insert_card("Exterminator", 1, "Attack", "Rare", "Deal 20 damage", 50)
+    db.insert_card("Vortex shield", 1, "Block", "Rare", "Gain 10 shield", 50)
 
     # Fetch and print data
     print("Artifacts:", db.fetch_artifacts())
