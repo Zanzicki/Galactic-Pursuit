@@ -52,26 +52,31 @@ class UIManager:
             manager=self.ui_manager
         )
 
+        start_x = 180
+        y = self.screen.height - 80
+        button_width = 200
+        button_height = 50
+        button_spacing = 40
+
         self.back_to_map_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.screen.width - 220, self.screen.height - 320), (200, 50)),
+            relative_rect=pygame.Rect((start_x + 3 * (button_width + button_spacing), y), (button_width, button_height)),
             text="RETURN TO MAP",
             manager=self.ui_manager,
             visible=False 
         )
-        
+
         self.show_deck_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.screen.width - 220, self.screen.height - 160), (200, 50)),
+            relative_rect=pygame.Rect((start_x, y), (button_width, button_height)),
             text="Show Deck",
             manager=self.ui_manager
         )
         self.show_discard_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.screen.width - 220, self.screen.height - 240), (200, 50)),
+            relative_rect=pygame.Rect((start_x + button_width + button_spacing, y), (button_width, button_height)),
             text="Show Discard",
             manager=self.ui_manager
         )
-                # End turn button
         self.end_turn_button = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.screen.width - 220, self.screen.height - 80), (200, 60)),
+            relative_rect=pygame.Rect((start_x + 2 * (button_width + button_spacing), y), (button_width, button_height)),
             text="End Turn",
             manager=self.ui_manager
         )

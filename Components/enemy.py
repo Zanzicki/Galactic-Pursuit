@@ -1,15 +1,26 @@
+import pygame
+import time
+import random
 from Components.component import Component
+from Components.hiteffect import HitEffect
 from soundmanager import SoundManager
 
 
-class Enemy(Component):
+class Enemy(Component, HitEffect):
     def __init__(self, name, health, attack, strategy):
         super().__init__()
+        Component.__init__(self)
+        HitEffect.__init__(self)
         self._name = name
         self._health = health
         self._attack = attack
         self._is_alive = True
         self._strategy = strategy
+        self._max_health = health  # Store the maximum health for potential future use
+        self.hit_timer = 0
+        self.shake_offset = (0, 0)
+        self.damage_popup = None
+        self.damage_popup_timer = 0
 
     @property
     def name(self):
@@ -26,21 +37,17 @@ class Enemy(Component):
     @property
     def is_alive(self):
         return self._is_alive
-    
-    @property
-    def take_damage(self):
-        raise AttributeError("This property is write-only.")
 
     
     def take_damage(self, damage):
-        if self._is_alive:
-            self._health -= damage
-            if self._health <= 0:
-                self._is_alive = False
-                print(f"{self._name} has been defeated!")
-                self.gameObject.is_destroyed = True #remove enemy from game world
-                SoundManager().play_sound("explosion")
-                self.game_world.game_state = "map" # Transition to the map state
+        self._health -= damage
+        self.trigger_hit(damage)
+        if self._health <= 0:
+            self._is_alive = False
+            print(f"{self._name} has been defeated!")
+            self.gameObject.is_destroyed = True #remove enemy from game world
+            SoundManager().play_sound("explosion")
+            self._game_world.game_state = "map" # Transition to the map state
         else:
             print(f"{self._name} is already defeated.")
 
@@ -51,7 +58,10 @@ class Enemy(Component):
         pass
 
     def update(self, delta_time):
-        pass
-    
+        self.update_hit_effect(delta_time)
+
     def enemy_action(self):
         self._strategy.choose_action(self._attack)
+
+    def draw(self, screen, base_position, sprite_image):
+         self.draw_hit_effect(screen, sprite_image, base_position)

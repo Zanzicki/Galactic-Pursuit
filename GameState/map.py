@@ -72,7 +72,7 @@ class Map:
                     break
 
             if position is None:
-                print(f" Kunne ikke placere planet '{name}' uden overlap efter {max_attempts} forsøg.")
+                print(f"Kunne ikke placere planet '{name}' uden overlap efter {max_attempts} forsøg.")
                 continue
 
             planet = GameObject(position)
@@ -87,7 +87,7 @@ class Map:
             self.planets.append(planet)
             self.game_world._gameObjects.append(planet)
 
-            print(f" Placerede planet '{name}' ved {position} med farve {color}")
+            print(f"Placerede planet '{name}' ved {position} med farve {color}")
 
 
 
@@ -124,3 +124,40 @@ class Map:
             planet_component = planet.get_component("Planet")
             if planet_component:
                 planet.draw(screen, self.font)
+    
+    def check_player_planet_interaction(self, player, events):
+        player_position = player.gameObject.transform.position
+
+        for event in events:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                for planet in self.planets:
+                    planetcomponent = planet.get_component("Planet")
+                    if planetcomponent._visited:
+                        continue
+                    dx = player_position.x - planetcomponent.position[0]
+                    dy = player_position.y - planetcomponent.position[1]
+                    distance = (dx ** 2 + dy ** 2) ** 0.5
+                    if distance <= planetcomponent._size + 20:
+                        planetcomponent._visited = True
+                        self.check_and_spawn_boss()
+                        player.repository.change_planet_explored(player._id, planetcomponent._name)
+                        # Handle transitions
+                        if planetcomponent._name == "Boss":
+                            print("Boss planet reached!")
+                            self.game_world._game_state = "boss_fight"
+                            return
+                        if planetcomponent._color == (0, 0, 255):
+                            print(f"{planetcomponent._name} (Blue): Entering shop!")
+                            self.game_world.state_changed_to_shop = "into"
+                            self.game_world._game_state = "shop"
+                            return
+                        elif planetcomponent._color == (255, 0, 0):
+                            print(f"{planetcomponent._name} (Red): Entering fight!")
+                            self.game_world._game_state = "boss_fight"
+                            return
+                        elif planetcomponent._color == (0, 255, 0):
+                            print(f"{planetcomponent._name} (Green): Entering artifact!")
+                            self.game_world._game_state = "artifact"
+                        elif planetcomponent._color == (255, 0, 255):
+                            print(f"{planetcomponent._name} (Magenta): Entering mystery!")
+                            self.game_world._game_state = "mystery"
