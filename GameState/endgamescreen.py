@@ -5,7 +5,7 @@ from Components import player
 from Components.player import Player
 from GameState.map import Map
 from gameobject import GameObject
-from soundmanager import SoundManager
+
 
 
 class EndGameScreen:
@@ -43,10 +43,9 @@ class EndGameScreen:
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.restart_button:
                     self.restart_game()
-                    self.game_world._game_state  ="menu"
-                    SoundManager().play_music(loop=True)                
+                    self.game_world._game_state  ="menu"                                    
                     print("Restarting game...")
-        #SoundManager().fade_out_music(5000)
+        
         
         
         self.ui_manager.update(time_delta)
@@ -56,7 +55,7 @@ class EndGameScreen:
         status_text = self.font.render(f"{self.get_player_status_alive_or_dead()}", True, (255, 255, 255))
         screen.blit(status_text, (self.game_world.width // 2 - status_text.get_width() // 2, self.game_world.height // 2))
         self.ui_manager.draw_ui(screen)
-        SoundManager().stop_music()
+        
 
     def restart_player(self):
         builder = PlayerBuilder()

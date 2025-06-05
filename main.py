@@ -1,5 +1,6 @@
 import pygame
 from gameworld import GameWorld
+from soundmanager import SoundManager
 
 if __name__ == "__main__":
     pygame.init()
@@ -7,3 +8,4 @@ if __name__ == "__main__":
     game_world.awake()
     game_world.start()
     game_world.update()
+    

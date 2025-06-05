@@ -4,6 +4,7 @@ import pygame_gui
 
 from BuilderPattern.playerbuilder import PlayerBuilder
 from Components.player import Player
+from GameState.optionssetting import OptionsSettings
 from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
@@ -49,9 +50,13 @@ class GameWorld:
         self.card_pool = ReusablePool(10)  # Initialize the object pool
         self._fight_initialized = False  # Flag to check if fight has been initialized
         
+        # initialize UI sound manager
+        self.sound_manager = SoundManager()
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
+
+        
 
         # --- Player Setup ---
         builder = PlayerBuilder()
@@ -68,6 +73,7 @@ class GameWorld:
         self.shop = Shop(self)
         self.start_game = NewGame(self)
         self.end_game = EndGameScreen(self)
+        self.options_settings = OptionsSettings(self.sound_manager, self)
         self.turn_order = None
         self.current_enemy = None
 
@@ -159,6 +165,10 @@ class GameWorld:
             self.end_game.update(delta_time, events)
             self.end_game.draw(self.screen)
             SoundManager().stop_music()
+        elif self._game_state == "options":
+            self.options_settings.draw(self.screen)
+            for event in events:
+                self.options_settings.handle_event(event)
 
         # Update artifacts (if not in menu)
         if self._game_state != "menu":
