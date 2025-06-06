@@ -56,6 +56,7 @@ class GameWorld:
         
         # initialize UI sound manager
         self.sound_manager = SoundManager()
+        self.sound_manager.play_music()
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
@@ -196,6 +197,7 @@ class GameWorld:
             for gameObject in self._gameObjects:
                 if gameObject.get_component("Artifact") is not None:
                     gameObject.update(delta_time)
+                    
             self.ui_manager.hide_menu_buttons()
 
 
