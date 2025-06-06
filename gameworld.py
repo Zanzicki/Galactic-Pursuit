@@ -172,8 +172,13 @@ class GameWorld:
                 self.ui_manager.show_game_buttons()
                 self.draw_and_update_fight(delta_time, events, boss_fight=True)
                 self.back_to_map(delta_time)
+            case "options":
+                self.options_settings.draw(self.screen)
+                for event in events:
+                    self.options_settings.handle_event(event)
             case _:
                 print(f"Unknown game state: {self._game_state}")
+            
 
         # Update artifacts (if not in menu)
         if self._game_state != "menu":
