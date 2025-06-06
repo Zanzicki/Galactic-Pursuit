@@ -1,6 +1,6 @@
 import pygame
 from gameworld import GameWorld
-from soundmanager import SoundManager
+
 
 if __name__ == "__main__":
     pygame.init()

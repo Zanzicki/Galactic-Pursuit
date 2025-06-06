@@ -1,4 +1,3 @@
-import pygame
 from Components.component import Transform
 
 

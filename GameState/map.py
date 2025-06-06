@@ -1,7 +1,7 @@
 import pygame
 import random
 import pygame_gui
-from Components import planet
+
 from Components.planet import Planet
 from gameobject import GameObject
 

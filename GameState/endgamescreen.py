@@ -1,10 +1,8 @@
 import pygame
 import pygame_gui
 from BuilderPattern.playerbuilder import PlayerBuilder
-from Components import player
 from Components.player import Player
-from GameState.map import Map
-from gameobject import GameObject
+
 
 
 

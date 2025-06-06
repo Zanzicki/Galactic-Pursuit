@@ -1,6 +1,3 @@
-import random
-
-import pygame
 from Components.component import Component
 from Components.player import Player
 from StatePattern.statemachine import BossStateMachine

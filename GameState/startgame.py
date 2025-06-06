@@ -4,7 +4,7 @@ from Components.player import Player
 from Database.sqlrepository import SQLRepository
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from gameobject import GameObject
-from GameState.map import Map
+
 
 class NewGame:
     def __init__(self, game_world):

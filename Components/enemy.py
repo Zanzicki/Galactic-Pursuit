@@ -1,6 +1,3 @@
-import pygame
-import time
-import random
 from Components.component import Component
 from Components.hiteffect import HitEffect
 from GameState.rewardscreen import RewardScreen

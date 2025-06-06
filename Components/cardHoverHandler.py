@@ -1,10 +1,7 @@
 import pygame
-from Components.card import Card
 from Components.component import Component
 from Components.player import Player
 from soundmanager import SoundManager
-
-# made by Erik
 
 class CardHoverHandler(Component):  
     def __init__(self):

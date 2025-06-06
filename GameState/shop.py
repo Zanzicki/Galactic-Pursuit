@@ -6,7 +6,6 @@ from Components.card import Card
 from Components.player import Player
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from UI.uielement import UIElement
-import upgrades
 from Database.sqlrepository import SQLRepository
 
 class Shop:
@@ -168,7 +167,7 @@ class Shop:
 
     def heal_player(self):
         heal_amount = 10
-        self.player.health = min(self.player.health + heal_amount, self.player.max_health)
+        self.player.health = min(self.player.health + heal_amount, self.player._max_health)
 
     # -------------------- Update & Draw --------------------
     def update(self, delta_time):

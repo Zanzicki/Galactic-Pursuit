@@ -8,8 +8,8 @@ class RewardScreen:
         self.currency = Currency()
         
 
-        self.gained_credits = 25
-        self.gained_scraps = 10
+        self.gained_credits = 50
+        self.gained_scraps = 20
 
         self.credit_img = pygame.image.load("Assets/Icons/credit.png").convert_alpha()
         self.scrap_img = pygame.image.load("Assets/Icons/scrap.png").convert_alpha()
@@ -53,11 +53,11 @@ class RewardScreen:
         screen.blit(title, (400, 50))
 
         screen.blit(self.credit_img, (350, 100))
-        credits_text = self.font.render(f"Credits: 50", True, (255, 255, 255)) # Adjusted to match gained_credits {self.gained_credits}
+        credits_text = self.font.render(f"Credits: {self.gained_credits}", True, (255, 255, 255)) 
         screen.blit(credits_text, (400, 100))
 
         screen.blit(self.scrap_img, (350, 150))
-        scraps_text = self.font.render(f"Scraps: 20", True, (255, 255, 255)) # Adjusted to match gained_scraps {self.gained_scraps}
+        scraps_text = self.font.render(f"Scraps: {self.gained_scraps}", True, (255, 255, 255))
         screen.blit(scraps_text, (400, 150))
 
         # Tegn UI
