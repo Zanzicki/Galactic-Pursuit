@@ -44,33 +44,28 @@ class CardHoverHandler(Component):
 
     def attack_card_activated(self, game_world, target=None):      
         get_card_component = self.get_card_component()
-
         card_type = getattr(get_card_component, "_type", "")
-        card_damage = getattr(get_card_component, "damage", 0)
+        card_damage = getattr(get_card_component, "_value", 0)  # Use _value from card
 
-        
         if card_type == "Attack":
             print(f"[card activated] {card_type} activated")        
             if target: 
-                
                 enemy_component = target.get_component("Enemy") or target.get_component("Boss")
                 if enemy_component:
-                    card_damage= 10
                     enemy_component.take_damage(card_damage)
                     print(f"[card activated] {card_type} dealt {card_damage} to {enemy_component.name}")
                     SoundManager().play_sound("laser")
                 else:
                     print("[error] Target does not have an Enemy component.")
-
         else:
             print("you missed the target")       
 
     
     def block_card_activated(self, game_world, target=None):
         get_card_component = self.get_card_component()
-
         card_type = getattr(get_card_component, "_type", "")
-        
+        card_block = getattr(get_card_component, "_value", 0)  # Use _value from card
+
         if card_type == "Block":
             print("Block activated")
 
@@ -81,7 +76,7 @@ class CardHoverHandler(Component):
                     player = player_component
                     break
             if player:
-                player.add_temp_health(5)
+                player.add_temp_health(card_block)
                 print(f"[card activated] {card_type} activated, block points: {player.temp_health}")
                 SoundManager().play_sound("shield_up")
 

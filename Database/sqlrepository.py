@@ -29,6 +29,9 @@ class SQLRepository:
 
     def fetch_cards(self):
         return self.db.fetch_cards()
+    
+    def fetch_card_by_id(self, card_id):
+        return self.db.fetch_card_by_id(card_id)
 
     def fetch_all_cards(self):
         return self.db.fetch_all_cards()
@@ -37,6 +40,9 @@ class SQLRepository:
         return self.db.fetch_basic_cards()
     
     def fetch_all_card_names(self):
+        return self.db.fetch_all_card_names()
+    
+    def fetch_all_non_basic_cards(self):
         return self.db.fetch_all_card_names()
 
     # --- Player methods ---
