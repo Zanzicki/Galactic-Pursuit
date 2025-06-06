@@ -15,7 +15,6 @@ class Deck:
 
     def add_card(self, card: Card):
         self.decklist.append(card)
-        print (f"Card added: {card.name} (ID: {card._id})")
 
     def remove_card(self, card: Card):
         if card in self.decklist:

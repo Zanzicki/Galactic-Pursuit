@@ -133,6 +133,7 @@ class Shop:
             self.player.deck.add_card(Card(card_data['name'], card_data['value'], card_data['type'],card_data['rarity'],card_data['description'],card_data['price'] ))
             # Save to database
             self.repository.insert_player_card(self.player._id, card_data['id'])
+            self.repository.update_player_currency(player_id=self.player._id, credits=self.player._credits)
             print(f"Bought {card_data['name']} for {price} credits.")
         else:
             print("Not enough credits.")
@@ -146,6 +147,8 @@ class Shop:
             self.player.artifacts.append(artifact_data)
             # Save to database
             self.repository.insert_player_artifact(self.player._id, artifact_data['id'])
+            self.repository.update_player_currency(player_id=self.player._id, credits=self.player._credits)
+
             print(f"Bought {artifact_data['name']} for {price} credits.")
         else:
             print("Not enough credits.")
@@ -156,6 +159,7 @@ class Shop:
         if self.player._scraps >= price:
             self.player._scraps -= price
             self.heal_player()
+            self.repository.update_player_currency(player_id=self.player._id, scrap=self.player._scraps)
             print("Player healed!")
         else:
             print("Not enough scrap for repair.")

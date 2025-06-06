@@ -228,6 +228,7 @@ class UIManager:
     def return_to_map(self):
         print("Returning to Map")
         self.game_world._game_state = "map"
+        self.game_world.shop.exit()
         self.back_to_map_button.hide()
         self.game_world._fight_initialized = False
     
