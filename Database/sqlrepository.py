@@ -43,7 +43,7 @@ class SQLRepository:
         return self.db.fetch_all_card_names()
     
     def fetch_all_non_basic_cards(self):
-        return self.db.fetch_all_card_names()
+        return self.db.fetch_all_non_basic_cards()
 
     # --- Player methods ---
     def insert_player(self, name, credits, scraps, health, max_health):

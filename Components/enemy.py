@@ -8,7 +8,7 @@ from soundmanager import SoundManager
 
 
 class Enemy(Component, HitEffect):
-    def __init__(self, name, health, attack, strategy):
+    def __init__(self, name, health, attack, strategy, game_world=None):
         super().__init__()
         Component.__init__(self)
         HitEffect.__init__(self)
@@ -22,7 +22,6 @@ class Enemy(Component, HitEffect):
         self.shake_offset = (0, 0)
         self.damage_popup = None
         self.damage_popup_timer = 0
-
     @property
     def name(self):
         return self._name

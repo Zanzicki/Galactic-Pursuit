@@ -1,10 +1,10 @@
+from Components.card import Card
 from Components.planet import Planet
 from Components.player import Player
 from Database.sqlrepository import SQLRepository
 from FactoryPatterns.artifactFactory import ArtifactFactory
 from gameobject import GameObject
 from GameState.map import Map
-
 
 class NewGame:
     def __init__(self, game_world):
@@ -79,16 +79,11 @@ class NewGame:
         # --------- Load cards for this player and add to deck ---------
         cards_rows = self.repository.fetch_player_cards(player_id)
         for row in cards_rows:
-            print(f"Card row: {row}")
-        for row in cards_rows:
-            card_id = row[1]  # Adjust index if needed
+            card_id = row[2]  # Adjust index if needed
             card_data = self.repository.fetch_card_by_id(card_id)
             if card_data:
-                player.deck.add_card(card_data)
-                print(f"Loaded card: {card_data['name']} for player {player.name}")
-
-        for card in player.deck.decklist:
-            print(f"Card in deck: {card.name}")
+                player.deck.add_card(Card(card_data[1], card_data[2], card_data[3], card_data[4], card_data[5], card_data[6]))
+                print (f"Old cards added{card_data[1]} (ID: {card_id})")
 
     def get_player_list(self):
         return self.repository.fetch_players()
