@@ -60,6 +60,8 @@ class MysteryPlanetState:
                 if self.reward_type == "artifact":
                     self.player.artifacts.append(self.reward)
                     self.repository.insert_player_artifact(self.player._id, self.reward_id)
+                    self.game_world.instantiate(self.reward)
+                    self.player.update_artifacts()
                 elif self.reward_type == "gold":
                     self.currency.addCredit(self.reward)
                 elif self.reward_type == "scraps":
