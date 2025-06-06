@@ -90,6 +90,8 @@ class GameWorld:
             "defend": pygame.image.load("Assets/Icons/defend.png").convert_alpha(),
             "skill": pygame.image.load("Assets/Icons/skill.png").convert_alpha(),
         }
+        # bool to check if reward has been given
+        self.reward_given = False
         
 
     # --- Properties ---
@@ -151,6 +153,7 @@ class GameWorld:
                 pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)
                 self.draw_and_update_map(delta_time, events)
                 self.ui_manager.hide_game_buttons()
+                
             case "shop":
                 if self.state_changed_to_shop == "into":
                     self.state_changed_to_shop = "in"
@@ -186,11 +189,13 @@ class GameWorld:
                 for event in events:
                     self.options_settings.handle_event(event)
             case "reward_screen":
-                self.reward_screen.update()
+                for event in events:
+                    self.reward_screen.handle_event(event)
+                self.reward_screen.update(delta_time)
                 self.reward_screen.draw(self.screen)
+
             case _:
                 print(f"Unknown game state: {self._game_state}")
-            
 
         # Update artifacts (if not in menu)
         if self._game_state != "menu":
@@ -246,7 +251,7 @@ class GameWorld:
 
         # Draw cards and enemy/boss
         for gameObject in self._gameObjects:
-            if gameObject.get_component("Card") is not None:
+            if gameObject.get_component("CardDisplay") is not None:
                 gameObject.update(delta_time)
                 gameObject.get_component("CardDisplay").draw_cardtext(self.screen, gameObject)
 
@@ -377,14 +382,8 @@ class GameWorld:
             if card_game_object is None:
                 card_game_object = self._cardFactory.create_component(card)
             else:
-                card_component = card_game_object.get_component("Card")
-                card_component._name = card._name
-                card_component._value = card._value
-                card_component._type = card._type
-                card_component._rarity = card._rarity
-                card_component._description = card._description
-                card_component._prize = card._prize
-                card_component.damage = getattr(card, "damage", 0)
+                card_game_object.get_component("CardDisplay").card_data = card
+                card_game_object.is_destroyed = False
             self.instantiate(card_game_object)
             card_game_object.transform.position = self.player.deck.card_positions[i]
 

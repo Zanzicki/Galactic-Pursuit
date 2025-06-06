@@ -47,8 +47,8 @@ class Enemy(Component, HitEffect):
             print(f"{self._name} has been defeated!")
             self.gameObject.is_destroyed = True #remove enemy from game world
             SoundManager().play_sound("explosion")
-            self._game_world.game_state = "reward_screen"
-            self.reward_screen = RewardScreen(self._game_world)
+            self.game_world._game_state = "reward_screen"
+            self.reward_screen = RewardScreen(self.game_world)
         else:
             print(f"{self._name} is already defeated.")
 
