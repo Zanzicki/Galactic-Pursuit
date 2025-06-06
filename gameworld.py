@@ -5,6 +5,7 @@ import pygame_gui
 from BuilderPattern.playerbuilder import PlayerBuilder
 from Components.player import Player
 from GameState.optionssetting import OptionsSettings
+from GameState.rewardscreen import RewardScreen
 from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
@@ -75,6 +76,7 @@ class GameWorld:
         self.start_game = NewGame(self)
         self.end_game = EndGameScreen(self)
         self.options_settings = OptionsSettings(self.sound_manager, self)
+        self.reward_screen = RewardScreen(self)
         self.turn_order = None
         self.current_enemy = None
 
@@ -176,6 +178,9 @@ class GameWorld:
                 self.options_settings.draw(self.screen)
                 for event in events:
                     self.options_settings.handle_event(event)
+            case "reward_screen":
+                self.reward_screen.update()
+                self.reward_screen.draw(self.screen)
             case _:
                 print(f"Unknown game state: {self._game_state}")
             
