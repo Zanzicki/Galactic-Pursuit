@@ -50,11 +50,11 @@ class RewardScreen:
         screen.blit(title, (400, 50))
 
         screen.blit(self.credit_img, (350, 100))
-        credits_text = self.font.render(f"Credits: 50", True, (255, 255, 255)) # Adjusted to match gained_credits
+        credits_text = self.font.render(f"Credits: 50", True, (255, 255, 255)) # Adjusted to match gained_credits {self.gained_credits}
         screen.blit(credits_text, (400, 100))
 
         screen.blit(self.scrap_img, (350, 150))
-        scraps_text = self.font.render(f"Scraps: 20", True, (255, 255, 255)) # Adjusted to match gained_scraps
+        scraps_text = self.font.render(f"Scraps: 20", True, (255, 255, 255)) # Adjusted to match gained_scraps {self.gained_scraps}
         screen.blit(scraps_text, (400, 150))
 
         # Tegn UI
