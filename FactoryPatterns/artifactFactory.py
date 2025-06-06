@@ -32,14 +32,10 @@ class ArtifactFactory(Factory):
             description = artifact_data['description']
             price = artifact_data['price']
         elif isinstance(artifact_data, tuple):
-            name = artifact_data[1]
-            rarity = artifact_data[2]
-            description = artifact_data[3]
-            price = artifact_data[4]
+            name, rarity, description, price = artifact_data[1:5]
         else:
             raise ValueError("artifact_data must be a dict or tuple")
         go = GameObject(pygame.math.Vector2(50, 50))
         go.add_component(Artifact(name, rarity, description, price))
         go.add_component(SpriteRenderer(f"Assets/Artifacts/{name}.png"))
-        print(f"Artifact {name} created with rarity {rarity} and price {price}")
         return go

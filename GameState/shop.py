@@ -208,7 +208,7 @@ class Shop:
                 price = item['price']
                 icon = self.ui_element.credit_img
             elif item_type == 'repair':
-                price = 15
+                price = 50
                 icon = self.ui_element.scrap_img
             else:
                 continue

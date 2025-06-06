@@ -14,8 +14,8 @@ class NewGame:
         
     def create_new_player(self, name):
         player = Player.get_instance()
-        player._credits = 300
-        player._scraps = 10
+        player._credits = 20
+        player._scraps = 20
         player._health = 100
         player._max_health = 100
         # Insert player and get ID

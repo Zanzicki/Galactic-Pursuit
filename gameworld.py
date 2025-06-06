@@ -4,6 +4,8 @@ import pygame_gui
 
 from BuilderPattern.playerbuilder import PlayerBuilder
 from Components.player import Player
+from GameState.optionssetting import OptionsSettings
+from GameState.rewardscreen import RewardScreen
 from GameState.artifactplanet import ArtifactPlanetState
 from GameState.mysteryplanet import MysteryPlanetState
 from gameobject import GameObject
@@ -22,6 +24,7 @@ from GameState.endgamescreen import EndGameScreen
 from ObjectPool.pool import ReusablePool
 from soundmanager   import SoundManager
 from BuilderPattern.bossbuilder import BossBuilder
+from UI.starbackground import StarBackground
 
 class GameWorld:
     def __init__(self, width, height):
@@ -50,10 +53,16 @@ class GameWorld:
         # --- UI and Managers ---
         self.ui_element = UIElement(self.screen)
         self.card_pool = ReusablePool(10)  # Initialize the object pool
-        SoundManager().play_music()  # Play background music
+        self._fight_initialized = False  # Flag to check if fight has been initialized
+        
+        # initialize UI sound manager
+        self.sound_manager = SoundManager()
+        self.sound_manager.play_music()
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
+
+        
 
         # --- Player Setup ---
         builder = PlayerBuilder()
@@ -70,6 +79,8 @@ class GameWorld:
         self.shop = Shop(self)
         self.start_game = NewGame(self)
         self.end_game = EndGameScreen(self)
+        self.options_settings = OptionsSettings(self.sound_manager, self)
+        self.reward_screen = RewardScreen(self)
         self.turn_order = None
         self.current_enemy = None
         self.artifactplanet = ArtifactPlanetState(self)
@@ -80,7 +91,10 @@ class GameWorld:
             "defend": pygame.image.load("Assets/Icons/defend.png").convert_alpha(),
             "skill": pygame.image.load("Assets/Icons/skill.png").convert_alpha(),
         }
+        # bool to check if reward has been given
+        self.reward_given = False
         
+        self.star_bg = StarBackground(self.screen.get_width(), self.screen.get_height())
 
     # --- Properties ---
     @property
@@ -104,7 +118,7 @@ class GameWorld:
         gameObject.awake(self)
         gameObject.start()
         self._gameObjects.append(gameObject)
-        # print(f"Instantiated GameObject: {gameObject}")
+        print(f"Instantiated GameObject: {gameObject}")
 
     # --- Game Loop ---
     def update(self):
@@ -122,7 +136,9 @@ class GameWorld:
             if pygame.pressed_keys[pygame.K_ESCAPE]:
                 self._running = False
 
-            self.screen.fill("black")
+            self.star_bg.update()
+            self.screen.fill((10, 10, 30))  # dark space background
+            self.star_bg.draw(self.screen)
             self._handle_state(delta_time, events)
             self._cleanup_destroyed_objects()
             self._debug_gameobject_list()
@@ -141,6 +157,7 @@ class GameWorld:
                 pygame.draw.circle(self.screen, (255, 223, 0), (400, 300), 100)
                 self.draw_and_update_map(delta_time, events)
                 self.ui_manager.hide_game_buttons()
+                
             case "shop":
                 if self.state_changed_to_shop == "into":
                     self.state_changed_to_shop = "in"
@@ -171,6 +188,17 @@ class GameWorld:
                 self.ui_manager.show_game_buttons()
                 self.draw_and_update_fight(delta_time, events, boss_fight=True)
                 self.back_to_map(delta_time)
+            case "options":
+                if not self.options_settings.buttons_created:
+                    self.options_settings.enter()
+                self.options_settings.handle_event(events)
+                self.options_settings.draw(self.screen, delta_time)
+            case "reward_screen":
+                for event in events:
+                    self.reward_screen.handle_event(event)
+                self.reward_screen.update(delta_time)
+                self.reward_screen.draw(self.screen)
+
             case _:
                 print(f"Unknown game state: {self._game_state}")
 
@@ -179,6 +207,7 @@ class GameWorld:
             for gameObject in self._gameObjects:
                 if gameObject.get_component("Artifact") is not None:
                     gameObject.update(delta_time)
+                    
             self.ui_manager.hide_menu_buttons()
 
 
@@ -315,7 +344,7 @@ class GameWorld:
 
         print (f"Boss fight initialized: {boss_fight}")
         if boss_fight is True:
-            boss_builder = BossBuilder("Gorkron the Destroyer", 20, 100)
+            boss_builder = BossBuilder("Gorkron the Destroyer", 20, 200)
             boss_builder.build()
             boss_game_object = boss_builder.get_gameObject()
             self.instantiate(boss_game_object)
@@ -358,10 +387,8 @@ class GameWorld:
             if card_game_object is None:
                 card_game_object = self._cardFactory.create_component(card)
             else:
-                # Just update the CardDisplay's reference, do NOT overwrite fields!
                 card_game_object.get_component("CardDisplay").card_data = card
                 card_game_object.is_destroyed = False
-
             self.instantiate(card_game_object)
             card_game_object.transform.position = self.player.deck.card_positions[i]
 
@@ -369,4 +396,3 @@ class GameWorld:
         self.ui_manager.back_to_map_button.show()
         self.ui_manager.update(delta_time)
         self.ui_manager.draw(self.screen)
-

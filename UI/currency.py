@@ -6,7 +6,6 @@ from Database.sqlrepository import SQLRepository
 class Currency:
     def __init__(self):
         self.player = Player.get_instance()
-        self.shop = Shop.get_instance()
         self.repository = SQLRepository()
 
     @staticmethod
@@ -23,20 +22,6 @@ class Currency:
     def addScrap(self, scrap_amount):
         self.player._scraps += scrap_amount
         print(f"Scrap increased to {self.player._scraps}.")
-        self.db.update_player_currency(self.player._id, scrap=self.player._scraps)
-
-    def buyingWithScrap(self):
-        if self.player._scraps - self.shop.item_cost > 0:
-            self.player._scraps -= self.shop.item_cost
-            self.db.update_player_currency(self.player._id, scrap=self.player._scraps)
-        else:
-            print("I cannot afford that.")
-
-    def buyingWithCredits(self):
-        if self.player._credits - self.shop.item_cost > 0:
-            self.player._credits -= self.shop.item_cost
-            self.db.update_player_currency(self.player._id, credits=self.player._credits)
-        else:
-            print("I cannot afford that.")
+        self.repository.update_player_currency(self.player._id, scrap=self.player._scraps)
 
 
