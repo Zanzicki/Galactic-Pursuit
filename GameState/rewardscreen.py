@@ -31,15 +31,18 @@ class RewardScreen:
         self.ui_manager.process_events(event)
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.continue_button:
+            self.gain_reward(self.gained_credits, self.gained_scraps)
             self.game_world._game_state = "map"
             self.game_world.reward_given = False  # Reset reward given status
 
-    def update(self, time_delta):
-        if not self.game_world.reward_given:
-            self.currency.addCredit(self.gained_credits)
-            self.currency.addScrap(self.gained_scraps)
-            self.game_world.reward_given = True
+    def gain_reward(self, credits, scraps):
+        self.currency.addCredit(credits)
+        self.currency.addScrap(scraps)
+        # Log the gained rewards
+        print(f"Gained Credits: {self.gained_credits}, Gained Scraps: {self.gained_scraps}")
 
+
+    def update(self, time_delta):
         self.ui_manager.update(time_delta)
 
     def draw(self, screen):

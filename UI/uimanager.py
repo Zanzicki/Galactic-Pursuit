@@ -122,9 +122,6 @@ class UIManager:
                 self.show_card_list_window(deck_type="deck")
             elif event.ui_element == self.show_discard_button:
                 self.show_card_list_window(deck_type="discard")
-            elif self.game_world._game_state == "options" and self.options_setting:
-                self.options_setting.handle_events(event)
-                self.options_setting.draw(self.screen)
 
         # Handle text entry for new player
         if self.name_entry_line and event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED:
@@ -247,6 +244,7 @@ class UIManager:
     
     def show_options(self):
         print("Showing Options")
+        self.hide_menu_buttons()
         self.options_setting = OptionsSettings(self.sound_manager, self.game_world)
         self.game_world._game_state = "options"
             
