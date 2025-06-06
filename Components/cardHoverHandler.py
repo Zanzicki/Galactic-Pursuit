@@ -100,28 +100,28 @@ class CardHoverHandler(Component):
         if self._hovered:
              pygame.draw.rect(self._game_world.screen, (255, 0, 0), rect, 2)
 
-            card_info = self.gameObject.get_component("CardDisplay").card_data
-            if not card_info:
+        card_info = self.gameObject.get_component("CardDisplay").card_data
+        if not card_info:
                 return
 
 
-            info_text = f"Name: {getattr(card_info, '_name', '???')} - rarity: {getattr(card_info, '_rarity', '???')} - value: {getattr(card_info, '_value', '???')}"
-            description = f"Description: {getattr(card_info, '_description', '???')}"
+        info_text = f"Name: {getattr(card_info, '_name', '???')} - rarity: {getattr(card_info, '_rarity', '???')} - value: {getattr(card_info, '_value', '???')}"
+        description = f"Description: {getattr(card_info, '_description', '???')}"
 
-             text_surface_1 = self.font.render(info_text, True, (255, 255, 255))
-             text_surface_2 = self.font.render(description, True, (200, 200, 200))
+        text_surface_1 = self.font.render(info_text, True, (255, 255, 255))
+        text_surface_2 = self.font.render(description, True, (200, 200, 200))
 
             # Background box for text
-             text_bg_rect = pygame.Rect(mouse_pos[0], mouse_pos[1], max(text_surface_1.get_width(), text_surface_2.get_width()) + 10, 40)
-             pygame.draw.rect(self._game_world.screen, (0, 0, 0), text_bg_rect)
-             pygame.draw.rect(self._game_world.screen, (255, 255, 255), text_bg_rect, 1)
+        text_bg_rect = pygame.Rect(mouse_pos[0], mouse_pos[1], max(text_surface_1.get_width(), text_surface_2.get_width()) + 10, 40)
+        pygame.draw.rect(self._game_world.screen, (0, 0, 0), text_bg_rect)
+        pygame.draw.rect(self._game_world.screen, (255, 255, 255), text_bg_rect, 1)
 
             # Draw text on top of the background box
-             self._game_world.screen.blit(text_surface_1, (mouse_pos[0] + 5, mouse_pos[1] + 2))
-             self._game_world.screen.blit(text_surface_2, (mouse_pos[0] + 5, mouse_pos[1] + 20))
+        self._game_world.screen.blit(text_surface_1, (mouse_pos[0] + 5, mouse_pos[1] + 2))
+        self._game_world.screen.blit(text_surface_2, (mouse_pos[0] + 5, mouse_pos[1] + 20))
 
 
-             if pygame.mouse.get_pressed()[0]:  # Left mouse button
+        if pygame.mouse.get_pressed()[0]:  # Left mouse button
                 if not self.clicked:
                     self.clicked = True
                     print(f"Card clicked!")                 
