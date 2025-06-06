@@ -24,6 +24,7 @@ from GameState.endgamescreen import EndGameScreen
 from ObjectPool.pool import ReusablePool
 from soundmanager   import SoundManager
 from BuilderPattern.bossbuilder import BossBuilder
+from UI.starbackground import StarBackground
 
 class GameWorld:
     def __init__(self, width, height):
@@ -93,6 +94,7 @@ class GameWorld:
         # bool to check if reward has been given
         self.reward_given = False
         
+        self.star_bg = StarBackground(self.screen.get_width(), self.screen.get_height())
 
     # --- Properties ---
     @property
@@ -134,7 +136,9 @@ class GameWorld:
             if pygame.pressed_keys[pygame.K_ESCAPE]:
                 self._running = False
 
-            self.screen.fill("black")
+            self.star_bg.update()
+            self.screen.fill((10, 10, 30))  # dark space background
+            self.star_bg.draw(self.screen)
             self._handle_state(delta_time, events)
             self._cleanup_destroyed_objects()
             self._debug_gameobject_list()
@@ -185,9 +189,10 @@ class GameWorld:
                 self.draw_and_update_fight(delta_time, events, boss_fight=True)
                 self.back_to_map(delta_time)
             case "options":
-                self.options_settings.draw(self.screen)
-                for event in events:
-                    self.options_settings.handle_event(event)
+                if not self.options_settings.buttons_created:
+                    self.options_settings.enter()
+                self.options_settings.handle_event(events)
+                self.options_settings.draw(self.screen, delta_time)
             case "reward_screen":
                 for event in events:
                     self.reward_screen.handle_event(event)
@@ -339,7 +344,7 @@ class GameWorld:
 
         print (f"Boss fight initialized: {boss_fight}")
         if boss_fight is True:
-            boss_builder = BossBuilder("Gorkron the Destroyer", 20, 100)
+            boss_builder = BossBuilder("Gorkron the Destroyer", 20, 200)
             boss_builder.build()
             boss_game_object = boss_builder.get_gameObject()
             self.instantiate(boss_game_object)
@@ -391,8 +396,3 @@ class GameWorld:
         self.ui_manager.back_to_map_button.show()
         self.ui_manager.update(delta_time)
         self.ui_manager.draw(self.screen)
-    
-    
-
-    
-        
