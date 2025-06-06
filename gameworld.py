@@ -6,6 +6,8 @@ from BuilderPattern.playerbuilder import PlayerBuilder
 from Components.player import Player
 from GameState.optionssetting import OptionsSettings
 from GameState.rewardscreen import RewardScreen
+from GameState.artifactplanet import ArtifactPlanetState
+from GameState.mysteryplanet import MysteryPlanetState
 from gameobject import GameObject
 from FactoryPatterns.cardfactory import CardFactory
 from FactoryPatterns.artifactFactory import ArtifactFactory
@@ -79,6 +81,8 @@ class GameWorld:
         self.reward_screen = RewardScreen(self)
         self.turn_order = None
         self.current_enemy = None
+        self.artifactplanet = ArtifactPlanetState(self)
+        self.mysteryplanet = MysteryPlanetState(self)
 
         self.state_icons = {
             "attack": pygame.image.load("Assets/Icons/attack.png").convert_alpha(),
@@ -162,10 +166,12 @@ class GameWorld:
             case "game_over":
                 self._draw_centered_text("Game Over", (255, 0, 0))
             case "artifact":
-                self._draw_centered_text("Artifact", (255, 0, 0))
+                self.artifactplanet.update(delta_time, events)
+                self.artifactplanet.draw()
                 self.back_to_map(delta_time)
             case "mystery":
-                self._draw_centered_text("Mystery", (255, 0, 0))
+                self.mysteryplanet.update(delta_time, events)
+                self.mysteryplanet.draw()
                 self.back_to_map(delta_time)
             case "end_game":
                 self.end_game.update(delta_time, events)

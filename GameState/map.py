@@ -160,6 +160,8 @@ class Map:
                         elif planetcomponent._color == (0, 255, 0):
                             print(f"{planetcomponent._name} (Green): Entering artifact!")
                             self.game_world._game_state = "artifact"
+                            self.game_world.artifactplanet.enter()
                         elif planetcomponent._color == (255, 0, 255):
                             print(f"{planetcomponent._name} (Magenta): Entering mystery!")
                             self.game_world._game_state = "mystery"
+                            self.game_world.mysteryplanet.enter()

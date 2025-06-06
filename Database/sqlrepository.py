@@ -22,6 +22,9 @@ class SQLRepository:
     
     def fetch_all_artifact_names(self):
         return self.db.fetch_all_artifact_names()
+    
+    def fetch_random_artifact(self):
+        return self.db.fetch_random_artifact()
 
     # --- Card methods ---
     def insert_card(self, name, value, type, rarity, description, prize):
@@ -44,6 +47,9 @@ class SQLRepository:
     
     def fetch_all_non_basic_cards(self):
         return self.db.fetch_all_non_basic_cards()
+    
+    def fetch_random_card(self):
+        return self.db.fetch_random_card()
 
     # --- Player methods ---
     def insert_player(self, name, credits, scraps, health, max_health):
