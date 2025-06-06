@@ -3,8 +3,8 @@ from Components.card import Card
 from Components.component import Component
 from Components.player import Player
 from soundmanager import SoundManager
-
-# made by Erik
+from Components.card import Card
+# mad by Erik
 
 class CardHoverHandler(Component):  
     def __init__(self):
@@ -82,10 +82,8 @@ class CardHoverHandler(Component):
 
 
     def update(self, delta_time):
-        #  Local import to avoid circular dependency
-        from gameworld import GameWorld
-
         sprite_renderer = self.gameObject.get_component("SpriteRenderer")
+        card_component = self.gameObject.get_component("Card")
         if not sprite_renderer:
             return
 
@@ -100,7 +98,7 @@ class CardHoverHandler(Component):
         self._hovered = rect.collidepoint(mouse_pos)
 
         if self._hovered:
-            pygame.draw.rect(self._game_world.screen, (255, 0, 0), rect, 2)
+             pygame.draw.rect(self._game_world.screen, (255, 0, 0), rect, 2)
 
             card_info = self.gameObject.get_component("CardDisplay").card_data
             if not card_info:
@@ -110,27 +108,20 @@ class CardHoverHandler(Component):
             info_text = f"Name: {getattr(card_info, '_name', '???')} - rarity: {getattr(card_info, '_rarity', '???')} - value: {getattr(card_info, '_value', '???')}"
             description = f"Description: {getattr(card_info, '_description', '???')}"
 
-            text_surface_1 = self.font.render(info_text, True, (255, 255, 255))
-            text_surface_2 = self.font.render(description, True, (200, 200, 200))
+             text_surface_1 = self.font.render(info_text, True, (255, 255, 255))
+             text_surface_2 = self.font.render(description, True, (200, 200, 200))
 
-             # Center the text in the middle of the screen
-            screen_center = self._game_world.screen.get_rect().center
-            text_x = screen_center[0] - (max(text_surface_1.get_width(), text_surface_2.get_width()) // 2)
-            text_y = screen_center[1] - 100  # slightly above center
+            # Background box for text
+             text_bg_rect = pygame.Rect(mouse_pos[0], mouse_pos[1], max(text_surface_1.get_width(), text_surface_2.get_width()) + 10, 40)
+             pygame.draw.rect(self._game_world.screen, (0, 0, 0), text_bg_rect)
+             pygame.draw.rect(self._game_world.screen, (255, 255, 255), text_bg_rect, 1)
 
-            text_bg_rect = pygame.Rect(
-                text_x - 5,
-                text_y - 5,
-                max(text_surface_1.get_width(), text_surface_2.get_width()) + 10,
-                60
-            )
-            pygame.draw.rect(self._game_world.screen, (0, 0, 0), text_bg_rect)
-            pygame.draw.rect(self._game_world.screen, (255, 255, 255), text_bg_rect, 1)
+            # Draw text on top of the background box
+             self._game_world.screen.blit(text_surface_1, (mouse_pos[0] + 5, mouse_pos[1] + 2))
+             self._game_world.screen.blit(text_surface_2, (mouse_pos[0] + 5, mouse_pos[1] + 20))
 
-            self._game_world.screen.blit(text_surface_1, (text_x, text_y))
-            self._game_world.screen.blit(text_surface_2, (text_x, text_y + 25))
-            
-            if pygame.mouse.get_pressed()[0]:  # Left click
+
+             if pygame.mouse.get_pressed()[0]:  # Left mouse button
                 if not self.clicked:
                     self.clicked = True
                     print(f"Card clicked!")                 
