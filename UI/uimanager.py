@@ -3,6 +3,7 @@ import pygame_gui
 from Components.player import Player
 from GameState.startgame import NewGame
 from Database.database import Database
+from GameState.optionssetting import OptionsSettings
 
 
 class UIManager:
@@ -22,6 +23,11 @@ class UIManager:
 
         self.startgame = NewGame(self.game_world)
         self.startgame.database = Database()  # Attach your database
+
+        # options
+        self.sound_manager = self.game_world.sound_manager
+        self.options_setting = None
+
 
     def create_menu_buttons(self):
         # Create your menu buttons and add them to self.menu_buttons
@@ -116,6 +122,9 @@ class UIManager:
                 self.show_card_list_window(deck_type="deck")
             elif event.ui_element == self.show_discard_button:
                 self.show_card_list_window(deck_type="discard")
+            elif self.game_world._game_state == "options" and self.options_setting:
+                self.options_setting.handle_events(event)
+                self.options_setting.draw(self.screen)
 
         # Handle text entry for new player
         if self.name_entry_line and event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED:
@@ -209,6 +218,10 @@ class UIManager:
 
     def draw(self, screen):
         self.ui_manager.draw_ui(screen)
+        if self.game_world._game_state == "options" and self.options_setting:
+            self.options_setting.draw(self.screen)
+
+
 
     def start_game(self):
         print("Starting Game")
@@ -234,6 +247,10 @@ class UIManager:
     
     def show_options(self):
         print("Showing Options")
+        self.options_setting = OptionsSettings(self.sound_manager, self.game_world)
+        self.game_world._game_state = "options"
+            
+        
 
     def deck_tracker(self):
         print("Showing Deck Tracker")

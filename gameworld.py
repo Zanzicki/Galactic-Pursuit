@@ -4,6 +4,8 @@ import pygame_gui
 
 from BuilderPattern.playerbuilder import PlayerBuilder
 from Components.player import Player
+from GameState.optionssetting import OptionsSettings
+from GameState.rewardscreen import RewardScreen
 from GameState.artifactplanet import ArtifactPlanetState
 from GameState.mysteryplanet import MysteryPlanetState
 from gameobject import GameObject
@@ -50,10 +52,16 @@ class GameWorld:
         # --- UI and Managers ---
         self.ui_element = UIElement(self.screen)
         self.card_pool = ReusablePool(10)  # Initialize the object pool
-        SoundManager().play_music()  # Play background music
+        self._fight_initialized = False  # Flag to check if fight has been initialized
+        
+        # initialize UI sound manager
+        self.sound_manager = SoundManager()
+        self.sound_manager.play_music()
 
         # Initialize UIManager
         self.ui_manager = UIManager(self)
+
+        
 
         # --- Player Setup ---
         builder = PlayerBuilder()
@@ -70,6 +78,8 @@ class GameWorld:
         self.shop = Shop(self)
         self.start_game = NewGame(self)
         self.end_game = EndGameScreen(self)
+        self.options_settings = OptionsSettings(self.sound_manager, self)
+        self.reward_screen = RewardScreen(self)
         self.turn_order = None
         self.current_enemy = None
         self.artifactplanet = ArtifactPlanetState(self)
@@ -104,7 +114,7 @@ class GameWorld:
         gameObject.awake(self)
         gameObject.start()
         self._gameObjects.append(gameObject)
-        # print(f"Instantiated GameObject: {gameObject}")
+        print(f"Instantiated GameObject: {gameObject}")
 
     # --- Game Loop ---
     def update(self):
@@ -171,14 +181,23 @@ class GameWorld:
                 self.ui_manager.show_game_buttons()
                 self.draw_and_update_fight(delta_time, events, boss_fight=True)
                 self.back_to_map(delta_time)
+            case "options":
+                self.options_settings.draw(self.screen)
+                for event in events:
+                    self.options_settings.handle_event(event)
+            case "reward_screen":
+                self.reward_screen.update()
+                self.reward_screen.draw(self.screen)
             case _:
                 print(f"Unknown game state: {self._game_state}")
+            
 
         # Update artifacts (if not in menu)
         if self._game_state != "menu":
             for gameObject in self._gameObjects:
                 if gameObject.get_component("Artifact") is not None:
                     gameObject.update(delta_time)
+                    
             self.ui_manager.hide_menu_buttons()
 
 
@@ -227,7 +246,7 @@ class GameWorld:
 
         # Draw cards and enemy/boss
         for gameObject in self._gameObjects:
-            if gameObject.get_component("CardDisplay") is not None:
+            if gameObject.get_component("Card") is not None:
                 gameObject.update(delta_time)
                 gameObject.get_component("CardDisplay").draw_cardtext(self.screen, gameObject)
 
@@ -358,10 +377,14 @@ class GameWorld:
             if card_game_object is None:
                 card_game_object = self._cardFactory.create_component(card)
             else:
-                # Just update the CardDisplay's reference, do NOT overwrite fields!
-                card_game_object.get_component("CardDisplay").card_data = card
-                card_game_object.is_destroyed = False
-
+                card_component = card_game_object.get_component("Card")
+                card_component._name = card._name
+                card_component._value = card._value
+                card_component._type = card._type
+                card_component._rarity = card._rarity
+                card_component._description = card._description
+                card_component._prize = card._prize
+                card_component.damage = getattr(card, "damage", 0)
             self.instantiate(card_game_object)
             card_game_object.transform.position = self.player.deck.card_positions[i]
 
@@ -369,4 +392,8 @@ class GameWorld:
         self.ui_manager.back_to_map_button.show()
         self.ui_manager.update(delta_time)
         self.ui_manager.draw(self.screen)
+    
+    
 
+    
+        
