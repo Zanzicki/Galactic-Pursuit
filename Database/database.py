@@ -110,6 +110,10 @@ class Database:
     def fetch_all_artifact_names(self):
         self.cursor.execute('SELECT name FROM artifacts')
         return [row[0] for row in self.cursor.fetchall()]
+    
+    def fetch_random_artifact(self):
+        self.cursor.execute('SELECT * FROM artifacts ORDER BY RANDOM() LIMIT 1')
+        return self.cursor.fetchone()
 
     # ---------- Card Methods ----------
     def insert_card(self, name, value, type, rarity, description, price):
@@ -142,6 +146,10 @@ class Database:
     def fetch_all_non_basic_cards(self):
         self.cursor.execute('SELECT * FROM cards WHERE rarity != "Basic"')
         return self.cursor.fetchall()
+    
+    def fetch_random_card(self):
+        self.cursor.execute('SELECT * FROM cards ORDER BY RANDOM() LIMIT 1')
+        return self.cursor.fetchone()
 
     # ---------- Player Methods ----------
     def insert_player(self, name, credits, scraps, health, max_health):
