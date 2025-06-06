@@ -22,6 +22,7 @@ from GameState.endgamescreen import EndGameScreen
 from ObjectPool.pool import ReusablePool
 from soundmanager   import SoundManager
 from BuilderPattern.bossbuilder import BossBuilder
+from UI.starbackground import StarBackground
 
 class GameWorld:
     def __init__(self, width, height):
@@ -81,6 +82,7 @@ class GameWorld:
             "skill": pygame.image.load("Assets/Icons/skill.png").convert_alpha(),
         }
         
+        self.star_bg = StarBackground(self.screen.get_width(), self.screen.get_height())
 
     # --- Properties ---
     @property
@@ -122,7 +124,9 @@ class GameWorld:
             if pygame.pressed_keys[pygame.K_ESCAPE]:
                 self._running = False
 
-            self.screen.fill("black")
+            self.star_bg.update()
+            self.screen.fill((10, 10, 30))  # dark space background
+            self.star_bg.draw(self.screen)
             self._handle_state(delta_time, events)
             self._cleanup_destroyed_objects()
             self._debug_gameobject_list()

@@ -28,6 +28,7 @@ class EndGameScreen:
         
         self.game_world._game_state  = "menu"
         self.game_world.ui_manager.show_menu_buttons()
+        self.game_world.ui_manager.back_to_map_button.hide()
         self.restart_player()        
         SoundManager().fade_in_music("Assets/SoundsFiles/backgroundmusiclooped.mp3", loop=True, fade_time_ms=3000)
 
