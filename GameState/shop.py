@@ -143,14 +143,13 @@ class Shop:
         price = artifact_data['price']
         if self.player._credits >= price:
             self.player._credits -= price
-            # Add artifact to player in memory
-            self.player.artifacts.append(artifact_data)
-            # Save to database
+            # Add artifact to player in memory            # Save to database
             self.repository.insert_player_artifact(self.player._id, artifact_data['id'])
             self.repository.update_player_currency(player_id=self.player._id, credits=self.player._credits)
             artifact_go = self.artifact_factory.create_component(artifact_data)
             self._game_world.instantiate(artifact_go)
-
+            self.player.artifacts.append(artifact_go)
+            self.player.update_artifacts()
 
             print(f"Bought {artifact_data['name']} for {price} credits.")
         else:
