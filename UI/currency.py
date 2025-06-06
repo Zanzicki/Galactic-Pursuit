@@ -6,7 +6,7 @@ from Database.sqlrepository import SQLRepository
 class Currency:
     def __init__(self):
         self.player = Player.get_instance()
-        self.shop = Shop.get_instance()
+        self.shop = Shop._instance
         self.repository = SQLRepository()
 
     @staticmethod

@@ -12,7 +12,10 @@ class RewardScreen:
         self.gained_credits = 50
         self.gained_scraps = 20
 
-        self.countinue_button = Button(500, 400, 200, 50, "Continue", (0, 255, 0), (0, 255, 0), (255, 255, 255), self.font)
+        self.credit_img = pygame.image.load("Assets/Icons/credit.png").convert_alpha()
+        self.scrap_img = pygame.image.load("Assets/Icons/scrap.png").convert_alpha()
+
+        self.continue_button = Button(500, 400, 200, 50, "Continue", (0, 255, 0), (0, 255, 0), (255, 255, 255), self.font)
 
     def handle_event(self, event):
         if self.countinue_button.is_clicked(event):
@@ -29,11 +32,13 @@ class RewardScreen:
 
         title = self.font.render("Rewards", True, (255, 255, 255))
         screen.blit(title, (400, 50))
-
+        
+        screen.blit(self.credit_img, (350, 50))
         credits_text = self.font.render(f"Credits: {self.gained_credits}", True, (255, 255, 255))
         screen.blit(credits_text, (400, 100))
 
+        screen.blit(self.scrap_img, (350, 100))
         scraps_text = self.font.render(f"Scraps: {self.gained_scraps}", True, (255, 255, 255))
         screen.blit(scraps_text, (400, 150))
 
-        self.countinue_button.draw(screen)
+        self.continue_button.draw(screen)

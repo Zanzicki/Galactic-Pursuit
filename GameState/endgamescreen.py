@@ -64,4 +64,5 @@ class EndGameScreen:
         self.game_world.player = builder.player
         Player._instance = self.game_world.player
         self.game_world.instantiate(self.game_world.playerGo)
+        
           
