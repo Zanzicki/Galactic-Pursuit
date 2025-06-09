@@ -8,7 +8,6 @@ class IdleState(State):
 
     def execute(self, boss, player):
         print("Boss is idling.")
-        # Example logic: If boss health < 40%, enrage. If player health < 30%, attack. Otherwise, defend.
         boss_health_pct = boss.health / boss._max_health
         player_health_pct = player.health / player._max_health
 
