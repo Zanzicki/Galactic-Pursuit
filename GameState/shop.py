@@ -64,7 +64,7 @@ class Shop:
         screen_width = 1280
         button_width = 220
         button_height = 60
-        spacing = 60  # space between buttons
+        spacing = 120  # space between buttons
 
         # Center the two card buttons
         total_width = 2 * button_width + spacing
@@ -174,19 +174,40 @@ class Shop:
         self.manager.update(delta_time)
 
     def draw(self):
-        self.screen.blit(self.background, (0, 0))
         self.manager.draw_ui(self.screen)
-        # Draw icons next to buttons
-        for i, (_, card, button) in enumerate(self.buttons):
-            if card and 'price' in card:
-                # Draw credit icon next to card/artifact buttons
-                self.ui_element.screen.blit(self.ui_element.credit_img, (button.relative_rect.x + button.relative_rect.width + 10, button.relative_rect.y + 10))
-            elif _ == 'repair':
-                self.ui_element.screen.blit(self.ui_element.scrap_img, (button.relative_rect.x + button.relative_rect.width + 10, button.relative_rect.y + 10))
         self.ui_element.draw("Intergalactic Trade Sector", (640, 40), self.player._credits, self.player._scraps, self.player._health, self.player._max_health)
-    
-    def draw_shop_prices_and_descriptions(self, screen, font):
-        # Draw descriptions and prices for each button
+
+        # --- Section Titles ---
+        font_title = pygame.font.Font(None, 40)
+        font_desc = pygame.font.Font(None, 24)
+        center_x = self.screen.get_width() // 2
+
+        # Titles above each section
+        card_buttons = [b for b in self.buttons if b[0] == 'card']
+        artifact_buttons = [b for b in self.buttons if b[0] == 'artifact']
+        util_buttons = [b for b in self.buttons if b[0] == 'repair']
+
+        if card_buttons:
+            first = card_buttons[0][2]
+            last = card_buttons[-1][2]
+            title_rect = font_title.render("Cards", True, (255, 255, 0)).get_rect()
+            title_x = (first.relative_rect.x + last.relative_rect.x + last.relative_rect.width) // 2 - title_rect.width // 2
+            self.screen.blit(font_title.render("Cards", True, (255, 255, 0)), (title_x, 150))
+
+        if artifact_buttons:
+            first = artifact_buttons[0][2]
+            last = artifact_buttons[-1][2]
+            title_rect = font_title.render("Artifacts", True, (0, 255, 255)).get_rect()
+            title_x = (first.relative_rect.x + last.relative_rect.x + last.relative_rect.width) // 2 - title_rect.width // 2
+            self.screen.blit(font_title.render("Artifacts", True, (0, 255, 255)), (title_x, 300))
+
+        if util_buttons:
+            util_button = util_buttons[0][2]
+            title_rect = font_title.render("Utilities", True, (255, 128, 0)).get_rect()
+            title_x = util_button.relative_rect.x + util_button.relative_rect.width // 2 - title_rect.width // 2
+            self.screen.blit(font_title.render("Utilities", True, (255, 128, 0)), (title_x, 450))
+
+        # --- Draw Buttons, Descriptions, and Prices ---
         for item_type, item, button in self.buttons:
             bx, by = button.relative_rect.x, button.relative_rect.y
             bw, bh = button.relative_rect.width, button.relative_rect.height
@@ -195,11 +216,11 @@ class Shop:
             if item_type in ('card', 'artifact') and item:
                 desc = item.get('description', '')
                 if desc:
-                    desc_surf = font.render(desc, True, (200, 200, 200))
+                    desc_surf = font_desc.render(desc, True, (200, 200, 200))
                     desc_rect = desc_surf.get_rect(center=(bx + bw // 2, by + bh + 25))
                     self.screen.blit(desc_surf, desc_rect)
 
-            # Draw price icon and number under the button
+            # Draw price icon and number beside the button (vertically centered)
             if item_type == 'card' and item:
                 price = item['price']
                 icon = self.ui_element.credit_img
@@ -212,9 +233,9 @@ class Shop:
             else:
                 continue
 
-            icon_y = by + bh + 45
-            icon_x = bx + bw // 2 - 30
+            icon_y = by + bh // 2 - icon.get_height() // 2
+            icon_x = bx + bw  # Increased space between button and price/icon
             self.screen.blit(icon, (icon_x, icon_y))
-            price_surf = font.render(str(price), True, (255, 255, 255))
-            price_rect = price_surf.get_rect(midleft=(icon_x + icon.get_width() + 8, icon_y + icon.get_height() // 2))
+            price_surf = self.font.render(str(price), True, (255, 255, 255))
+            price_rect = price_surf.get_rect(midleft=(icon_x + icon.get_width() + 16, icon_y + icon.get_height() // 2))  # Also increase space here
             self.screen.blit(price_surf, price_rect)

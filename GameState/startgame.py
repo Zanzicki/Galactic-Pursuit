@@ -22,6 +22,10 @@ class NewGame:
         player._id = self.repository.insert_player(name, player._credits, player._scraps, player._health, player._max_health)
         player.name = name
         print(f"New player created: {name} (ID: {player._id})")
+        if player.deck.decklist == None or player.deck.decklist == []:
+            player.deck.create_starter_deck()
+            print("New deck created for the player.")
+        player.temp_health = 0
 
         self._game_world.map.generate_planets()
         planets = self._game_world.map.planets
